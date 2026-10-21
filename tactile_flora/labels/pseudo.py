@@ -82,7 +82,7 @@ def run_pseudo(
     from tactile_flora.eval.inference import DENSE_MAX_NEW_TOKENS
     from tactile_flora.prompts.flora import build_prompt, to_messages
     from tactile_flora.prompts.parse import dense_regex, parse_dense
-    from tactile_flora.sources.base import get_source
+    from tactile_flora.sources.base import make_adapter
     from tactile_flora.verify import holdout_path, manifest, report, verified_dir
 
     if cfg.eval_only:
@@ -98,7 +98,7 @@ def run_pseudo(
     )
     hp = holdout_path(data_root)
     held = manifest.load_holdout(hp).held_out_ids if hp.exists() else frozenset[str]()
-    adapter = get_source(cfg.name)()
+    adapter = make_adapter(cfg.name, cfg)
     adapter.discover(Path(cfg.root))
     splits = adapter.splits()
     eps: dict[str, Episode] = {}

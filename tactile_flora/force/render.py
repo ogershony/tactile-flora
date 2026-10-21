@@ -1,16 +1,19 @@
 """Rendering normalized features to the force text block, one line per frame.
 
-Owns: render_lines, render_block, token_count, budget_check, TokenBudgetError.
+Owns: render_lines, render_block, token_count, budget_check, load_tokenizer, TokenBudgetError.
 Must never: resample, normalize, or decide the ablation mode.
 
 Format: two decimals, arms in L then R order, an absent arm written ``L none`` / ``R none``.
-NaN values (empty resample windows) render as 0.00 with c=0. A missing gripper renders g=0.00.
-Negative values keep their minus sign; values that round to zero render as 0.00, never -0.00.
+NaN values (empty resample windows) render as 0.00 with c=0. A missing gripper renders g=0.00
+(open; deliberately not distinguished from a present open gripper).
+Negative values keep their minus sign; values that round to zero render as 0.00, never -0.00,
+and the same holds for the frame time ``t``.
 
 Token budget: real runs pass the Qwen tokenizer (any object with ``encode(str)`` returning a
 sequence, e.g. ``tokenizers.Tokenizer`` wrapped, or a transformers tokenizer) to budget_check.
-With none, a conservative estimate of FALLBACK_TOKENS_PER_CHAR tokens per character is used, so no
-tokenizer download is needed in tests.
+With none, an estimate of FALLBACK_TOKENS_PER_CHAR tokens per character is used, so no tokenizer
+download is needed in tests. Real runs set ``render.tokenizer_json`` in configs/force.yaml to the
+Qwen3.5 tokenizer.json path; load_tokenizer(cfg) then returns it for budget_check.
 """
 
 from __future__ import annotations
@@ -22,8 +25,13 @@ from typing import Protocol
 from tactile_flora.config import RenderConfig
 from tactile_flora.schema import Arm, ArmFeatures, ResampledForce
 
-FALLBACK_TOKENS_PER_CHAR = 0.8
-"""Conservative tokens-per-character ratio used when no tokenizer is passed (see token_count)."""
+FALLBACK_TOKENS_PER_CHAR = 0.75
+"""Tokens-per-character ratio used when no tokenizer is passed (see token_count).
+
+Measured with the real tokenizer: 0.70 (40/57, one-arm pad), 0.75 (68/91, two-arm pad), 0.68
+(34/50, one-arm wrist). 0.75 is the maximum, so the fallback never rejects what the real
+tokenizer accepts.
+"""
 
 
 class TokenBudgetError(ValueError):
@@ -42,6 +50,22 @@ def _fmt(x: float | None) -> str:
     v = 0.0 if x is None or math.isnan(x) else x
     s = f"{v:.2f}"
     return "0.00" if s == "-0.00" else s
+
+
+def load_tokenizer(cfg: RenderConfig) -> Tokenizer | None:
+    """Load the ``tokenizers.Tokenizer`` at ``cfg.tokenizer_json``; None when it is unset."""
+    if cfg.tokenizer_json is None:
+        return None
+    from tokenizers import Tokenizer as HfTokenizer
+
+    class _Wrapped:
+        def __init__(self, tok: HfTokenizer) -> None:
+            self._tok = tok
+
+        def encode(self, text: str) -> Sequence[int]:
+            return self._tok.encode(text).ids
+
+    return _Wrapped(HfTokenizer.from_file(cfg.tokenizer_json))
 
 
 def _arm_text(arm: Arm, channel: str, af: ArmFeatures, i: int) -> str:
@@ -72,7 +96,7 @@ def render_lines(features: ResampledForce, frame_times: Sequence[float], channel
                 cells.append(f"{arm} none")
             else:
                 cells.append(_arm_text(arm, channel, af, i))
-        lines.append(f"t={t:.2f} " + " | ".join(cells))
+        lines.append(f"t={_fmt(t)} " + " | ".join(cells))
     return lines
 
 

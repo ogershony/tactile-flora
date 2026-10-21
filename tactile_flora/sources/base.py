@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Protocol, TypeVar, runtime_checkable
+from typing import Any, Protocol, TypeVar, runtime_checkable
 
 from tactile_flora.schema import Episode, Label
 
@@ -71,6 +71,27 @@ def registered_sources() -> list[str]:
     import tactile_flora.sources  # noqa: F401  (populates the registry)
 
     return sorted(_REGISTRY)
+
+
+def make_adapter(name: str, cfg: Any = None) -> SourceAdapter:
+    """Instantiate the adapter registered as ``name``, passing ``cfg`` when its __init__ takes one.
+
+    Real adapters need their SourceConfig (root, split rules); argument-free adapters (tests) do
+    not. Without ``cfg`` the config is read from configs/sources/<name>.yaml when that exists.
+    """
+    import inspect
+
+    cls = get_source(name)
+    if "cfg" not in inspect.signature(cls.__init__).parameters:
+        return cls()
+    if cfg is None:
+        from tactile_flora.config import SourceConfig, load_config
+
+        path = Path("configs/sources") / f"{name}.yaml"
+        if not path.exists():
+            raise FileNotFoundError(f"adapter {name!r} needs a SourceConfig and {path} is missing")
+        cfg = load_config(path, SourceConfig)
+    return cls(cfg)  # type: ignore[call-arg]
 
 
 def get_source(name: str) -> type[SourceAdapter]:

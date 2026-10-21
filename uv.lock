@@ -1306,6 +1306,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pyyaml" },
     { name = "rich" },
+    { name = "tokenizers" },
     { name = "typer" },
     { name = "zarr" },
 ]
@@ -1350,6 +1351,7 @@ requires-dist = [
     { name = "rich" },
     { name = "rospkg", marker = "extra == 'baxter'" },
     { name = "ruff", marker = "extra == 'dev'" },
+    { name = "tokenizers", specifier = ">=0.23.3" },
     { name = "tokenizers", marker = "extra == 'train'" },
     { name = "torch", marker = "extra == 'train'" },
     { name = "transformers", marker = "extra == 'train'" },

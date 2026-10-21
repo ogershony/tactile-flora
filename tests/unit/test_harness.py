@@ -95,7 +95,9 @@ def test_parse_failure_is_counted(env: tuple[Path, Path]) -> None:
     be = StubBackend(text_fn=lambda m, v: "garbage")
     out = run(env, "omitted", be)
     doc = json.loads((out / "metrics.json").read_text())
-    assert doc["parse_failed"] == 12 and doc["metrics"]["mae"] is None
+    assert doc["parse_failed"] == 12
+    # unparsable outcomes are replaced by score 3 and stay in MAE: |3 - 1| = |3 - 5| = 2
+    assert doc["metrics"]["mae"] == pytest.approx(200.0)
 
 
 def test_grid_skips_existing_and_report(env: tuple[Path, Path]) -> None:
@@ -127,7 +129,8 @@ def test_grid_skips_existing_and_report(env: tuple[Path, Path]) -> None:
     assert "## synth" in report and "| force / real |" in report
     assert "shuffle delta (failure_recall)" in report
     real_row = next(ln for ln in report.splitlines() if ln.startswith("| force / real"))
-    assert real_row.rstrip().endswith("+0.000 |")  # stub ignores force, so real == shuffled
+    assert real_row.rstrip().endswith("+0.000 | - |")  # stub ignores force, so real == shuffled
+    assert "omitted_minus_control" in report
 
     f = root / "eval/force/synth/shuffled/metrics.json"
     doc = json.loads(f.read_text())
@@ -185,3 +188,73 @@ def test_make_roboreward_and_eval(tmp_path: Path) -> None:
     truth = df["target"].str.removeprefix("Score: ").astype(int)
     assert doc["metrics"]["mae"] == pytest.approx((truth - 3).abs().mean() * 100)
     assert doc["n_windows"] == 20
+
+
+def test_checkpoint_tag_adapter_and_collision() -> None:
+    assert harness.checkpoint_tag("data/runs/force/adapter") == "force"
+    assert harness.checkpoint_tag("data/runs/control") == "control"
+    assert harness.checkpoint_tag("released") == "released"
+    cfg = E.eval_cfg(Path("x"), Path("y"))
+    grid = GridConfig(
+        checkpoints=["a/force/adapter", "b/force"], modes={"synth": ["omitted"]}, seed=0
+    )
+    with pytest.raises(harness.CheckpointTagCollisionError):
+        harness.expand_grid(grid, cfg)
+
+
+def test_grid_reruns_stale_cells(env: tuple[Path, Path]) -> None:
+    root, mp = env
+    cfg = E.eval_cfg(mp, root)
+    grid = GridConfig(checkpoints=["released"], modes={"synth": ["omitted"]}, seed=0)
+    kw: dict[str, Any] = {"source_cfgs": {"synthetic": E.SOURCE_CFG}}
+
+    def run_g(c: Any, g: GridConfig = grid) -> list[Path]:
+        return harness.run_grid(g, c, FORCE_CFG, root, lambda ck: StubBackend(), **kw)
+
+    assert len(run_g(cfg)) == 1 and run_g(cfg) == []
+    cell = root / "eval/released/synth/omitted"
+    (cell / "metrics.json").unlink()  # predictions exist but the last file does not
+    assert len(run_g(cfg)) == 1
+    assert run_g(cfg) == []
+    assert len(run_g(cfg, grid.model_copy(update={"seed": 9}))) == 1  # config hash changed
+    doc = json.loads((cell / "metrics.json").read_text())
+    doc["manifest_hash"] = "0" * 64
+    (cell / "metrics.json").write_text(json.dumps(doc))
+    assert len(run_g(cfg, grid.model_copy(update={"seed": 9}))) == 1  # manifest hash changed
+
+
+def test_missing_logprobs_not_silently_integer(env: tuple[Path, Path]) -> None:
+    class NoLp(StubBackend):
+        def generate(self, messages: Any, video: VideoSpec, **kw: Any) -> Any:
+            return (
+                super()
+                .generate(messages, video, **kw)
+                .model_copy(update={"score_token_logprobs": None})
+            )
+
+    out = run(env, "omitted", NoLp(outcome_score=5))
+    preds = pd.read_parquet(out / "predictions.parquet")
+    assert preds.loc[preds["prompt_kind"] == "outcome", "expected_score"].isna().all()
+    doc = json.loads((out / "metrics.json").read_text())
+    assert doc["no_logprobs"] == 6 and doc["warnings"]
+
+
+def test_dense_frames_keyed_by_source_and_episode(env: tuple[Path, Path]) -> None:
+    out = run(env, "omitted")
+    doc = json.loads((out / "metrics.json").read_text())
+    assert doc["n_episodes"] == 6
+
+
+def test_provider_called_once(env: tuple[Path, Path]) -> None:
+    root, mp = env
+    inner = harness.make_provider(mp, {"dense", "outcome"}, FORCE_CFG, Path("configs/sources"),
+                                  {"synthetic": E.SOURCE_CFG})  # fmt: skip
+    calls: list[int] = []
+
+    def counting() -> Any:
+        calls.append(1)
+        return inner()
+
+    harness.run_eval("released", "synth", "shuffled", E.eval_cfg(mp, root), FORCE_CFG, root,
+                     StubBackend(), seed=1, provider=counting)  # fmt: skip
+    assert len(calls) == 1

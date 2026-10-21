@@ -12,6 +12,13 @@ span [t_i, t_i + dt). A "held" state starts at each grasp_acquired frame and end
 where g <= grasp_g or the contact flag c is 0 (``held_mask``). Detectors that need a gripper
 signal return no spans when ``g`` is None; off_axis needs ``delta`` (pad channel only). NaN frames
 are unknown and never trigger a detector.
+
+Documented choices: contact_loss keeps quality 2 when ``task_complete`` (a drop that did not end
+the task; the spec only defines 1 for an incomplete task). Slip needs a net F' decrease of more
+than SLIP_MIN_DROP across the run, measured from the frame before the run to its last frame: at
+4 Hz the 0.1 s minimum is a single frame, so a lone noisy dF' sample is not enough and the load
+must really leave the pads (a sensor spike that bounces back is not a slip). Crush needs g to rise
+by more than slip_g_tol between consecutive frames, so quantisation jitter in g is not "closing".
 """
 
 from __future__ import annotations
@@ -25,6 +32,7 @@ from tactile_flora.schema import Arm, ArmFeatures, Label, ResampledForce, Span
 
 _ARM_WORD: dict[Arm, str] = {"L": "left", "R": "right"}
 _EPS = 1e-9
+SLIP_MIN_DROP = 0.5  # normalized F' units the load must fall across a slip run
 
 
 def _dt(features: ResampledForce) -> float:
@@ -139,7 +147,11 @@ def detect_slip(
         mask[i] = bool(dF[i] < cfg.slip_df and steady and held[i - 1])
     need = _frames_at_least(cfg.slip_min_s, dt)
     why = f"the object slips in the {_ARM_WORD[arm]} gripper"
-    return [_span(features, dt, a, b, 2, why) for a, b in _runs(mask) if b - a + 1 >= need]
+    return [
+        _span(features, dt, a, b, 2, why)
+        for a, b in _runs(mask)
+        if b - a + 1 >= need and F[a - 1] - F[b] > SLIP_MIN_DROP
+    ]
 
 
 def detect_contact_loss(
@@ -196,8 +208,8 @@ def detect_crush(
 ) -> list[Span]:
     """Crush: load far above the median grasp while the gripper is still squeezing harder.
 
-    F' above crush_f while g increases frame over frame (the controller keeps closing on a
-    compliant object). Quality 1.
+    F' above crush_f while g increases by more than slip_g_tol frame over frame (the controller
+    keeps closing on a compliant object). Quality 1.
     """
     af = features.arms[arm]
     F, _, g = _cols(af)
@@ -205,7 +217,7 @@ def detect_crush(
         return []
     dt = _dt(features)
     mask = np.zeros(len(F), dtype=bool)
-    mask[1:] = (F[1:] > cfg.crush_f) & (np.diff(g) > 0)
+    mask[1:] = (F[1:] > cfg.crush_f) & (np.diff(g) > cfg.slip_g_tol)
     return [_span(features, dt, a, b, 1, "excessive force on the object") for a, b in _runs(mask)]
 
 

@@ -1,12 +1,21 @@
+import json
 from pathlib import Path
 
 import numpy as np
 
 from tactile_flora.config import RenderConfig
 from tactile_flora.force.normalize import ArmNorm, NormConstants
-from tactile_flora.schema import BenchmarkHashRow, Episode, Label, PadArmForce, Span
+from tactile_flora.schema import (
+    Arm,
+    BenchmarkHashRow,
+    Episode,
+    Label,
+    PadArmForce,
+    Span,
+    WristArmForce,
+)
 from tactile_flora.verify import checks, hashing
-from tests.fixtures.synthetic import make_pad_episode
+from tests.fixtures.synthetic import make_pad_episode, make_wrist_episode
 from tests.fixtures.synthetic_video import SyntheticFrameReader
 from tests.fixtures.verify_ctx import FORCE_CFG, clean_episodes, make_ctx, outcome_window
 
@@ -142,10 +151,14 @@ def test_label_sanity() -> None:
     assert checks.has_bad_label(_labeled(True)) and not checks.has_bad_label(_labeled(False))
     assert checks.observed_label_rate([_labeled(True), _labeled(False)]) == 0.5
     assert checks.observed_label_rate([EP]) is None
-    assert checks.check_label_sanity(EP, make_ctx(EPS, observed_label_rate=0.5)).passed
-    r = checks.check_label_sanity(EP, make_ctx(EPS, observed_label_rate=0.9))
+    n = {"labeled_episode_count": 20}
+    assert checks.check_label_sanity(EP, make_ctx(EPS, observed_label_rate=0.5, **n)).passed
+    r = checks.check_label_sanity(EP, make_ctx(EPS, observed_label_rate=0.9, **n))
     assert not r.passed
-    assert not checks.check_label_sanity(EP, make_ctx(EPS, observed_label_rate=0.1)).passed
+    assert not checks.check_label_sanity(EP, make_ctx(EPS, observed_label_rate=0.1, **n)).passed
+    # below the minimum labeled-episode count the rate is not assessed
+    few = make_ctx(EPS, observed_label_rate=0.9, labeled_episode_count=3)
+    assert checks.check_label_sanity(EP, few).passed
 
 
 def test_spot_check_threshold() -> None:
@@ -230,3 +243,96 @@ def test_license() -> None:
     assert checks.check_license(EP, CTX).passed
     r = checks.check_license(EP.model_copy(update={"license": "CC-BY-NC-4.0"}), CTX)
     assert not r.passed and r.action == "drop_episode"
+
+
+def _with_arm(ep: Episode, arm: Arm, data: object) -> Episode:
+    arms = {**ep.force.arms, arm: data}
+    return ep.model_copy(update={"force": ep.force.model_copy(update={"arms": arms})})
+
+
+def test_saturation_counts_top_rail_only() -> None:
+    data = EP.force.arms["L"]
+    assert isinstance(data, PadArmForce)
+    floored = [max(v, 0.9) for v in data.f_a]  # a long run at the minimum is healthy
+    ok = _with_arm(EP, "L", data.model_copy(update={"f_a": floored}))
+    assert checks.check_sensor_health(ok, CTX).passed
+    top = [min(v, 0.5) for v in data.f_a]
+    bad = _with_arm(EP, "L", data.model_copy(update={"f_a": top}))
+    r = checks.check_sensor_health(bad, CTX)
+    assert not r.passed and "saturated" in r.detail
+
+
+def test_saturation_value_rail() -> None:
+    data = EP.force.arms["L"]
+    assert isinstance(data, PadArmForce)
+    th = CTX.thresholds.model_copy()
+    object.__setattr__(th, "saturation_value", 0.3)
+    ctx = CTX.model_copy(update={"thresholds": th})
+    r = checks.check_sensor_health(EP, ctx)
+    assert not r.passed and "saturated" in r.detail
+
+
+def test_drop_channel_names_arms() -> None:
+    r = checks.check_sensor_health(_flat_pad(EP, "L", "f_a"), CTX)
+    assert r.action == "drop_channel" and r.detail.startswith("arm=L;")
+    both = _flat_pad(_flat_pad(EP, "L", "f_a"), "R", "f_b")
+    r = checks.check_sensor_health(both, CTX)
+    assert r.action == "drop_episode" and r.detail.startswith("arm=L,arm=R;")
+
+
+def _flat_wrist(ep: Episode, arm: Arm, names: tuple[str, ...]) -> Episode:
+    data = ep.force.arms[arm]
+    assert isinstance(data, WristArmForce)
+    return _with_arm(
+        ep, arm, data.model_copy(update={n: [0.0] * len(getattr(data, n)) for n in names})
+    )
+
+
+def test_wrist_health() -> None:
+    wr = make_wrist_episode(0, arms=("L", "R"))
+    ctx = make_ctx(EPS)
+    assert checks.check_sensor_health(wr, ctx).passed  # fy and torques are flat in the fixture
+    one = _flat_wrist(wr, "L", ("fx", "fy", "fz"))
+    r = checks.check_sensor_health(one, ctx)
+    assert r.action == "drop_channel" and r.detail.startswith("arm=L;")
+    both = _flat_wrist(one, "R", ("fx", "fy", "fz"))
+    assert checks.check_sensor_health(both, ctx).action == "drop_episode"
+
+
+def test_normalization_records_json_stats_unclipped() -> None:
+    r = checks.check_normalization(EP, CTX)
+    doc = json.loads(r.detail)
+    assert set(doc) == {"grasp", "free", "p99", "problems"} and len(doc["p99"]) == 2
+    assert abs(doc["free"][0]) < 0.1
+
+
+def test_baxter_onset_lag_rule() -> None:
+    # the fixture's force onset trails gripper closure (g >= 0.5) by 175 ms
+    ctx = make_ctx(EPS, source="baxter")
+    r = checks.check_sync(EP, ctx)
+    assert not r.passed and r.action == "drop_episode" and "onset" in r.detail
+    assert checks.check_sync(EP, CTX).passed  # other sources: xcorr rule only
+    early = EP.model_copy(
+        update={"force": EP.force.model_copy(update={"t": [x - 0.1 for x in EP.force.t]})}
+    )
+    r = checks.check_sync(early, ctx)
+    assert r.passed and "onset L=+75ms" in r.detail
+
+
+def test_spot_mp4_written(tmp_path: Path) -> None:
+    items = [(e, outcome_window(e, CTX.norm)) for e in EPS]
+    idx = checks.write_spot_strips("synthetic", items, SyntheticFrameReader(), tmp_path, n=2)
+    doc = json.loads(idx.read_text())
+    assert len(doc["videos"]) == 2 and all((tmp_path / v).stat().st_size > 0 for v in doc["videos"])
+
+
+def test_prompt_diff_uses_tokenizer_json(tmp_path: Path) -> None:
+    from tokenizers import Tokenizer, models
+
+    path = tmp_path / "tok.json"
+    Tokenizer(models.WordLevel({"[UNK]": 0}, unk_token="[UNK]")).save(str(path))
+    cfg = RenderConfig(
+        **{**FORCE_CFG.render.model_dump(), "max_tokens": 10, "tokenizer_json": str(path)}
+    )
+    r = checks.check_prompt_diff(EP, make_ctx(EPS, render_cfg=cfg))
+    assert r.passed and r.value == 1.0

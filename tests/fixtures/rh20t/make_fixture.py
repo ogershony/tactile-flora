@@ -38,5 +38,35 @@ def main() -> None:
     )
 
 
+def write_long(root: Path, rating: int = 7) -> None:
+    """A 16 s single-episode port (10 Hz, ``rating``) under ``root`` for the end-to-end test."""
+    cfg = root / "rh20t_cfg3"
+    shutil.rmtree(root, ignore_errors=True)
+    n = 160
+    t = np.arange(n) / 10.0
+    plateau = np.interp(t, [0, 2, 4, 10, 12, 16], [0, 0, 10, 10, 0, 0]).astype(np.float32)
+    rng = np.random.default_rng(1)
+    ft = np.zeros((n, 6), dtype=np.float32)
+    ft[:, 2] = plateau + rng.normal(0, 0.05, n).astype(np.float32)
+    ft[:, 0] = plateau * 0.3 + rng.normal(0, 0.05, n).astype(np.float32)
+    grip = (100 * np.interp(t, [0, 3, 4, 10, 11, 16], [0, 0, 1, 1, 0, 0])).astype(np.float32)
+    write_lerobot_v3(
+        cfg,
+        fps=10,
+        columns={
+            "observation.robot_ft": ft,
+            "observation.state.gripper": grip.reshape(-1, 1),
+            "meta.rating": np.full((n, 1), rating, dtype=np.int64),
+        },
+        episode_meta={"tasks": ["put the cup on the plate"]},
+        video_keys=["observation.images.cam_f0001", "observation.images.cam_f0002"],
+        stats={"observation.state.gripper": {"max": [110.0]}},
+        n_frames=n,
+    )
+    (cfg / "meta" / "rh20t_episodes.json").write_text(
+        json.dumps([{"episode_index": 0, "folder": "task_0001_user_0001_scene_0006_cfg_0003"}])
+    )
+
+
 if __name__ == "__main__":
     main()

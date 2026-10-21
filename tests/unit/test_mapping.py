@@ -1,6 +1,10 @@
 import pytest
 
-from tactile_flora.labels.mapping import map_native_labels, rh20t_outcome
+from tactile_flora.labels.mapping import (
+    map_native_labels,
+    phantom_success_p99,
+    rh20t_outcome,
+)
 from tactile_flora.schema import ArmFeatures, Episode, ResampledForce
 from tests.fixtures.synthetic import make_pad_episode
 
@@ -22,6 +26,30 @@ def test_rh20t_rating_rule(rating: int, moved: bool, expected: int) -> None:
 def test_rh20t_rating_out_of_range() -> None:
     with pytest.raises(ValueError):
         rh20t_outcome(10, False)
+
+
+def test_rh20t_unrated_gives_no_label() -> None:
+    assert rh20t_outcome(-1, False) is None
+    assert map_native_labels("rh20t", ep("rh20t", rating=-1)) == []
+
+
+def test_eval_only_sources_are_noops() -> None:
+    for name in ("baxter", "hrdexdb", "softvtbench"):
+        assert map_native_labels(name, ep(name, success=False)) == []
+
+
+def test_phantom_p99_only_for_failure_demos_and_computed_per_object() -> None:
+    good = ep("phantom", success=True, object="cup")
+    bad = ep("phantom", success=False, object="cup")
+    f = _features([0.5, 1.0, 1.5, 2.6, 2.8, 1.0])
+    p99 = phantom_success_p99([(good, _features([0.0, 1.0, 2.0] * 10)), (bad, f)])
+    assert set(p99) == {"cup"} and 1.9 < p99["cup"] <= 2.0
+    # a successful demo never gets the failure span, even above the p99
+    assert [
+        x.kind for x in map_native_labels("phantom", good, features=f, phantom_p99=p99["cup"])
+    ] == ["outcome"]
+    kinds = [x.kind for x in map_native_labels("phantom", bad, features=f, phantom_p99=p99["cup"])]
+    assert kinds == ["outcome", "dense"]
 
 
 def test_rh20t_mapping() -> None:
@@ -62,8 +90,11 @@ def test_phantom_dense_failure_span() -> None:
 
 
 def test_reassemble() -> None:
-    anomalies = [{"t0": 1.0, "t1": 2.0, "text": "gripper misses the peg"}]
-    e = ep("reassemble", action_success=[True, False, True], anomalies=anomalies)
+    segs = [
+        {"t0": 0.0, "t1": 1.0, "text": "reach", "success": True},
+        {"t0": 1.0, "t1": 2.0, "text": "gripper misses the peg", "success": False},
+    ]
+    e = ep("reassemble", action_success=[True, False, True], segments=segs)
     out, dense = map_native_labels("reassemble", e)
     assert out.outcome == 1
     assert (dense.kind, dense.origin) == ("dense", "source")

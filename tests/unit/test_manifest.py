@@ -78,10 +78,59 @@ def test_caps_and_seed_are_byte_identical(tmp_path: Path) -> None:
     a, b = tmp_path / "a.parquet", tmp_path / "b.parquet"
     rows = _build(a, capped)
     _build(b, capped)
-    assert len(rows) == 3 and a.read_bytes() == b.read_bytes()
+    # caps thin train only: 3 train rows + the val and the test row
+    assert sorted(r.split for r in rows) == ["test", "train", "train", "train", "val"]
+    assert a.read_bytes() == b.read_bytes()
     assert mf.manifest_hash(a) == mf.manifest_hash(b)
     other = _build(tmp_path / "c.parquet", capped.model_copy(update={"seed": 8}))
-    assert len(other) == 3 and {r.window_id for r in other} != {r.window_id for r in rows}
+    assert {r.window_id for r in other} != {r.window_id for r in rows}
+
+
+def test_caps_never_thin_eval_and_frozen_train_stays(tmp_path: Path) -> None:
+    capped = CFG.model_copy(update={"max_episodes": 1, "max_windows": 1})
+    rows = _build(tmp_path / "a.parquet", capped)
+    assert [r.split for r in rows].count("val") == 1 and [r.split for r in rows].count("test") == 1
+    assert [r.split for r in rows].count("train") == 1
+    doc = HoldoutFile(
+        git_hash="g",
+        manifests={},
+        splits={"synthetic/pad-0": "train", "synthetic/pad-1": "train", "synthetic/pad-4": "val"},
+    )
+    rows = _build(tmp_path / "b.parquet", capped, holdout=doc)
+    train = {r.episode_id for r in rows if r.split == "train"}
+    assert {"pad-0", "pad-1"} <= train  # frozen train episodes survive both caps
+
+
+def test_per_kind_caps_are_train_only(tmp_path: Path) -> None:
+    cfg = CFG.model_copy(update={"max_dense_windows": 1, "max_outcome_windows": 2})
+    rows = _build(tmp_path / "a.parquet", cfg)
+    train = [r for r in rows if r.split == "train"]
+    assert len(train) == 2 and {r.prompt_kind for r in train} == {"outcome"}
+    assert len(rows) == 2 + 2  # val and test untouched
+
+
+def test_eval_only_source_refuses_train_rows(tmp_path: Path) -> None:
+    with pytest.raises(mf.EvalOnlyTrainError):
+        _build(tmp_path / "a.parquet", CFG.model_copy(update={"eval_only": True}))
+    ok = {"val": [f"s{i}" for i in range(4)] + ["s4"], "test": ["s5"]}
+    assert _build(tmp_path / "b.parquet", CFG.model_copy(update={"eval_only": True}), splits=ok)
+
+
+def test_shift_s_and_drop_channel(tmp_path: Path) -> None:
+    res = {e: dict(r) for e, r in RESULTS.items()}
+    res["pad-0"]["sync"] = CheckResult(passed=True, value=0.25, action="shift")
+    res["pad-1"]["sensor_health"] = CheckResult(passed=False, action="drop_channel", detail="arm=L")
+    rows = _build(tmp_path / "a.parquet", results=res)
+    by = {r.episode_id: r for r in rows}
+    assert by["pad-0"].shift_s == -0.25 and by["pad-2"].shift_s == 0.0
+    assert "pad-1" in by  # only arm L is dropped; windowing removes it, the episode stays
+    res["pad-2"]["sensor_health"] = CheckResult(passed=False, action="drop_channel", detail="")
+    assert "pad-2" not in {r.episode_id for r in _build(tmp_path / "b.parquet", results=res)}
+    assert mf.dropped_arms(res["pad-1"], ["L", "R"]) == {"L"}
+    r = CheckResult(passed=False, action="drop_channel", detail="R: f_a, f_b; L: f_a")
+    assert mf.dropped_arms({"x": r}, ["L", "R"]) == {"L", "R"}
+    r2 = CheckResult(passed=False, action="drop_channel", detail="")
+    assert mf.dropped_arms({"x": r2}, ["L", "R"]) == {"L", "R"}
 
 
 def test_freeze_then_rebuild_refuses_split_change(tmp_path: Path) -> None:

@@ -23,7 +23,7 @@ n_tokens (packing-free; batch size 1 per GPU, gradient accumulation in sft.py).
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Collection, Sequence
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -33,7 +33,6 @@ from pydantic import BaseModel, ConfigDict
 from tactile_flora.config import ForceConfig, ForceMode
 from tactile_flora.eval.ablations import apply_force_mode
 from tactile_flora.force import normalize, render
-from tactile_flora.force.resample import resample
 from tactile_flora.prompts.flora import VideoSpec, build_prompt, prompt_diff, to_messages
 from tactile_flora.schema import Episode, ManifestRow, ResampledForce, Window
 from tactile_flora.verify import manifest as manifest_mod
@@ -125,9 +124,19 @@ def build_samples(
     windows_source: WindowsSource | None = None,
     seed: int = 0,
     splits: Sequence[str] = ("train",),
+    eval_only_sources: Collection[str] | None = None,
 ) -> list[Sample]:
-    """Build tokenized samples for every manifest row in ``splits``, sorted by n_tokens."""
+    """Build tokenized samples for every manifest row in ``splits``, sorted by n_tokens.
+
+    Raises EvalOnlyTrainError if a row of an eval_only source is in a train split. The eval_only
+    sources are ``eval_only_sources`` or, by default, every configs/sources/*.yaml with
+    ``eval_only: true`` plus labels.mapping.EVAL_ONLY_SOURCES.
+    """
     rows = [r for r in manifest_mod.read_manifest(manifest_path) if r.split in splits]
+    banned = set(eval_only_sources) if eval_only_sources is not None else _eval_only_sources()
+    bad = sorted({r.source for r in rows if r.split == "train" and r.source in banned})
+    if bad:
+        raise manifest_mod.EvalOnlyTrainError(f"eval_only sources in the train split: {bad}")
     source = windows_source or adapter_windows_source(data_root, force_cfg)
     items: list[tuple[ManifestRow, WindowItem]] = []
     for row in rows:
@@ -191,17 +200,41 @@ def estimate_wallclock(samples: Sequence[Sample], s_per_window: float) -> float:
     return len(samples) * s_per_window
 
 
+def _eval_only_sources(sources_dir: Path = Path("configs/sources")) -> set[str]:
+    """Names of eval_only sources: the source configs that say so plus the known eval sources."""
+    from tactile_flora.config import SourceConfig, load_config
+    from tactile_flora.labels.mapping import EVAL_ONLY_SOURCES
+
+    out = set(EVAL_ONLY_SOURCES)
+    for p in sorted(sources_dir.glob("*.yaml")) if sources_dir.is_dir() else []:
+        try:
+            cfg = load_config(p, SourceConfig)
+        except Exception:  # noqa: BLE001  (not a source config, e.g. baxter.yaml)
+            continue
+        if cfg.eval_only:
+            out.add(cfg.name)
+    return out
+
+
 def adapter_windows_source(data_root: Path, force_cfg: ForceConfig) -> WindowsSource:
     """Default ``windows_source``: rebuild windows with the manifest's source adapter.
 
     Reads data_root/verified/<source>/norm.json; resolves rows by ``window_id``. Episodes are
     cached one at a time per source (rows are sorted by episode in the manifest).
     """
-    from tactile_flora.sources.base import get_source
-    from tactile_flora.verify.windowing import episode_windows
+    from tactile_flora.sources.base import make_adapter
+    from tactile_flora.verify import report
+    from tactile_flora.verify.windowing import (
+        SourceInputs,
+        build_source_inputs,
+        episode_windows,
+        prepare_episode,
+        resample_shifted,
+    )
 
     adapters: dict[str, Any] = {}
     consts: dict[str, normalize.NormConstants] = {}
+    inputs: dict[str, SourceInputs] = {}
     cache: dict[tuple[str, str], dict[str, WindowItem]] = {}
 
     def source(row: ManifestRow) -> WindowItem | None:
@@ -209,17 +242,30 @@ def adapter_windows_source(data_root: Path, force_cfg: ForceConfig) -> WindowsSo
         if key not in cache:
             cache.clear()
             if row.source not in adapters:
-                adapters[row.source] = get_source(row.source)()
-                consts[row.source] = normalize.load(
-                    data_root / "verified" / row.source / "norm.json"
+                vdir = data_root / "verified" / row.source
+                adapters[row.source] = make_adapter(row.source)
+                consts[row.source] = normalize.load(vdir / "norm.json")
+                results = report.read_checks(vdir) if (vdir / "checks.parquet").exists() else {}
+                inputs[row.source] = build_source_inputs(
+                    adapters[row.source],
+                    force_cfg,
+                    consts[row.source],
+                    vdir,
+                    sorted(results),
+                    results,
                 )
             ep = adapters[row.source].load(row.episode_id)
             c = consts[row.source]
+            inp = inputs[row.source]
+            prepared = prepare_episode(ep, inp)
             cam = ep.cameras.get("scene")
             out: dict[str, WindowItem] = {}
-            for w in episode_windows(ep, force_cfg, c, row.split):
+            for w in episode_windows(ep, force_cfg, c, row.split, inputs=inp):
+                assert prepared is not None
                 feats = normalize.apply(
-                    resample(ep.force, ep.gripper, list(w.frame_times), force_cfg.resample),
+                    resample_shifted(
+                        prepared, w.frame_times, force_cfg.resample, inp.shift_of(ep.episode_id)
+                    ),
                     c,
                     force_cfg.render,
                 )

@@ -58,6 +58,7 @@ def make_windows(
                     force_lines=tuple(lines.get(anchor, ())),
                     target=to_flora_dense_target(spans, anchor, episode.duration_s),
                     split=split,
+                    label_origin=dense_label_origin(dense, anchor),
                 )
             )
     outcome = next((lab for lab in merged if lab.kind == "outcome" and lab.outcome), None)
@@ -75,9 +76,36 @@ def make_windows(
                 force_lines=tuple(outcome_force_lines),
                 target=to_flora_outcome_target(outcome, with_rationale=True),
                 split=split,
+                label_origin=outcome.origin,
             )
         )
     return out
+
+
+_ORIGIN_ORDER = ("human", "source", "programmatic", "pseudo")
+
+
+def dense_label_origin(dense: Sequence[Label], anchor: float) -> str:
+    """Origin that produced a dense window's target.
+
+    The origin with the most non-normal span time inside [anchor - 2, anchor + 14) (ties: higher
+    precedence); with no non-normal span there, the top origin of the dense labels present.
+    """
+    lo, hi = anchor - WINDOW_PRE_S, anchor + 16.0 - WINDOW_PRE_S
+    time: dict[str, float] = {}
+    for lab in dense:
+        for s in lab.spans:
+            if s.quality == 3:
+                continue
+            ov = min(s.t1, hi) - max(s.t0, lo)
+            if ov > 0:
+                time[s.origin or lab.origin] = time.get(s.origin or lab.origin, 0.0) + ov
+    if time:
+        return min(
+            time, key=lambda o: (-time[o], _ORIGIN_ORDER.index(o) if o in _ORIGIN_ORDER else 9)
+        )
+    present = {lab.origin for lab in dense}
+    return next((o for o in _ORIGIN_ORDER if o in present), "none")
 
 
 def dense_anchors(t_last: float) -> list[float]:

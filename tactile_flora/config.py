@@ -30,6 +30,9 @@ class SourceConfig(_Strict):
     license_allowed: list[str]
     max_windows: int = Field(ge=0)
     max_episodes: int = Field(ge=0)
+    # per-prompt-kind train caps; None falls back to max_windows (0 = no cap)
+    max_dense_windows: int | None = Field(default=None, ge=0)
+    max_outcome_windows: int | None = Field(default=None, ge=0)
     eval_only: bool
     expected_label_rate: float = Field(ge=0, le=1)
     split_rules: dict[str, Any] = Field(default_factory=dict)
@@ -53,6 +56,7 @@ class RenderConfig(_Strict):
     decimals: int
     max_tokens: int
     clip_max: float
+    tokenizer_json: str | None = None
 
 
 class EventsConfig(_Strict):

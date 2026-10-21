@@ -1,9 +1,12 @@
+from pathlib import Path
+
 import pytest
 
 from tactile_flora.config import ForceConfig, load_config
 from tactile_flora.force.render import (
     TokenBudgetError,
     budget_check,
+    load_tokenizer,
     render_block,
     render_lines,
     token_count,
@@ -64,3 +67,42 @@ def test_budget() -> None:
             return list(range(len(text.split())))
 
     assert budget_check(block, CFG.render.max_tokens, Fake()) == len(block.split())
+
+
+def _one_arm_line() -> str:
+    f = ResampledForce(
+        channel="pad",
+        frame_times=[23.75],
+        arms={"L": ArmFeatures(F=[0.62], delta=[-0.08], dF=[0.41], g=[0.31], c=[1])},
+    )
+    return render_lines(f, [23.75], "pad")[0]
+
+
+def test_fallback_accepts_64_one_arm_pad_lines() -> None:
+    block = render_block([_one_arm_line()] * 64, CFG.render)
+    assert CFG.render.max_tokens == 3000
+    assert budget_check(block, CFG.render.max_tokens) < 3000
+
+
+def test_tokenizer_json_loader_and_use(tmp_path: Path) -> None:
+    from tokenizers import Tokenizer, models
+
+    assert load_tokenizer(CFG.render) is None
+    path = tmp_path / "tok.json"
+    Tokenizer(models.WordLevel({"[UNK]": 0}, unk_token="[UNK]")).save(str(path))
+    cfg = CFG.render.model_copy(update={"tokenizer_json": str(path)})
+    tok = load_tokenizer(cfg)
+    assert tok is not None
+    block = render_block([_one_arm_line()] * 64, CFG.render)
+    assert budget_check(block, 5, tok) == 1  # whole text is one unknown word
+    with pytest.raises(TokenBudgetError):
+        budget_check(block, 5)
+
+
+def test_time_never_negative_zero() -> None:
+    f = ResampledForce(
+        channel="wrist",
+        frame_times=[-0.001],
+        arms={"L": ArmFeatures(F=[0.1], dF=[0.0], g=None, c=[0])},
+    )
+    assert render_lines(f, [-0.001], "wrist")[0].startswith("t=0.00 ")

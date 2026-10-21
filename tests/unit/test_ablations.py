@@ -1,7 +1,7 @@
 import pytest
 
 from tactile_flora.config import ForceConfig, load_config
-from tactile_flora.eval.ablations import apply_force_mode
+from tactile_flora.eval.ablations import PoolEntry, apply_force_mode
 from tactile_flora.force import normalize
 from tactile_flora.force.render import render_lines
 from tactile_flora.force.resample import resample
@@ -53,3 +53,34 @@ def test_shuffled_needs_donor() -> None:
     f = _pool()[0]
     with pytest.raises(ValueError):
         apply_force_mode(f, "shuffled", pool=[f], seed=0)
+
+
+def _entries(sources: list[str], episodes: list[str], kinds: list[str]) -> list[PoolEntry]:
+    feats = _pool()
+    return [
+        PoolEntry(features=feats[i % 3], source=s, episode_id=e, prompt_kind=k)
+        for i, (s, e, k) in enumerate(zip(sources, episodes, kinds, strict=True))
+    ]
+
+
+def test_shuffled_donor_same_source_other_episode_same_kind() -> None:
+    pool = _entries(
+        ["a", "a", "a", "b", "a"],
+        ["e0", "e0", "e1", "e2", "e3"],
+        ["dense", "dense", "outcome", "dense", "dense"],
+    )
+    me = pool[0]
+    donors = {
+        id(apply_force_mode(me.features, "shuffled", pool=pool, seed=s, identity=me).features)
+        for s in range(30)
+    }
+    assert donors  # only entry 4 qualifies: same source+kind, different episode
+    for s in range(30):
+        got = apply_force_mode(me.features, "shuffled", pool=pool, seed=s, identity=me).features
+        assert got is not None and got.arms == pool[4].features.arms
+    lone = [pool[0], pool[1], pool[2], pool[3]]  # e0 twice, e1 other kind, e2 other source
+    with pytest.raises(ValueError, match="different episode of the same source"):
+        apply_force_mode(me.features, "shuffled", pool=lone, seed=0, identity=me)
+    bare = [p.features for p in pool]
+    with pytest.raises(ValueError):  # bare features carry no identity, so none qualifies
+        apply_force_mode(me.features, "shuffled", pool=bare, seed=0, identity=me)

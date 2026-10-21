@@ -188,6 +188,8 @@ class Window(BaseModel):
     force_lines: tuple[str, ...]
     target: str
     split: Split
+    # origin that produced the target ("human"/"source"/"programmatic"/"pseudo"; "none" = unknown)
+    label_origin: str = "none"
 
     @model_validator(mode="after")
     def _frame_count(self) -> Window:
@@ -215,6 +217,8 @@ class ManifestRow(BaseModel):
     label_origin: str
     license: str
     report_version: str
+    # clock correction added to the force timestamps (force sampled at t - shift_s); 0 = none
+    shift_s: float = 0.0
 
 
 class CheckResult(BaseModel):
@@ -260,6 +264,7 @@ class VerifyThresholds(BaseModel):
     rate_tol_frac: float = 0.2  # median force dt vs declared rate
     noise_floor: float = 1e-4  # minimum channel standard deviation (raw units)
     saturation_frac: float = 0.01
+    saturation_value: float | None = None  # pad ADC top rail in raw units, if known
     baseline_sigma: float = 2.0
     baseline_window_s: float = 0.5
     sync_grid_s: float = 0.025
@@ -270,6 +275,7 @@ class VerifyThresholds(BaseModel):
     norm_free_tol: float = 0.15  # median free space F'
     norm_p99_max: float = 3.0
     label_rate_factor: float = 2.0
+    label_rate_min_n: int = 10  # label_sanity is skipped below this many labeled episodes
     spot_n: int = 20
     spot_min_pass: int = 17
     overlap_max_distance: int = 6
@@ -301,6 +307,7 @@ class VerifyContext(BaseModel):
     hash_cache: Any = None
     expected_label_rate: float | None = None
     observed_label_rate: float | None = None
+    labeled_episode_count: int = 0
     spot_n: int = 0
     spot_reviewer_pass: int | None = None
     windows: dict[str, list[Window]] = Field(default_factory=lambda: dict[str, list[Window]]())

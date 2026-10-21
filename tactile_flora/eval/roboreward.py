@@ -122,7 +122,7 @@ def make_roboreward(
     schema = pa.schema(
         [
             (f, pa.list_(pa.string()) if f == "frame_hashes" else
-             pa.float64() if f == "anchor_s" else pa.string())
+             pa.float64() if f in ("anchor_s", "shift_s") else pa.string())
             for f in ManifestRow.model_fields
         ]
     )  # fmt: skip

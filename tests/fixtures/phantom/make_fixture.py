@@ -68,5 +68,57 @@ def main() -> None:
     (HERE / "manifests" / "all.jsonl").write_text(json.dumps(row) + "\n")
 
 
+def _long_profile(t: np.ndarray, peak: float) -> np.ndarray:
+    """Free space for 2 s, ramp up, hold ``peak`` between 4 s and 10 s, release by 12 s."""
+    return np.interp(t, [0, 2, 4, 10, 12, 16], [0, 0, peak, peak, 0, 0])
+
+
+def write_long(root: Path) -> None:
+    """Two 16 s episodes (a failure demo and a success demo of the same object) under ``root``.
+
+    Used by the end-to-end verify and manifest test: long enough for normalization, sensor health
+    and dense windows. The failure demo squeezes a little harder (peak 7 vs 6).
+    """
+    shutil.rmtree(root, ignore_errors=True)
+    rows = []
+    rng = np.random.default_rng(0)
+    for task, ep_name, peak, failure in (
+        ("egg_fail", "ep_egg_fail_20260801_000", 7.0, True),
+        ("egg", "ep_egg_20260801_001", 6.0, False),
+    ):
+        ep = root / "tasks" / task / ep_name
+        ep.mkdir(parents=True)
+        n = 240
+        scene_ts = T0 + np.arange(n) / 15.0
+        g = zarr.open_group(str(ep / "camera_scene_color"), mode="w", zarr_format=2)
+        frames = np.empty(n, dtype=object)
+        for i in range(n):
+            frames[i] = _jpeg(i)
+        arr = g.create_array("data", shape=(n,), dtype=VariableLengthBytes(), chunks=(n,))
+        arr[:] = frames
+        g.create_array("ts", data=scene_ts)
+        ft = T0 + np.arange(800) / 50.0
+        for name, k in (("tactile_left_wrench", 1.0), ("tactile_right_wrench", 0.8)):
+            w = np.zeros((800, 6))
+            w[:, 2] = -(_long_profile(ft - T0, peak * k) + rng.normal(0, 0.05, 800))
+            _group(ep, name, w, ft)
+        gt = T0 + np.arange(1520) / 95.0
+        grip = np.zeros((1520, 2))
+        grip[:, 0] = np.interp(gt - T0, [0, 3, 4, 10, 11, 16], [0, 0, 1, 1, 0, 0])
+        _group(ep, "gripper", grip, gt)
+        meta = {"task": task, "text": "Pick up the egg", "operator": "op1", "success": not failure}
+        (ep / "meta.json").write_text(json.dumps(meta))
+        rows.append(
+            {
+                "episode": ep_name, "task": task, "success": not failure,
+                "failure_demo": failure, "tactile_contact": True, "split": "train",
+                "session": "20260801", "operator": "op1", "duration_s": 16.0,
+                "peak_force_N": peak, "max_contact_mm2": 55.0, "path": f"tasks/{task}/{ep_name}",
+            }
+        )  # fmt: skip
+    (root / "manifests").mkdir()
+    (root / "manifests" / "all.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+
+
 if __name__ == "__main__":
     main()

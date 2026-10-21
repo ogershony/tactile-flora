@@ -15,11 +15,25 @@ that instead. Output layout::
     <data_root>/eval/<checkpoint tag>/<benchmark>/<mode>/{predictions.parquet, metrics.json,
                                                             config.json, log.jsonl}
 
-where the tag is the last component of the checkpoint path ("released" stays as is).
+where the tag is the last component of the checkpoint path, except that a path ending in
+``adapter`` uses the run directory name (``data/runs/force/adapter`` -> ``force``) so that every
+run's ``adapter`` directory does not collide ("released" stays as is). Two different checkpoints
+that map to one tag are rejected (``CheckpointTagCollisionError``, checked when the grid is
+expanded).
 Stitching of dense windows to 1 Hz uses labels/windows.py for predictions and truth alike, and
-truth is the window target string. An unparsable outcome answer counts in ``parse_failed`` and
-is dropped from MAE / accuracy / AUROC (the dense replacement is all-normal, as in the paper).
-Binary outcome labels for accuracy / AUROC: truth score >= 4 is success.
+truth is the window target string. Dense predictions, truth and objects are keyed by
+``source/episode_id``, never the bare episode id. An unparsable outcome answer counts in
+``parse_failed`` and is replaced by score 3 (``metrics.OUTCOME_PARSE_FAIL_SCORE``, the middle of
+the scale; the dense replacement is all-normal, as in the paper), so it stays in MAE, accuracy
+and AUROC (with E[s] = 3). Binary outcome labels and the predicted-success cut share one
+constant, ``metrics.SUCCESS_THRESHOLD`` (>= 4.0). When a backend returns no score-token logprobs
+``expected_score`` is NaN (never silently the integer score), ``no_logprobs`` counts them in
+metrics.json, and accuracy / AUROC / mae_vs_dsr then use the integer score with a
+``warnings`` entry.
+Each episode is loaded and windowed once per run (the provider output is cached in memory,
+keyed by ``source/episode_id``). A grid cell counts as done only when its ``metrics.json`` (the
+last file written) exists and records the current manifest hash, windows-cache hash and config
+hash; otherwise the cell is rerun and the reason logged.
 """
 
 from __future__ import annotations
@@ -44,7 +58,7 @@ from tactile_flora.config import (
 )
 from tactile_flora.eval import cache as wcache
 from tactile_flora.eval import metrics as M
-from tactile_flora.eval.ablations import apply_force_mode
+from tactile_flora.eval.ablations import PoolEntry, apply_force_mode
 from tactile_flora.eval.inference import (
     DENSE_MAX_NEW_TOKENS,
     RATIONALE_MAX_NEW_TOKENS,
@@ -66,19 +80,22 @@ from tactile_flora.prompts.parse import (
     parse_outcome,
 )
 from tactile_flora.schema import Episode, ManifestRow, ResampledForce, Window
-from tactile_flora.sources.base import get_source
+from tactile_flora.sources.base import make_adapter
 from tactile_flora.verify import full_git_hash, manifest
 from tactile_flora.video.readers import SourceRootReader as SourceRootReader
 
 log = logging.getLogger(__name__)
 
 OMITTED_ONLY = frozenset({"roboreward_500"})  # no force exists for these benchmarks
-SUCCESS_SCORE = 4  # truth outcome score >= this is a binary success
 DEFAULT_SOURCES_DIR = Path("configs/sources")
 
 
 class ManifestMismatchError(RuntimeError):
     """Raised when a report would compare predictions built from different manifests."""
+
+
+class CheckpointTagCollisionError(ValueError):
+    """Raised when two different checkpoints of a grid map to the same directory tag."""
 
 
 class EpisodeBatch(NamedTuple):
@@ -87,14 +104,22 @@ class EpisodeBatch(NamedTuple):
     episode: Episode
     windows: list[Window]
     window_ids: list[str]
+    shift_s: float = 0.0  # force clock correction from the manifest rows (0.0 when absent)
 
 
 Provider = Callable[[], Iterator[EpisodeBatch]]
 
 
 def checkpoint_tag(checkpoint: str) -> str:
-    """Directory name for a checkpoint: the last path component ("released" is unchanged)."""
-    return Path(checkpoint).name or checkpoint
+    """Directory name for a checkpoint.
+
+    The last path component, except that a path ending in ``adapter`` uses its run directory
+    name (``data/runs/force/adapter`` -> ``force``). "released" is unchanged.
+    """
+    p = Path(checkpoint)
+    if p.name == "adapter" and p.parent.name:
+        return p.parent.name
+    return p.name or checkpoint
 
 
 def cell_dir(data_root: Path, checkpoint: str, benchmark: str, mode: str) -> Path:
@@ -138,7 +163,7 @@ def adapter_provider(
         adapters: dict[str, Any] = {}
         for (src, eid), rs in sorted(by_ep.items()):
             if src not in adapters:
-                a = get_source(src)()
+                a = make_adapter(src, source_cfgs[src])
                 a.discover(Path(source_cfgs[src].root))
                 adapters[src] = a
             ep: Episode = adapters[src].load(eid)
@@ -150,7 +175,8 @@ def adapter_provider(
             if missing:
                 raise RuntimeError(f"{src}/{eid}: manifest windows not reproducible: {missing[:3]}")
             ids = [r.window_id for r in rs]
-            yield EpisodeBatch(ep, [wins[i] for i in ids], ids)
+            shift = float(getattr(rs[0], "shift_s", 0.0) or 0.0)
+            yield EpisodeBatch(ep, [wins[i] for i in ids], ids, shift)
 
     return _iter
 
@@ -191,10 +217,26 @@ def make_provider(
 
 
 def window_features(
-    ep: Episode, w: Window, consts: normalize.NormConstants, force_cfg: ForceConfig
+    ep: Episode,
+    w: Window,
+    consts: normalize.NormConstants,
+    force_cfg: ForceConfig,
+    shift_s: float = 0.0,
 ) -> ResampledForce:
-    """Resample and normalize the episode force at the window's frame times."""
-    feats = resample(ep.force, ep.gripper, w.frame_times, force_cfg.resample)
+    """Resample and normalize the episode force at the window's frame times.
+
+    A non-zero ``shift_s`` (ManifestRow.shift_s) is applied through
+    ``verify.windowing.resample_shifted`` when that function exists.
+    """
+    from tactile_flora.verify import windowing
+
+    shifted = getattr(windowing, "resample_shifted", None)
+    if shift_s and shifted is not None:
+        feats = shifted(ep, w.frame_times, force_cfg.resample, shift_s)
+    else:
+        if shift_s:
+            log.warning("manifest shift_s=%s ignored: resample_shifted is unavailable", shift_s)
+        feats = resample(ep.force, ep.gripper, w.frame_times, force_cfg.resample)
     return normalize.apply(feats, consts, force_cfg.render)
 
 
@@ -215,6 +257,7 @@ def _read_consts(data_root: Path, sources: set[str]) -> dict[str, normalize.Norm
 
 
 def _stitched(per_ep: dict[str, list[tuple[float, list[int]]]]) -> pd.DataFrame:
+    """1 Hz frame keyed by ``source/episode_id`` (the dict keys)."""
     recs = [
         {"episode_id": e, "t": t, "quality": q}
         for e, wins in per_ep.items()
@@ -223,12 +266,91 @@ def _stitched(per_ep: dict[str, list[tuple[float, list[int]]]]) -> pd.DataFrame:
     return pd.DataFrame(recs, columns=["episode_id", "t", "quality"])
 
 
+def _has_over_compression(ep: Episode) -> bool:
+    """Return whether the episode carries source over-compression event spans."""
+    return any(
+        lb.origin == "source" and sp.rationale == M.OVERCOMPRESS_RATIONALE
+        for lb in ep.labels
+        if lb.kind != "outcome"
+        for sp in lb.spans
+    )
+
+
+def _dsr(ep: Episode, success: bool) -> float:
+    """DSR: 1 if success and peak_fem_kabsch_max_pct <= tolerance, else 0; NaN if unknown."""
+    peak, tol = ep.meta.get("peak_fem_kabsch_max_pct"), ep.meta.get("dsr_tolerance_pct")
+    if peak is None or tol is None:
+        return math.nan
+    return float(success and float(peak) <= float(tol))
+
+
+def _load_batches(prov: Provider) -> dict[str, EpisodeBatch]:
+    """Run the provider once; episodes keyed by ``source/episode_id`` (duplicates merge)."""
+    out: dict[str, EpisodeBatch] = {}
+    for b in prov():
+        key = f"{b.episode.source}/{b.episode.episode_id}"
+        if key in out:
+            o = out[key]
+            out[key] = EpisodeBatch(
+                o.episode, o.windows + b.windows, o.window_ids + b.window_ids, o.shift_s
+            )
+        else:
+            out[key] = b
+    return out
+
+
 def _metric_block(
     names: list[str],
     dense: tuple[pd.DataFrame, pd.DataFrame] | None,
     outcome: tuple[pd.DataFrame, pd.DataFrame] | None,
 ) -> dict[str, float | None]:
     return {k: _clean(v) for k, v in M.compute_metrics(names, dense, outcome).items()}
+
+
+def _cell_config(
+    checkpoint: str,
+    benchmark: str,
+    force_mode: str,
+    seed: int,
+    eval_cfg: EvalConfig,
+    force_cfg: ForceConfig,
+) -> dict[str, Any]:
+    return {
+        "checkpoint": checkpoint,
+        "benchmark": benchmark,
+        "force_mode": force_mode,
+        "seed": seed,
+        "eval": eval_cfg.model_dump(mode="json"),
+        "force": force_cfg.model_dump(mode="json"),
+    }
+
+
+def _config_hash(config: Mapping[str, Any]) -> str:
+    """Hash of the cell config without the backend name (unknown before a backend exists)."""
+    return _sha({k: v for k, v in config.items() if k != "backend"})
+
+
+def stale_reason(
+    cell: Path,
+    mpath: Path,
+    config: Mapping[str, Any],
+) -> str | None:
+    """Why ``cell`` must be rerun, or None when its metrics.json matches the current inputs."""
+    f = cell / "metrics.json"
+    if not f.exists():
+        return "metrics.json missing"
+    try:
+        doc = json.loads(f.read_text("utf-8"))
+    except (OSError, ValueError):
+        return "metrics.json unreadable"
+    sidecar = wcache.cache_path(mpath)
+    cur_manifest = manifest.manifest_hash(mpath) if mpath.exists() else "none"
+    cur_cache = manifest.manifest_hash(sidecar) if sidecar.exists() else None
+    if doc.get("manifest_hash") != cur_manifest or doc.get("windows_cache_hash") != cur_cache:
+        return "manifest hash changed"
+    if doc.get("config_hash") != _config_hash(config):
+        return "config hash changed"
+    return None
 
 
 def run_eval(
@@ -255,23 +377,31 @@ def run_eval(
     mpath = _manifest_path(spec.manifest, data_root)
     out = cell_dir(data_root, checkpoint, benchmark, force_mode)
     out.mkdir(parents=True, exist_ok=True)
+    (out / "metrics.json").unlink(missing_ok=True)  # last file written: absent while running
     prov = provider or make_provider(mpath, set(spec.prompts), force_cfg, sources_dir, source_cfgs)
+    batches = _load_batches(prov)  # every episode is loaded and windowed exactly once
 
     need_force = force_mode != "omitted"
     consts: dict[str, normalize.NormConstants] = {}
     if need_force:
-        consts = _read_consts(data_root, {b.episode.source for b in prov()})
-    pool: list[tuple[str, ResampledForce]] = []
-    if force_mode == "shuffled":
-        for b in prov():
-            c = consts[b.episode.source]
-            pool.extend(
-                (
-                    f"{b.episode.source}/{b.episode.episode_id}",
-                    window_features(b.episode, w, c, force_cfg),
+        consts = _read_consts(data_root, {b.episode.source for b in batches.values()})
+    feat_of: dict[str, ResampledForce] = {}
+    pool: list[PoolEntry] = []
+    if need_force:
+        for b in batches.values():
+            for wid, w in zip(b.window_ids, b.windows, strict=True):
+                feat_of[wid] = window_features(
+                    b.episode, w, consts[b.episode.source], force_cfg, b.shift_s
                 )
-                for w in b.windows
-            )
+                if force_mode == "shuffled":
+                    pool.append(
+                        PoolEntry(
+                            features=feat_of[wid],
+                            source=b.episode.source,
+                            episode_id=b.episode.episode_id,
+                            prompt_kind=w.prompt_kind,
+                        )
+                    )
 
     recs: list[dict[str, Any]] = []
     dense_pred: dict[str, list[tuple[float, list[int]]]] = {}
@@ -279,21 +409,28 @@ def run_eval(
     out_pred: list[dict[str, Any]] = []
     out_truth: list[dict[str, Any]] = []
     obj_of: dict[str, str] = {}
+    over_comp: dict[str, bool] = {}
+    no_logprobs = 0
     k = 0
     with open(out / "log.jsonl", "w", encoding="utf-8") as logf:
-        for b in prov():
+        for ekey, b in batches.items():
             ep = b.episode
-            ekey = f"{ep.source}/{ep.episode_id}"
             cam = ep.cameras.get("scene") or next(iter(ep.cameras.values()))
             obj = str(ep.meta.get("object", ""))
-            obj_of[ep.episode_id] = obj
+            obj_of[ekey] = obj
+            over_comp[ekey] = _has_over_compression(ep)
             for wid, w in zip(b.window_ids, b.windows, strict=True):
                 block: str | None = None
                 blank = False
                 if need_force:
-                    feats = window_features(ep, w, consts[ep.source], force_cfg)
+                    ident = PoolEntry(
+                        features=feat_of[wid],
+                        source=ep.source,
+                        episode_id=ep.episode_id,
+                        prompt_kind=w.prompt_kind,
+                    )
                     abl = apply_force_mode(
-                        feats, force_mode, pool=[f for key, f in pool if key != ekey], seed=seed + k
+                        feat_of[wid], force_mode, pool=pool, seed=seed + k, identity=ident
                     )
                     blank = abl.video_blank
                     if abl.features is not None:
@@ -332,27 +469,30 @@ def run_eval(
                 es = math.nan
                 score = math.nan
                 if isinstance(parsed, ParsedDense):
-                    dense_pred.setdefault(ep.episode_id, []).append((w.anchor_s, parsed.digits))
+                    dense_pred.setdefault(ekey, []).append((w.anchor_s, parsed.digits))
                     truth = parse_dense(w.target)
-                    dense_truth.setdefault(ep.episode_id, []).append((w.anchor_s, truth.digits))
+                    dense_truth.setdefault(ekey, []).append((w.anchor_s, truth.digits))
                 else:
                     t_out = parse_outcome(w.target)
                     if parsed.score is not None:
                         score = float(parsed.score)
-                        es = (
-                            expected_score(res.score_token_logprobs)
-                            if res.score_token_logprobs
-                            else score
-                        )
-                    out_pred.append(
-                        {"episode_id": ep.episode_id, "score": score, "expected_score": es}
-                    )
+                        if res.score_token_logprobs:
+                            es = expected_score(res.score_token_logprobs)
+                        else:
+                            no_logprobs += 1  # NaN, never silently the integer score
+                    else:
+                        # unparsable: counted in parse_failed AND replaced by the middle score
+                        score = float(M.OUTCOME_PARSE_FAIL_SCORE)
+                        es = score
+                    out_pred.append({"episode_id": ekey, "score": score, "expected_score": es})
                     t_score = float(t_out.score) if t_out.score is not None else math.nan
+                    success = bool(t_score >= M.SUCCESS_THRESHOLD)
                     out_truth.append(
                         {
-                            "episode_id": ep.episode_id,
+                            "episode_id": ekey,
                             "score": t_score,
-                            "label": int(t_score >= SUCCESS_SCORE),
+                            "label": int(success),
+                            "dsr": _dsr(ep, success),
                             "object": obj,
                         }
                     )
@@ -395,8 +535,17 @@ def run_eval(
     if dense_pred:
         d_pred, d_truth = _stitched(dense_pred), _stitched(dense_truth)
         d_truth["object"] = d_truth["episode_id"].map(obj_of)
+        d_truth["over_compression"] = d_truth["episode_id"].map(over_comp).astype(bool)
         d_pair = (d_pred, d_truth)
     o_pair = (pd.DataFrame(out_pred), pd.DataFrame(out_truth)) if out_pred else None
+    warnings: list[str] = []
+    if o_pair is not None and no_logprobs:
+        warnings.append(
+            f"{no_logprobs} outcome answers had no score-token logprobs: expected_score is NaN "
+            "in predictions; accuracy, AUROC and mae_vs_dsr use the integer score instead"
+        )
+        log.warning(warnings[-1])
+        o_pair = (o_pair[0].assign(expected_score=o_pair[0]["score"]), o_pair[1])
     block_metrics = _metric_block(spec.metrics, d_pair, o_pair)
     per_obj: dict[str, dict[str, float | None]] = {}
     for name in spec.metrics:
@@ -405,15 +554,8 @@ def run_eval(
             continue
         for o, v in M.per_object(M.METRICS[name], pair[0], pair[1], keys).items():
             per_obj.setdefault(o, {})[name] = _clean(v)
-    config = {
-        "checkpoint": checkpoint,
-        "benchmark": benchmark,
-        "force_mode": force_mode,
-        "seed": seed,
-        "backend": backend.name,
-        "eval": eval_cfg.model_dump(mode="json"),
-        "force": force_cfg.model_dump(mode="json"),
-    }
+    config = _cell_config(checkpoint, benchmark, force_mode, seed, eval_cfg, force_cfg)
+    config["backend"] = backend.name
     (out / "config.json").write_text(json.dumps(config, indent=2, sort_keys=True), "utf-8")
     sidecar = wcache.cache_path(mpath)
     doc: dict[str, Any] = {
@@ -429,7 +571,9 @@ def run_eval(
         "manifest_hash": manifest.manifest_hash(mpath) if mpath.exists() else "none",
         "windows_cache_hash": manifest.manifest_hash(sidecar) if sidecar.exists() else None,
         "git_hash": full_git_hash(),
-        "config_hash": _sha(config),
+        "config_hash": _config_hash(config),
+        "no_logprobs": no_logprobs,
+        "warnings": warnings,
         "seed": seed,
     }
     (out / "metrics.json").write_text(json.dumps(doc, indent=2, sort_keys=True), "utf-8")
@@ -439,6 +583,13 @@ def run_eval(
 def expand_grid(grid_cfg: GridConfig, eval_cfg: EvalConfig) -> list[tuple[str, str, ForceMode]]:
     """Expand checkpoints x benchmarks x modes, honoring checkpoint_modes and omitted-only."""
     cells: list[tuple[str, str, ForceMode]] = []
+    seen: dict[str, str] = {}
+    for ckpt in grid_cfg.checkpoints:
+        tag = checkpoint_tag(ckpt)
+        if seen.setdefault(tag, ckpt) != ckpt:
+            raise CheckpointTagCollisionError(
+                f"checkpoints {seen[tag]!r} and {ckpt!r} both map to directory tag {tag!r}"
+            )
     for ckpt in grid_cfg.checkpoints:
         cap = grid_cfg.checkpoint_modes.get(ckpt)
         for bench in eval_cfg.benchmarks:
@@ -460,14 +611,23 @@ def run_grid(
     source_cfgs: Mapping[str, SourceConfig] | None = None,
     provider: Provider | None = None,
 ) -> list[Path]:
-    """Run every grid cell whose predictions.parquet does not exist; return the cells run."""
+    """Run every grid cell without a current metrics.json; return the cells run.
+
+    A cell is skipped only if its metrics.json (written last) exists with the current manifest,
+    windows-cache and config hashes; otherwise it is rerun and the reason logged.
+    """
     done: list[Path] = []
     backends: dict[str, Backend] = {}
     for ckpt, bench, mode in expand_grid(grid_cfg, eval_cfg):
         d = cell_dir(data_root, ckpt, bench, mode)
-        if (d / "predictions.parquet").exists():
-            log.info("skip existing cell %s", d)
+        mpath = _manifest_path(eval_cfg.benchmarks[bench].manifest, data_root)
+        cfg_now = _cell_config(ckpt, bench, mode, grid_cfg.seed, eval_cfg, force_cfg)
+        why = stale_reason(d, mpath, cfg_now)
+        if why is None:
+            log.info("skip up-to-date cell %s", d)
             continue
+        if (d / "predictions.parquet").exists() or (d / "metrics.json").exists():
+            log.warning("rerun cell %s: %s", d, why)
         if ckpt not in backends:
             backends[ckpt] = backend_factory(ckpt)
         done.append(
@@ -503,8 +663,11 @@ def write_report(eval_cfg: EvalConfig, data_root: Path, out: Path | None = None)
     """Render one markdown table per benchmark from the metrics.json files under data/eval.
 
     Rows are conditions (checkpoint / mode), columns the benchmark's metrics plus parse_failed
-    and a shuffle-delta column (real minus shuffled on the headline metric: failure_recall when
-    present). Baxter also gets a per-object table. Raises ManifestMismatchError if the cells
+    a shuffle-delta column (real minus shuffled on the headline metric: failure_recall when
+    present) and an ``omitted_minus_control`` column, filled on the omitted row of each force
+    checkpoint (any checkpoint other than released / control) as its omitted headline metric
+    minus the control's omitted one (the spec's "must match the control within noise" check).
+    Baxter also gets a per-object table. Raises ManifestMismatchError if the cells
     of one benchmark were built from different manifests.
     """
     root = data_root / "eval"
@@ -528,13 +691,20 @@ def write_report(eval_cfg: EvalConfig, data_root: Path, out: Path | None = None)
             key=lambda d: (checkpoint_tag(d["checkpoint"]), MODE_ORDER.index(d["force_mode"]))
         )
         by = {(checkpoint_tag(d["checkpoint"]), d["force_mode"]): d for d in docs}
-        lines += [f"## {bench}", "", f"manifest hash: `{docs[0]['manifest_hash'][:12]}`", ""]
+        lines += [
+            f"## {bench}",
+            "",
+            f"manifest hash: `{docs[0]['manifest_hash'][:12]}` (headline metric: {head})",
+            "",
+        ]
         lines.append(
             "| condition | "
-            + " | ".join([*names, "parse_failed", f"shuffle delta ({head})"])
+            + " | ".join(
+                [*names, "parse_failed", f"shuffle delta ({head})", "omitted_minus_control"]
+            )
             + " |"
         )
-        lines.append("|" + "---|" * (len(names) + 3))
+        lines.append("|" + "---|" * (len(names) + 4))
         for d in docs:
             tag = checkpoint_tag(d["checkpoint"])
             delta = "-"
@@ -542,10 +712,15 @@ def write_report(eval_cfg: EvalConfig, data_root: Path, out: Path | None = None)
                 r, s = d["metrics"].get(head), by[(tag, "shuffled")]["metrics"].get(head)
                 if r is not None and s is not None:
                     delta = f"{r - s:+.3f}"
+            omit = "-"
+            if d["force_mode"] == "omitted" and tag not in ("released", "control"):
+                o, c = d["metrics"].get(head), by.get(("control", "omitted"), {}).get("metrics", {})
+                if o is not None and c.get(head) is not None:
+                    omit = f"{o - c[head]:+.3f}"
             cols = [_fmt(d["metrics"].get(n)) for n in names]
             lines.append(
                 f"| {tag} / {d['force_mode']} | "
-                + " | ".join([*cols, str(d["parse_failed"]), delta])
+                + " | ".join([*cols, str(d["parse_failed"]), delta, omit])
                 + " |"
             )
         objects = sorted({o for d in docs for o in d.get("per_object", {})})

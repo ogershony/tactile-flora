@@ -41,3 +41,32 @@ def test_empty_window_is_nan() -> None:
     )
     r = resample(s, None, [0.0, 5.0], CFG.resample)
     assert r.arms["L"].F[0] == 1.0 and np.isnan(r.arms["L"].F[1])
+
+
+def test_groups_cover_every_frame_once() -> None:
+    ep = make_pad_episode(0, n_frames=64)
+    times = [i * 0.25 for i in range(64)]
+    L = resample(ep.force, ep.gripper, times, CFG.resample).arms["L"]
+    assert len(L.raw_groups) == 32
+    t_raw = ep.force.t_array
+    hw = CFG.resample.half_window_s
+    for k, grp in enumerate(L.raw_groups):
+        lo, hi = times[2 * k] - hw, times[2 * k + 1] + hw
+        assert len(grp) == int(((t_raw >= lo) & (t_raw <= hi)).sum())
+    odd = resample(ep.force, ep.gripper, times[:63], CFG.resample).arms["L"]
+    assert len(odd.raw_groups) == 32 and len(odd.raw_groups[-1]) < len(odd.raw_groups[0])
+
+
+def test_first_frame_df_uses_raw_at_previous_period() -> None:
+    t = [i * 0.01 for i in range(300)]
+    a = [1.0 if x < 1.3 else 2.0 for x in t]
+    s = ForceStream(
+        channel="pad", arms={"L": PadArmForce(f_a=a, f_b=[0.0] * 300)}, rate_hz=100, t=t
+    )
+    r = resample(s, None, [1.5], CFG.resample).arms["L"]
+    assert r.dF[0] == 4.0  # (2.0 - 1.0) / 0.25, with no earlier frame in the list
+    r = resample(s, None, [0.1, 2.0], CFG.resample).arms["L"]
+    assert r.dF[0] == 0.0  # nothing at t - 0.25
+    # spacing 0.5 still divides by the 0.25 spec constant
+    r = resample(s, None, [1.0, 1.5], CFG.resample).arms["L"]
+    assert r.dF[1] == (r.F[1] - 1.0) / 0.25

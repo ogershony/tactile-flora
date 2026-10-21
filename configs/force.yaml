@@ -8,9 +8,12 @@ render:
   header: "Force (normalized: 0 free space, 1 median grasp, max 3):"
   decimals: 2
   # Spec asked for 1,500, but with the Qwen3 tokenizer the exact spec line format costs
-  # 40 tokens per one-arm pad line and 68 per two-arm line (64 lines: 2,560 / 4,352).
-  # 2,800 covers every single-arm window; two-arm windows need a format decision (see README).
-  max_tokens: 2800
+  # 40 tokens per one-arm pad line, 34 per one-arm wrist line and 68 per two-arm pad line.
+  # 3000 admits every single-arm window: 64 one-arm pad lines = 2,560 real / ~2,740 with the
+  # 0.75 tokens/char fallback. Two-arm windows (4,352) are rejected; see docs/deviations.md.
+  max_tokens: 3000
+  # Real runs set this to the Qwen3.5 tokenizer.json path so budget checks use the real count.
+  tokenizer_json: null
   clip_max: 3.0
 events:
   grasp_g: 0.6

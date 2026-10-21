@@ -3,10 +3,16 @@
 Owns: one pure mapper per source, following the label-mapping table of the spec, and the
 dispatcher ``map_native_labels``. Raw native values are read from ``episode.meta``:
 
-- phantom: ``success`` (bool), ``task_folder`` (str, ``*_fail`` means failure), ``object`` (str)
-  and optionally ``peak_force_p99`` (float, the object's success-set 99th percentile of F').
-- rh20t: ``rating`` (int 0-9) and ``object_moved_toward_goal`` (bool, default False).
-- reassemble: ``action_success`` (list[bool]) and ``anomalies`` (list of {t0, t1, text}).
+- phantom: ``success`` (bool), ``task_folder`` (str, ``*_fail`` means failure), ``failure_demo``
+  (bool, optional), ``object`` (str) and optionally ``peak_force_p99`` (float). The per-object
+  success-set 99th percentile of F' is COMPUTED by ``phantom_success_p99`` (called once per source
+  by the verify pipeline) and passed in as ``phantom_p99``.
+- rh20t: ``rating`` (int -1..9; -1 means unrated and gives no label) and
+  ``object_moved_toward_goal`` (bool). The latter cannot be derived from the recorded data: it is
+  an OPERATOR-PROVIDED annotation in meta and defaults to False, so a rating of 1 maps to 2 unless
+  an operator marks the object as moved toward the goal.
+- reassemble: ``action_success`` (list[bool]) and ``segments`` (list of {t0, t1, text, success});
+  dense failure spans come from the failed segments (there are no anomaly annotations).
 - airoa: ``success`` (bool), ``failure_cause`` (str | None) and ``failed_segments`` (list of
   {t0, t1, cause}).
 - sharpadex: nothing (labels come from pseudo-labeling and programmatic events).
@@ -18,20 +24,36 @@ Must never: read raw datasets or run on Baxter data (its labels are human).
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from typing import Any
+
+import numpy as np
 
 from tactile_flora.schema import Episode, Label, ResampledForce, Span
 
+# Registered sources that are evaluation-only: their labels are their own (human or native) and
+# never get mapped, programmatic or pseudo labels added.
+EVAL_ONLY_SOURCES: frozenset[str] = frozenset({"baxter", "hrdexdb", "softvtbench"})
 
-def rh20t_outcome(rating: int, moved_toward_goal: bool) -> int:
-    """RH20T rating to outcome: 0 -> 1; 1 -> 2 (3 if the object moved toward the goal); 2-9 -> 5."""
+
+# Training sources with a mapper in ``map_native_labels``.
+MAPPED_SOURCES: frozenset[str] = frozenset({"phantom", "rh20t", "reassemble", "airoa", "sharpadex"})
+
+
+def rh20t_outcome(rating: int, moved_toward_goal: bool) -> int | None:
+    """RH20T rating to outcome: 0 -> 1; 1 -> 2 (3 if the object moved toward the goal); 2-9 -> 5.
+
+    -1 is "unrated" and gives None (no label).
+    """
+    if rating == -1:
+        return None
     if rating == 0:
         return 1
     if rating == 1:
         return 3 if moved_toward_goal else 2
     if 2 <= rating <= 9:
         return 5
-    raise ValueError(f"RH20T rating must be in 0..9, got {rating}")
+    raise ValueError(f"RH20T rating must be in -1..9, got {rating}")
 
 
 def _outcome(score: int, spans: list[Span] | None = None) -> Label:
@@ -49,17 +71,53 @@ def _failure_spans(items: list[dict[str, Any]], text_key: str) -> list[Span]:
     ]
 
 
+def _phantom_failed(m: dict[str, Any]) -> bool:
+    return (
+        str(m.get("task_folder", "")).endswith("_fail")
+        or m.get("success") is False
+        or bool(m.get("failure_demo", False))
+    )
+
+
+def phantom_success_p99(
+    episodes_features: Iterable[tuple[Episode, ResampledForce]],
+) -> dict[str, float]:
+    """Per-object 99th percentile of normalized F' over the SUCCESS-set episodes of a source.
+
+    ``episodes_features`` pairs each episode with its NORMALIZED features; failure demos are
+    skipped, every finite F' of every arm is pooled per ``meta["object"]``.
+    """
+    pooled: dict[str, list[np.ndarray]] = {}
+    for ep, feats in episodes_features:
+        if _phantom_failed(ep.meta):
+            continue
+        obj = str(ep.meta.get("object", ""))
+        for af in feats.arms.values():
+            f = np.asarray(af.F, dtype=np.float64)
+            pooled.setdefault(obj, []).append(f[np.isfinite(f)])
+    out: dict[str, float] = {}
+    for obj, parts in pooled.items():
+        allf = np.concatenate(parts) if parts else np.empty(0)
+        if allf.size:
+            out[obj] = float(np.percentile(allf, 99))
+    return out
+
+
 def map_phantom(
     episode: Episode, *, features: ResampledForce | None, p99: float | None
 ) -> list[Label]:
-    """PHANTOM: success -> 5, ``*_fail`` -> 1; dense failure from the first F' over the p99."""
+    """PHANTOM: success -> 5, failure -> 1; failure demos get a span from the first F' over p99.
+
+    The p99 failure span is only emitted for failure demos (``meta["failure_demo"]``, success
+    False or a ``*_fail`` folder); successful demos get an outcome label only.
+    """
     m = episode.meta
     labels: list[Label] = []
-    failed = str(m.get("task_folder", "")).endswith("_fail") or m.get("success") is False
-    if "success" in m or "task_folder" in m:
+    failed = _phantom_failed(m)
+    if "success" in m or "task_folder" in m or "failure_demo" in m:
         labels.append(_outcome(1 if failed else 5))
     p99 = p99 if p99 is not None else m.get("peak_force_p99")
-    if features is not None and p99 is not None:
+    if failed and features is not None and p99 is not None:
         hit: float | None = None
         for i, t in enumerate(features.frame_times):
             if any(af.F[i] > p99 for af in features.arms.values()):
@@ -76,18 +134,28 @@ def map_rh20t(episode: Episode) -> list[Label]:
     if "rating" not in episode.meta:
         return []
     moved = bool(episode.meta.get("object_moved_toward_goal", False))
-    return [_outcome(rh20t_outcome(int(episode.meta["rating"]), moved))]
+    score = rh20t_outcome(int(episode.meta["rating"]), moved)
+    return [] if score is None else [_outcome(score)]
 
 
 def map_reassemble(episode: Episode) -> list[Label]:
-    """REASSEMBLE: any failed action -> 1 else 5; anomaly annotations -> failure spans."""
+    """REASSEMBLE: any failed action -> 1 else 5; failed segments -> dense failure spans.
+
+    The rationale of a span is the segment text. ``meta["segments"]`` items need t0, t1 and
+    success; segments without a usable interval are skipped.
+    """
     m = episode.meta
     labels: list[Label] = []
     actions = m.get("action_success")
     if actions:
         labels.append(_outcome(5 if all(actions) else 1))
-    if "anomalies" in m:
-        labels.append(_dense(_failure_spans(list(m["anomalies"]), "text")))
+    failed = [
+        s
+        for s in m.get("segments", [])
+        if not s.get("success", True) and "t0" in s and "t1" in s and s["t1"] >= s["t0"]
+    ]
+    if failed:
+        labels.append(_dense(_failure_spans(failed, "text")))
     return labels
 
 
@@ -116,7 +184,12 @@ def map_native_labels(
     features: ResampledForce | None = None,
     phantom_p99: float | None = None,
 ) -> list[Label]:
-    """Dispatch to the per-source mapper (``features`` and ``phantom_p99`` are PHANTOM only)."""
+    """Dispatch to the per-source mapper (``features`` and ``phantom_p99`` are PHANTOM only).
+
+    Eval-only sources (EVAL_ONLY_SOURCES) are a no-op; an unknown name still raises.
+    """
+    if source in EVAL_ONLY_SOURCES:
+        return []
     if source == "phantom":
         return map_phantom(episode, features=features, p99=phantom_p99)
     if source == "rh20t":

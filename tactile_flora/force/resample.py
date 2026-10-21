@@ -5,7 +5,9 @@ not computed here because tau comes from normalization (see normalize.apply).
 Must never: normalize, render text, or read datasets.
 
 A frame whose window holds no samples gets NaN F, Delta and dF; downstream code renders those
-as 0.00 with c=0. The first frame has dF=0.
+as 0.00 with c=0. dF is (F_t - F_{t-P}) / P with P = cfg.frame_period_s (the spec constant, never
+the actual spacing of the frame list) and F_{t-P} the raw median in [t-P-hw, t-P+hw]; if no raw
+sample lies there dF=0.
 """
 
 from __future__ import annotations
@@ -52,7 +54,8 @@ def resample(
 ) -> ResampledForce:
     """Return raw-unit per-frame features per arm for ``frame_times``.
 
-    Group g covers frame positions 2g-1 and 2g (those that exist); its raw slice spans
+    Group k (0-based) covers 0-based frame positions 2k and 2k+1 (those that exist), so every
+    frame is in exactly one group and 64 frames give 32 groups; its raw slice spans
     [min t - half_window, max t + half_window] of those frames.
     """
     t_raw = stream.t_array
@@ -66,10 +69,15 @@ def resample(
         hi = np.searchsorted(t_raw, np.asarray(times) + hw, side="right")
         F = [_median(scalar[a:b]) for a, b in zip(lo, hi, strict=True)]
         delta = None if diff is None else [_median(diff[a:b]) for a, b in zip(lo, hi, strict=True)]
-        dF = [0.0] + [
-            (F[i] - F[i - 1]) / (times[i] - times[i - 1]) if times[i] > times[i - 1] else 0.0
-            for i in range(1, n)
-        ]
+        period = cfg.frame_period_s
+        lo_p = np.searchsorted(t_raw, np.asarray(times) - period - hw, side="left")
+        hi_p = np.searchsorted(t_raw, np.asarray(times) - period + hw, side="right")
+        dF: list[float] = []
+        for i in range(n):
+            if hi_p[i] <= lo_p[i]:
+                dF.append(0.0)
+            else:
+                dF.append((F[i] - _median(scalar[lo_p[i] : hi_p[i]])) / period)
         g: list[float] | None = None
         if gripper is not None and arm in gripper.arms and gripper.t:
             gt = np.asarray(gripper.t, dtype=np.float64)
@@ -77,7 +85,7 @@ def resample(
             g = [_nearest(gt, gv, t) for t in times]
         groups: list[list[float]] = []
         for k in range((n + 1) // 2):
-            pos = [p for p in (2 * k - 1, 2 * k) if 0 <= p < n]
+            pos = [p for p in (2 * k, 2 * k + 1) if p < n]
             a = int(np.searchsorted(t_raw, times[pos[0]] - hw, side="left"))
             b = int(np.searchsorted(t_raw, times[pos[-1]] + hw, side="right"))
             groups.append([float(v) for v in scalar[a:b]])

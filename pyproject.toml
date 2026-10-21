@@ -16,6 +16,7 @@ dependencies = [
     "pillow>=13.0.0",
     "zarr>=3.1.6",
     "h5py>=3.16.0",
+    "tokenizers>=0.23.3",
 ]
 
 [project.optional-dependencies]

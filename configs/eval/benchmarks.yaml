@@ -16,7 +16,7 @@ benchmarks:
   softvtbench:
     manifest: data/manifest/softvtbench.parquet
     prompts: [dense, outcome]
-    metrics: [mae, failure_recall]
+    metrics: [mae, failure_recall, over_compression_recall, mae_vs_dsr]
   baxter:
     manifest: data/manifest/baxter.parquet
     prompts: [dense, outcome]

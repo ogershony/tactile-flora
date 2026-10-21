@@ -32,9 +32,9 @@ from tactile_flora.schema import (
     VerifyContext,
     Window,
 )
-from tactile_flora.sources.base import SourceAdapter, get_source
+from tactile_flora.sources.base import SourceAdapter, make_adapter
 from tactile_flora.verify import checks, hashing, manifest, report
-from tactile_flora.verify.windowing import episode_windows
+from tactile_flora.verify.windowing import assemble_labels, build_source_inputs, episode_windows
 
 WindowsFn = Callable[[Episode, str], list[Window]]
 
@@ -77,7 +77,7 @@ def holdout_path(data_root: Path) -> Path:
 
 
 def _adapter(cfg: SourceConfig) -> SourceAdapter:
-    return get_source(cfg.name)()
+    return make_adapter(cfg.name, cfg)
 
 
 def _frame_times(ep: Episode, period: float) -> list[float]:
@@ -169,9 +169,26 @@ def run_verify(
         spot_reviewer_pass=reviewer,
         baseline_stats=baseline_stats,
     )
+    # label inputs (PHANTOM per-object p99, pseudo labels); windows built here are unshifted
+    # because the sync check has not run yet (the manifest and training paths apply the shift)
+    inputs = build_source_inputs(adapter, force_cfg, consts, out, ids)
     to_windows = windows_fn or (
-        lambda ep, split: episode_windows(ep, force_cfg, consts, split)  # type: ignore[arg-type]
+        lambda ep, split: episode_windows(ep, force_cfg, consts, split, inputs=inputs)
     )
+    # the observed label rate must count the ASSEMBLED labels (native + mapped + events +
+    # pseudo), not only what load() returned, which is empty for the real adapters
+    if windows_fn is None:
+        labeled = []
+        for eid in ids:
+            ep = adapter.load(eid)
+            labs = assemble_labels(ep, force_cfg, consts, inputs)
+            if labs:
+                labeled.append(checks.has_bad_label(ep.model_copy(update={"labels": labs})))
+        obs_rate = sum(labeled) / len(labeled) if labeled else None
+        ctx = ctx.model_copy(
+            update={"observed_label_rate": obs_rate, "labeled_episode_count": len(labeled)},
+            deep=False,
+        )
 
     # pass 2: windows and checks per episode
     results: dict[str, dict[str, CheckResult]] = {}
@@ -192,7 +209,11 @@ def run_verify(
     # spot strips are source-level: sample once, then re-evaluate spot_check for every episode
     if n_spot == 0 and pairs:
         picked = _pick(pairs, cfg.seed, ctx.thresholds.spot_n)
-        items = [(adapter.load(eid), w) for eid, w in picked]
+        # episode ids such as "rh20t_cfg3/0" contain a slash; the strip file name must not
+        items = [
+            (adapter.load(eid).model_copy(update={"episode_id": eid.replace("/", "_")}), w)
+            for eid, w in picked
+        ]
         checks.write_spot_strips(cfg.name, items, reader, spot_dir, ctx.thresholds.spot_n, cfg.seed)
         n_spot, reviewer = checks.read_spot_index(spot_dir)
         sctx = ctx.model_copy(update={"spot_n": n_spot, "spot_reviewer_pass": reviewer})
@@ -263,8 +284,9 @@ def run_manifest(
     consts = normalize.load(out / "norm.json")
     version = consts.version()
     splits = adapter.splits()
+    inputs = build_source_inputs(adapter, force_cfg, consts, out, sorted(results), results)
     to_windows = windows_fn or (
-        lambda ep, split: episode_windows(ep, force_cfg, consts, split)  # type: ignore[arg-type]
+        lambda ep, split: episode_windows(ep, force_cfg, consts, split, inputs=inputs)
     )
 
     def _pairs():

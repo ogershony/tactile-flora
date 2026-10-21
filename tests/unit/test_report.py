@@ -56,3 +56,29 @@ def test_source_verdicts() -> None:
 def test_all_pass_report(tmp_path: Path) -> None:
     res = {"e": {"license": CheckResult(passed=True)}}
     assert "None." in report.write_report("s", res, tmp_path).read_text()
+
+
+def _norm(grasp: list[float], free: list[float], p99: list[float]) -> CheckResult:
+    import json
+
+    detail = json.dumps({"grasp": grasp, "free": free, "p99": p99, "problems": []})
+    return CheckResult(passed=True, detail=detail)
+
+
+def test_normalization_verdict_is_pooled() -> None:
+    light = CheckResult(passed=False, detail=_norm([0.4], [0.0], [1.5]).detail)
+    res = {
+        "a": {"normalization": _norm([1.0], [0.0], [1.5])},
+        "b": {"normalization": _norm([1.1], [0.02], [2.0])},
+        "c": {"normalization": light},  # one light grasp does not fail the source
+    }
+    assert report.source_verdicts(res) == {"normalization": True}
+    res["d"] = {"normalization": _norm([0.5], [0.0], [1.5])}
+    res["e"] = {"normalization": _norm([0.5], [0.0], [1.5])}
+    assert report.source_verdicts(res) == {"normalization": False}
+    free = {"a": {"normalization": _norm([1.0], [0.3], [1.5])}}
+    assert report.source_verdicts(free) == {"normalization": False}
+    p99 = {"a": {"normalization": _norm([1.0], [0.0], [3.5])}}
+    assert report.source_verdicts(p99) == {"normalization": False}
+    nodetail = {"a": {"normalization": CheckResult(passed=False, detail="no constants")}}
+    assert report.source_verdicts(nodetail) == {"normalization": False}

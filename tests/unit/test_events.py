@@ -135,3 +135,26 @@ def test_real_pipeline_clean_grasp_has_no_events() -> None:
     assert len(detect_grasp_acquired(norm, "L", EV)) == 1
     for label in detect_all(norm, EV):
         assert label.spans == []
+
+
+def test_slip_needs_a_real_load_drop() -> None:
+    # dF' reads below slip_df for one frame but F' is back up next frame: not a slip
+    F = [0, 0, 0.8, 1, 1, 1, 1, 1] + [1.0] * 8
+    f = feats(F, G_HELD)
+    f.arms["L"].dF[6] = -3.0  # a lone noisy derivative sample, F' itself barely moved
+    assert detect_slip(f, "L", EV) == []
+
+
+def test_crush_ignores_g_jitter_and_needs_real_closing() -> None:
+    F = [0, 0, 0.8, 1, 3, 3, 3, 3] + [3.0] * 8
+    jitter = pad([0, 0] + [1.0, 1.001, 1.0, 1.001, 1.0, 1.001] * 2)[:16]
+    assert detect_crush(feats(F, jitter), "L", EV) == []
+    closing = pad([0, 0.6, 0.7, 0.8, 0.9, 1.0] + [1.0] * 10)
+    assert detect_crush(feats(F, closing), "L", EV)
+
+
+def test_contact_loss_quality_two_when_task_complete() -> None:
+    F = [0, 0, 0.8, 1, 1, 1, 0, 0, 0] + [0.0] * 7
+    f = feats(F, G_HELD)
+    assert [s.quality for s in detect_contact_loss(f, "L", EV)] == [1]
+    assert [s.quality for s in detect_contact_loss(f, "L", EV, task_complete=True)] == [2]

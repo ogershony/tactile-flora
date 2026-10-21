@@ -7,9 +7,11 @@ Must never: compute checks or write manifests.
 
 from __future__ import annotations
 
+import json
 from collections import Counter
 from pathlib import Path
 
+import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 
@@ -19,12 +21,51 @@ Results = dict[str, dict[str, CheckResult]]
 SOURCE_LEVEL = ("normalization", "label_sanity", "spot_check", "prompt_diff")
 
 
+NORM_GRASP_RANGE = (0.8, 1.2)
+NORM_FREE_TOL = 0.1
+NORM_P99_MAX = 3.0
+
+
+def _pooled_normalization_ok(seen: list[CheckResult]) -> bool:
+    """Pool the per-episode normalization stats stored as JSON in ``detail``.
+
+    Passes iff the pooled (median over episodes and arms) grasp median lies in [0.8, 1.2], the
+    pooled free-space median in [-0.1, 0.1] and the pooled 99th percentile (median of the
+    per-episode p99s) is at most 3. Missing stats (e.g. no constants in context) fail.
+    """
+    pooled: dict[str, list[float]] = {"grasp": [], "free": [], "p99": []}
+    for r in seen:
+        try:
+            doc = json.loads(r.detail)
+            for k in pooled:
+                pooled[k].extend(float(v) for v in doc[k])
+        except (ValueError, KeyError, TypeError):
+            return False
+    if not pooled["p99"] and not pooled["free"] and not pooled["grasp"]:
+        return False
+    if pooled["grasp"]:
+        g = float(np.median(pooled["grasp"]))
+        if not NORM_GRASP_RANGE[0] <= g <= NORM_GRASP_RANGE[1]:
+            return False
+    if pooled["free"] and abs(float(np.median(pooled["free"]))) > NORM_FREE_TOL:
+        return False
+    return not (pooled["p99"] and float(np.median(pooled["p99"])) > NORM_P99_MAX)
+
+
 def source_verdicts(results: Results) -> dict[str, bool]:
-    """Return, per source-level check, whether it passed on every episode."""
+    """Return, per source-level check, whether the source passed.
+
+    Most checks pass only if every episode passed. Normalization is pooled over all episodes
+    (see _pooled_normalization_ok), so one light grasp does not fail the source.
+    """
     out: dict[str, bool] = {}
     for name in SOURCE_LEVEL:
         seen = [r[name] for r in results.values() if name in r]
-        if seen:
+        if not seen:
+            continue
+        if name == "normalization":
+            out[name] = _pooled_normalization_ok(seen)
+        else:
             out[name] = all(c.passed for c in seen)
     return out
 

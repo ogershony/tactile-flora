@@ -59,3 +59,32 @@ def test_nan_frame_contact_zero() -> None:
         arms={"L": ArmFeatures(F=[float("nan")], delta=[float("nan")], dF=[0.0], g=[0.0])},
     )
     assert normalize.apply(f, consts, CFG.render).arms["L"].c == [0]
+
+
+def test_sigma_from_raw_samples_median_over_episodes() -> None:
+    raw = [_feats(s) for s in range(3)]
+    n = normalize.fit(raw, CFG.resample, source="synthetic").arms["L"]
+    # fixture noise on the pad sum is 0.02 at 100 Hz; frame-median std would be about 0.002
+    assert 0.015 < n.sigma < 0.03
+    # an outlier episode with a shifted baseline and huge noise does not move the pooled values
+    odd = _feats(9)
+    odd.arms["L"].raw_groups[0] = [
+        float(v) * 3 + (i % 2) * 5 for i, v in enumerate(odd.arms["L"].raw_groups[0])
+    ]
+    m = normalize.fit([*raw, odd], CFG.resample, source="synthetic").arms["L"]
+    assert abs(m.sigma - n.sigma) < 0.01 and abs(m.baseline - n.baseline) < 0.1
+
+
+def test_free_space_requires_open_gripper_and_clip_option() -> None:
+    f = _feats(0)
+    closed = f.model_copy(deep=True)
+    for af in closed.arms.values():
+        assert af.g is not None
+        af.g[0] = 1.0
+    consts = normalize.fit([f], CFG.resample, source="s")
+    with pytest.raises(normalize.NormError):
+        normalize.fit([closed], CFG.resample, source="s")
+    raw = normalize.apply(f, consts, CFG.render, clip=False).arms["L"]
+    clipped = normalize.apply(f, consts, CFG.render).arms["L"]
+    assert max(clipped.F) <= 3.0 and min(clipped.F) >= 0.0
+    assert any(a != b for a, b in zip(raw.F, clipped.F, strict=True))

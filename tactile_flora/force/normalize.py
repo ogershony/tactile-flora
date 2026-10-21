@@ -67,14 +67,47 @@ def _flatten(
             yield item
 
 
+def _free_samples(feats: ResampledForce, af: ArmFeatures, cfg: ResampleConfig) -> list[float]:
+    """Raw free-space samples of one arm in one episode (empty if the episode has none).
+
+    Uses ``raw_groups[0]``, the raw 100 Hz slice of the first 0.5 s group (it extends half a
+    window past 0.5 s), provided the first frame is inside the first group period and the gripper
+    is open at every frame of group 0. Features built without raw groups fall back to the frame
+    medians at t < group_period_s, which understates sigma (documented limitation).
+    """
+    if not feats.frame_times or feats.frame_times[0] >= cfg.group_period_s:
+        return []
+    if af.raw_groups and af.raw_groups[0]:
+        idx = [i for i in range(min(2, len(feats.frame_times)))]
+        if af.g is not None and any(af.g[i] > _GRIPPER_CLOSED for i in idx):
+            return []
+        return [v for v in af.raw_groups[0] if not np.isnan(v)]
+    out: list[float] = []
+    for i, t in enumerate(feats.frame_times):
+        g = None if af.g is None else af.g[i]
+        if t < cfg.group_period_s and (g is None or g <= _GRIPPER_CLOSED) and not np.isnan(af.F[i]):
+            out.append(af.F[i])
+    return out
+
+
 def fit(
     episodes_features: Iterable[ResampledForce | tuple[ResampledForce, ...]],
     cfg: ResampleConfig,
     *,
     source: str,
 ) -> NormConstants:
-    """Fit constants from raw-unit features of one source (tuples are flattened)."""
-    free: dict[Arm, list[float]] = {}
+    """Fit constants from raw-unit features of one source (tuples are flattened).
+
+    Free space is the first 0.5 s of every episode with the gripper open, taken from the RAW
+    100 Hz samples in ``ArmFeatures.raw_groups[0]`` (so the features alone suffice; no separate
+    stream argument). Per episode and arm the baseline is the median and sigma the std of those
+    raw samples; the source constants are the median of the per-episode baselines and the median
+    of the per-episode sigmas (robust to between-episode baseline spread). Grasp is the median of
+    frame-level F over frames with g > 0.6 and F > tau. The norm_version is the sha256 of the
+    resulting constants, as before.
+    """
+    baselines: dict[Arm, list[float]] = {}
+    sigmas: dict[Arm, list[float]] = {}
     grasp_cands: dict[Arm, list[tuple[float, float]]] = {}
     channel: str | None = None
     for feats in _flatten(episodes_features):
@@ -82,23 +115,21 @@ def fit(
             raise NormError("mixed channels in one fit")
         channel = feats.channel
         for arm, af in feats.arms.items():
-            for i, t in enumerate(feats.frame_times):
+            free = _free_samples(feats, af, cfg)
+            if len(free) >= 2:
+                baselines.setdefault(arm, []).append(float(np.median(free)))
+                sigmas.setdefault(arm, []).append(float(np.std(free)))
+            for i in range(len(feats.frame_times)):
                 f = af.F[i]
                 g = None if af.g is None else af.g[i]
-                if np.isnan(f):
-                    continue
-                if t < cfg.group_period_s and (g is None or g <= _GRIPPER_CLOSED):
-                    free.setdefault(arm, []).append(f)
-                if g is not None and g > _GRIPPER_CLOSED:
+                if not np.isnan(f) and g is not None and g > _GRIPPER_CLOSED:
                     grasp_cands.setdefault(arm, []).append((f, g))
-    if channel is None or not free:
+    if channel is None or not baselines:
         raise NormError("no free-space frames to fit baseline")
     arms: dict[Arm, ArmNorm] = {}
-    for arm, vals in free.items():
-        if len(vals) < 2:
-            raise NormError(f"arm {arm}: need >= 2 free-space frames, got {len(vals)}")
-        baseline = float(np.median(vals))
-        sigma = float(np.std(vals))
+    for arm, bs in baselines.items():
+        baseline = float(np.median(bs))
+        sigma = float(np.median(sigmas[arm]))
         tau = baseline + cfg.contact_sigma * sigma
         held = [f for f, _ in grasp_cands.get(arm, []) if f > tau]
         if not held:
@@ -112,8 +143,19 @@ def fit(
     return NormConstants(source=source, channel=channel, arms=arms)
 
 
-def apply(features: ResampledForce, consts: NormConstants, cfg: RenderConfig) -> ResampledForce:
-    """Return normalized features with contact flags and ``norm_version`` set."""
+def apply(
+    features: ResampledForce,
+    consts: NormConstants,
+    cfg: RenderConfig,
+    *,
+    clip: bool = True,
+) -> ResampledForce:
+    """Return normalized features with contact flags and ``norm_version`` set.
+
+    With ``clip=False`` F' is the unclipped (F - baseline) / scale (only for diagnostics such as
+    the normalization check's 99th percentile); the lower clip at 0 and upper clip at clip_max
+    are both skipped.
+    """
     if features.channel != consts.channel:
         raise NormError(f"channel {features.channel} != constants channel {consts.channel}")
     out: dict[Arm, ArmFeatures] = {}
@@ -122,7 +164,9 @@ def apply(features: ResampledForce, consts: NormConstants, cfg: RenderConfig) ->
             raise NormError(f"no constants for arm {arm}")
         n = consts.arms[arm]
         F = np.asarray(af.F, dtype=np.float64)
-        Fn = np.clip((F - n.baseline) / n.scale, 0.0, cfg.clip_max)
+        Fn = (F - n.baseline) / n.scale
+        if clip:
+            Fn = np.clip(Fn, 0.0, cfg.clip_max)
         tau_n = (n.tau - n.baseline) / n.scale
         c = [int(v > tau_n) if not np.isnan(v) else 0 for v in Fn]
         out[arm] = ArmFeatures(

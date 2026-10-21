@@ -88,7 +88,7 @@ def verify(
     out = data_root / "verified" / source
 
     def _entry() -> None:
-        summary = run_verify(cfg, fcfg, data_root, AutoReader(Path(cfg.root)), spot_pass=spot_pass)
+        summary = run_verify(cfg, fcfg, data_root, AutoReader("."), spot_pass=spot_pass)
         for name, ok in summary.source_verdicts.items():
             typer.echo(f"{name}: {'pass' if ok else 'FAIL'}")
         n_ok = sum(summary.episode_ok.values())

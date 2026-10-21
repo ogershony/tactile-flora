@@ -50,5 +50,45 @@ def main() -> None:
         write_mp4(out / f"{name}.mp4", 10, N_FRAMES, shade=40 * k)
 
 
+def write_long(root: Path) -> None:
+    """A 16 s recording with one failed segment (10 Hz video, 100 Hz F/T) under ``root``."""
+    shutil.rmtree(root, ignore_errors=True)
+    root.mkdir(parents=True)
+    n_cam, n_ft = 160, 1600
+    cam_t = T0 + np.arange(n_cam) / 10.0
+    ft_t = T0 + np.arange(n_ft) / 100.0
+    rng = np.random.default_rng(2)
+    frac = np.interp(ft_t - T0, [0, 3, 4, 10, 11, 16], [0, 0, 1, 1, 0, 0])
+    force = np.stack(
+        [
+            frac * 2 + rng.normal(0, 0.03, n_ft),
+            np.zeros(n_ft),
+            frac * 10 + rng.normal(0, 0.05, n_ft),
+        ],
+        axis=1,
+    )
+    width = (0.08 * (1 - frac)).reshape(-1, 1)
+    with h5py.File(root / f"{STEM}.h5", "w") as f:
+        rs = f.create_group("robot_state")
+        rs["measured_force"] = force
+        rs["measured_torque"] = np.zeros((n_ft, 3))
+        rs["gripper_positions"] = width
+        ts = f.create_group("timestamps")
+        ts["hama1"] = cam_t.reshape(-1, 1)
+        for k in ("measured_force", "measured_torque", "gripper_positions"):
+            ts[k] = ft_t.reshape(-1, 1)
+        seg = f.create_group("segments_info")
+        for i, (a, b, ok, text) in enumerate(
+            [(0.0, 8.0, True, "Pick square peg 3."), (8.0, 15.9, False, "Insert square peg 3.")]
+        ):
+            g = seg.create_group(str(i))
+            g["start"], g["end"], g["success"], g["text"] = T0 + a, T0 + b, ok, text
+            lg = g.create_group("Low_level").create_group("0")
+            lg["start"], lg["end"], lg["success"], lg["text"] = T0 + a, T0 + b, ok, "grasp"
+    out = root / "extracted" / STEM
+    for k, name in enumerate(("hama1", "hama2", "hand")):
+        write_mp4(out / f"{name}.mp4", 10, n_cam, shade=40 * k)
+
+
 if __name__ == "__main__":
     main()
