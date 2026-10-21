@@ -12,6 +12,10 @@ dependencies = [
     "pyyaml",
     "typer",
     "rich",
+    "av>=15,<16",
+    "pillow>=13.0.0",
+    "zarr>=3.1.6",
+    "h5py>=3.16.0",
 ]
 
 [project.optional-dependencies]

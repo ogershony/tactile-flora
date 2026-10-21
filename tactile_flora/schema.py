@@ -138,6 +138,8 @@ class Span(BaseModel):
     t1: float
     quality: Quality
     rationale: str = ""
+    # Provenance of the span after labels.merge.merge_labels ("" for unmerged spans).
+    origin: str = ""
 
     @model_validator(mode="after")
     def _ordered(self) -> Span:
