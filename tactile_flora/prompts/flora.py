@@ -5,7 +5,7 @@ Owns: PromptBundle, VideoSpec, build_prompt, to_messages, prompt_diff, and the s
 Must never: parse outputs, render force, or load models / tokenizers.
 
 The force block (header + lines, already rendered by force/render.py) goes after the video and
-before the clip description line. ``answer_prefix`` is "" because the target string already
+before the trailing template text. ``answer_prefix`` is "" because the target string already
 starts at the first grammar token (``Worst:`` / ``Rationale:`` / ``Score:``).
 """
 
@@ -58,11 +58,14 @@ def mosaic_layout(roles: Sequence[str]) -> tuple[tuple[int, int], list[str]]:
 def _assemble(system: str, clip_line: str, force_block: str | None) -> tuple[str, str]:
     """Place the force block and force sentence; this is the ONLY function that does.
 
-    Returns (system, user_text_after_video). No block means neither header nor sentence.
+    ``clip_line`` is the user-template text after ``<video>``. Returns (system,
+    user_text_after_video). No block means neither header nor sentence. With a block, the
+    sentence is a separate trailing system line and the block is its own line directly after
+    the video item, before the trailing text.
     """
     if force_block is None:
         return system, clip_line
-    return f"{system}\n{T.FORCE_SENTENCE}", f"{force_block}\n{clip_line}"
+    return f"{system}\n{T.FORCE_SENTENCE}", f"\n{force_block}{clip_line}"
 
 
 def build_prompt(
@@ -91,15 +94,14 @@ def build_prompt(
     )
     if len(idx) != len(times):
         raise ValueError("frame_indices must match frame_times")
-    t0, t1 = times[0], times[-1]
+    task = " ".join(task.split())
     if window.prompt_kind == "dense":
         system = T.DENSE_SYSTEM
-        before = T.DENSE_USER.format(task=task)
-        clip = T.DENSE_CLIP_LINE.format(t0=t0, t1=t1 + 1 / DENSE_FPS)
+        user = T.DENSE_USER.format(task=task, start_s=times[0], end_s=times[-1])
     else:
         system = T.OUTCOME_SYSTEM_RATIONALE if with_rationale else T.OUTCOME_SYSTEM_SCORE_ONLY
-        before = T.OUTCOME_USER.format(task=task)
-        clip = T.OUTCOME_CLIP_LINE.format(n=len(times), t0=t0, t1=t1)
+        user = T.OUTCOME_USER.format(task=task)
+    before, _, clip = user.partition(T.VIDEO_MARKER)
     system, after = _assemble(system, clip, force_block)
     video = VideoSpec(
         frame_times=times,
@@ -151,7 +153,7 @@ def prompt_diff(
     force = build_prompt(window, block, **kw)
     control = build_prompt(window, None, **kw)
     assert force.system == f"{control.system}\n{T.FORCE_SENTENCE}", "system differs beyond sentence"
-    assert force.user_text_after_video == f"{block}\n{control.user_text_after_video}", (
+    assert force.user_text_after_video == f"\n{block}{control.user_text_after_video}", (
         "user text differs beyond the force block"
     )
     assert force.user_text_before_video == control.user_text_before_video

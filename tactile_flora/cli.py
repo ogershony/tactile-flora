@@ -16,6 +16,7 @@ import typer
 from tactile_flora.config import (
     BaxterConfig,
     EvalConfig,
+    ForceConfig,
     GridConfig,
     SourceConfig,
     TrainConfig,
@@ -31,6 +32,8 @@ app.add_typer(eval_app, name="eval")
 app.add_typer(baxter_app, name="baxter")
 
 ConfigOpt = Annotated[Path, typer.Option("--config", help="Path to the YAML config.")]
+ForceConfigOpt = Annotated[Path, typer.Option("--force-config", help="Path to configs/force.yaml.")]
+DataRootOpt = Annotated[Path, typer.Option("--data-root", help="Root of the data/ tree.")]
 
 
 def git_hash() -> str:
@@ -54,16 +57,47 @@ def _run(config: Path, output: Path, entry: Callable[[], object]) -> None:
     except NotImplementedError as exc:
         typer.echo(f"not implemented: {exc}", err=True)
         raise typer.Exit(code=1) from exc
+    except typer.Exit:
+        raise
+    except (RuntimeError, FileExistsError) as exc:  # failed invariants: frozen splits, bad source
+        typer.echo(f"{type(exc).__name__}: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
 
 
 @app.command()
-def verify(config: ConfigOpt, source: Annotated[str, typer.Option(help="Source name.")]) -> None:
+def verify(
+    config: ConfigOpt,
+    source: Annotated[str, typer.Option(help="Source name.")],
+    force_config: ForceConfigOpt = Path("configs/force.yaml"),
+    data_root: DataRootOpt = Path("data"),
+    spot_pass: Annotated[
+        int | None, typer.Option("--spot-pass", help="Reviewer's pass count for the spot check.")
+    ] = None,
+) -> None:
     """Run every verification check over a source and write its report."""
-    from tactile_flora.verify import report
+    from tactile_flora.verify import run_verify
+    from tactile_flora.verify.video import PyAVFrameReader
 
-    load_config(config, SourceConfig)
-    out = Path("data/verified") / source
-    _run(config, out, lambda: report.write_report(source, out))
+    cfg = load_config(config, SourceConfig)
+    if cfg.name != source:
+        raise typer.BadParameter(
+            f"config is for {cfg.name!r}, not {source!r}", param_hint="--source"
+        )
+    fcfg = load_config(force_config, ForceConfig)
+    out = data_root / "verified" / source
+
+    def _entry() -> None:
+        summary = run_verify(
+            cfg, fcfg, data_root, PyAVFrameReader(Path(cfg.root)), spot_pass=spot_pass
+        )
+        for name, ok in summary.source_verdicts.items():
+            typer.echo(f"{name}: {'pass' if ok else 'FAIL'}")
+        n_ok = sum(summary.episode_ok.values())
+        typer.echo(f"episodes: {n_ok}/{summary.n_episodes} pass; report {summary.report_path}")
+        if not summary.source_ok:
+            raise typer.Exit(code=1)
+
+    _run(config, out, _entry)
 
 
 @manifest_app.callback()
@@ -73,32 +107,46 @@ def manifest(
         Path | None, typer.Option("--config", help="Path to the YAML config.")
     ] = None,
     name: Annotated[str, typer.Option(help="Manifest name.")] = "train",
+    force_config: ForceConfigOpt = Path("configs/force.yaml"),
+    data_root: DataRootOpt = Path("data"),
 ) -> None:
     """Turn passing episodes into manifest rows."""
     if ctx.invoked_subcommand is not None:
         return
     if config is None:
         raise typer.BadParameter("--config is required", param_hint="--config")
-    from tactile_flora.verify import manifest as mf
+    from tactile_flora.verify import full_git_hash, run_manifest
 
-    load_config(config, SourceConfig)
-    out = Path("data/manifest")
-    _run(config, out, lambda: mf.write_manifest(name, out))
+    cfg = load_config(config, SourceConfig)
+    fcfg = load_config(force_config, ForceConfig)
+    out = data_root / "manifest" / f"{name}.parquet"
+    _run(
+        config,
+        out,
+        lambda: run_manifest(cfg, fcfg, data_root, name=name, report_version=full_git_hash()),
+    )
 
 
 @manifest_app.command("freeze-holdout")
-def freeze_holdout(config: ConfigOpt) -> None:
+def freeze_holdout(
+    config: ConfigOpt,
+    manifests: Annotated[
+        list[Path] | None, typer.Option("--manifest", help="Manifest parquet(s) to freeze.")
+    ] = None,
+    data_root: DataRootOpt = Path("data"),
+) -> None:
     """Write data/manifest/holdout_ids.json once; later runs never change frozen splits."""
     from tactile_flora.verify import manifest as mf
 
     load_config(config, SourceConfig)
-    out = Path("data/manifest")
+    out = data_root / "manifest" / "holdout_ids.json"
+    paths = manifests or sorted((data_root / "manifest").glob("*.parquet"))
 
     def _entry() -> None:
-        raise NotImplementedError("milestone 6")
+        doc = mf.freeze_holdout(paths, out, git_hash())
+        typer.echo(f"froze {len(doc.splits)} episodes, {len(doc.held_out_ids)} held out")
 
-    _ = mf
-    _run(config, out / "holdout_ids.json", _entry)
+    _run(config, out, _entry)
 
 
 @app.command()

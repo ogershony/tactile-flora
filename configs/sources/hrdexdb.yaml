@@ -1,6 +1,6 @@
 name: hrdexdb
 root: data/raw/hrdexdb
-license_allowed: [check-card]
+license_allowed: [CC-BY-NC-4.0]
 max_windows: 0
 max_episodes: 0
 eval_only: true

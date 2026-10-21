@@ -1,4 +1,4 @@
-"""Programmatic force-event detectors (grasp_acquired, slip, contact_loss, regrasp, crush, off_axis).
+"""Programmatic force-event detectors (grasp, slip, contact loss, regrasp, crush, off-axis).
 
 Owns: pure span detectors over NORMALIZED features (a ResampledForce after normalize.apply) at the
 4 Hz frame clock, and ``detect_all`` which packages them as programmatic event Labels.
@@ -83,7 +83,7 @@ def _grasp_frames(F: np.ndarray, g: np.ndarray, dt: float, cfg: EventsConfig) ->
 
 
 def detect_grasp_acquired(features: ResampledForce, arm: Arm, cfg: EventsConfig) -> list[float]:
-    """Times (s) at which a grasp is acquired. Not a label.
+    """Return times (s) at which a grasp is acquired. Not a label.
 
     Physical rationale: a real grasp is the gripper closing onto an object, so g crosses above
     grasp_g and the fingertip load F' climbs above grasp_f within grasp_window_s. Closing on air
@@ -221,9 +221,7 @@ def detect_off_axis(
         return []
     d = np.abs(np.asarray(af.delta, dtype=np.float64))
     mask = (d > cfg.off_axis_delta) & held_mask(features, arm, cfg)
-    return [
-        _span(features, _dt(features), a, b, 2, "off-center grasp") for a, b in _runs(mask)
-    ]
+    return [_span(features, _dt(features), a, b, 2, "off-center grasp") for a, b in _runs(mask)]
 
 
 def detect_all(
@@ -233,7 +231,13 @@ def detect_all(
     labels: list[Label] = []
     for arm in sorted(features.arms):
         spans: list[Span] = []
-        for det in (detect_slip, detect_contact_loss, detect_regrasp, detect_crush, detect_off_axis):
+        for det in (
+            detect_slip,
+            detect_contact_loss,
+            detect_regrasp,
+            detect_crush,
+            detect_off_axis,
+        ):
             spans.extend(det(features, arm, cfg, task_complete=task_complete))
         spans.sort(key=lambda s: (s.t0, s.t1))
         labels.append(Label(kind="event", origin="programmatic", spans=spans))

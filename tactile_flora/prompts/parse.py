@@ -7,10 +7,13 @@ Must never: build prompts, or accept a Worst that disagrees with the minimum dig
 
 Dense grammar (``labels/windows.py`` builds targets from the same constants)::
 
-    Worst: <1-3>\nQuality: <32 digits of 1-3>\nRationales:(\n<first>-<last>[ <text>])*
+    Worst: [123]\nQuality:\n[123]{32}\nRationales:(?:\n<g>-<g> [^\n]{1,240})*
 
-Group numbers are 1-based. Rationale text is a single line. When every group is normal the
-text ends right after ``Rationales:``.
+This is exactly the released FLORA decoding regex. Group numbers <g> are 1-based (1..32). The
+digits sit on their own line after ``Quality:``; a rationale line has a mandatory space and
+1-240 non-newline characters. Outcome: ``Score: [1-5]`` or
+``Rationale: [^\n]{1,512}\n\nScore: [1-5]`` (blank line). Only surrounding whitespace is
+tolerated (the model text is stripped before matching).
 """
 
 from __future__ import annotations
@@ -27,14 +30,16 @@ WINDOW_PRE_S = 2.0  # window spans [anchor - 2, anchor + 14)
 
 # --- the single grammar definition -------------------------------------------------------
 GROUP_NUM = r"(?:[1-9]|[12][0-9]|3[0-2])"
+MAX_DENSE_RATIONALE = 240
+MAX_OUTCOME_RATIONALE = 512
 DENSE_BODY = (
-    rf"Worst: ([123])\nQuality: ([123]{{{N_GROUPS}}})\nRationales:"
-    rf"((?:\n{GROUP_NUM}-{GROUP_NUM}(?: [^\n]*)?)*)"
+    rf"Worst: [123]\nQuality:\n[123]{{{N_GROUPS}}}\nRationales:"
+    rf"(?:\n{GROUP_NUM}-{GROUP_NUM} [^\n]{{1,{MAX_DENSE_RATIONALE}}})*"
 )
-RATIONALE_LINE = re.compile(rf"({GROUP_NUM})-({GROUP_NUM})(?: ([^\n]*))?")
+RATIONALE_LINE = re.compile(rf"({GROUP_NUM})-({GROUP_NUM}) ([^\n]{{1,{MAX_DENSE_RATIONALE}}})")
 DENSE_RE = re.compile(DENSE_BODY)
-OUTCOME_RATIONALE_BODY = r"Rationale: ([^\n]*)\nScore: ([1-5])"
-OUTCOME_SCORE_BODY = r"Score: ([1-5])"
+OUTCOME_RATIONALE_BODY = rf"Rationale: [^\n]{{1,{MAX_OUTCOME_RATIONALE}}}\n\nScore: [1-5]"
+OUTCOME_SCORE_BODY = r"Score: [1-5]"
 OUTCOME_RATIONALE_RE = re.compile(OUTCOME_RATIONALE_BODY)
 OUTCOME_SCORE_RE = re.compile(OUTCOME_SCORE_BODY)
 
@@ -72,34 +77,33 @@ def _dense_failure() -> ParsedDense:
 
 def parse_dense(text: str) -> ParsedDense:
     """Parse a dense answer; reject to the all-normal replacement on any violation."""
-    m = DENSE_RE.fullmatch(text.strip())
-    if m is None:
+    if DENSE_RE.fullmatch(text.strip()) is None:
         return _dense_failure()
-    worst = int(m.group(1))
-    digits = [int(c) for c in m.group(2)]
+    lines = text.strip().split("\n")
+    worst = int(lines[0].removeprefix("Worst: "))
+    digits = [int(c) for c in lines[2]]
     if worst != min(digits):
         return _dense_failure()
     rationales: list[tuple[int, int, str]] = []
-    for line in m.group(3).split("\n")[1:]:
+    for line in lines[4:]:
         r = RATIONALE_LINE.fullmatch(line)
         if r is None:  # unreachable given DENSE_RE, kept as a guard
             return _dense_failure()
         first, last = int(r.group(1)), int(r.group(2))
         if last < first:
             return _dense_failure()
-        rationales.append((first, last, (r.group(3) or "").strip()))
+        rationales.append((first, last, r.group(3).strip()))
     return ParsedDense(worst=worst, digits=digits, rationales=rationales)
 
 
 def parse_outcome(text: str) -> ParsedOutcome:
     """Parse an outcome answer in either rationale or score-only mode."""
     t = text.strip()
-    m = OUTCOME_RATIONALE_RE.fullmatch(t)
-    if m is not None:
-        return ParsedOutcome(score=int(m.group(2)), rationale=m.group(1).strip())
-    m = OUTCOME_SCORE_RE.fullmatch(t)
-    if m is not None:
-        return ParsedOutcome(score=int(m.group(1)))
+    if OUTCOME_RATIONALE_RE.fullmatch(t) is not None:
+        rationale, _, score = t.removeprefix("Rationale: ").partition("\n\nScore: ")
+        return ParsedOutcome(score=int(score), rationale=rationale.strip())
+    if OUTCOME_SCORE_RE.fullmatch(t) is not None:
+        return ParsedOutcome(score=int(t.removeprefix("Score: ")))
     return ParsedOutcome(score=None, parse_failed=True)
 
 

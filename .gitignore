@@ -1,5 +1,6 @@
 # data stages live on disk, never in git
 data/
+!tests/fixtures/**/data/
 # python
 .venv/
 __pycache__/

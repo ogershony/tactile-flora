@@ -38,8 +38,8 @@ def test_force_vs_control_differ_only_in_block() -> None:
         f = build_prompt(w, block)
         c = build_prompt(w, None)
         assert T.FORCE_SENTENCE in f.system and T.FORCE_SENTENCE not in c.system
-        assert "H" not in c.user_text_after_video.split("\n")[0:1]
-        assert f.user_text_after_video.startswith(block + "\n")
+        assert f.user_text_after_video == "\n" + block + c.user_text_after_video
+        assert f.system.endswith("\n" + T.FORCE_SENTENCE)
         assert f.system.replace("\n" + T.FORCE_SENTENCE, "") == c.system
 
 
@@ -55,8 +55,28 @@ def test_messages_structure() -> None:
     assert [x["role"] for x in m] == ["system", "user"]
     kinds = [c["type"] for c in m[1]["content"]]
     assert kinds == ["text", "video", "text"]
-    assert m[1]["content"][0]["text"] == "Task: t"
-    assert m[1]["content"][2]["text"].startswith("blk\n")
+    assert m[1]["content"][0]["text"] == "Task: t\n\nSynchronized multiview clip:\n"
+    assert m[1]["content"][2]["text"].startswith("\nblk\n\nThe clip contains 64")
+
+
+def test_verbatim_templates() -> None:
+    assert T.TEMPLATES_VERIFIED_AGAINST_PAPER
+    assert T.OUTCOME_SYSTEM_SCORE_ONLY.endswith(
+        "exactly.\nDo not provide a rationale. Return exactly:\nScore: <1-5>"
+    )
+    assert T.OUTCOME_SYSTEM_RATIONALE.endswith("Rationale: <rationale>\n\nScore: <1-5>")
+    assert T.DENSE_SYSTEM.startswith("You are a dense action-quality reward model")
+    assert T.DENSE_SYSTEM.endswith("in time order>")
+
+
+def test_user_text_verbatim() -> None:
+    d = build_prompt(_dense(), None, task="a   b\nc")
+    assert d.user_text_before_video == "Task: a b c\n\nSynchronized multiview clip:\n"
+    assert "run from t=8.000 to t=23.750 seconds of the episode." in d.user_text_after_video
+    assert d.user_text_after_video.endswith("rationales for non-normal runs.")
+    o = build_prompt(_outcome(), None, task="x")
+    assert o.user_text_before_video == "Task: x\n\nComplete trajectory video:\n"
+    assert o.user_text_after_video == "\n\nEvaluate the terminal success of the task."
 
 
 def test_mosaic_layouts() -> None:

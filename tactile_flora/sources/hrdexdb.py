@@ -1,37 +1,226 @@
-"""Source adapter for HRDexDB (eval only).
+"""Source adapter for HRDexDB (`HRDexDB/HRDexDB`, eval only).
 
-Owns: how HRDexDB (eval only) is laid out on disk. Reads: Per-trial archives; fingertip tactile
-    mapped to pad using the two most-loaded fingers.
-Open question: tactile layout per hand type.
-Must never: filter episodes in discover(), write to disk, or leak layout details to other modules.
+Owns: how HRDexDB trials are laid out on disk and how one trial becomes an Episode. Maps
+fingertip tactile of the allegro_v5 and inspire_dftp hands to the pad channel (the two
+most-loaded fingertip channels, by mean absolute value over the trial) on arm "R".
+Must never: filter episodes in discover(), write to disk, be used for training (eval only), or
+leak layout details to other modules.
+
+Resolved open question ("HRDexDB tactile layout per hand type and which hands to include"),
+verified 2026-10-21 from the HF API and file headers (docs/research/datasets.md section 6):
+- Layout: ``<hand>/<object>/<scene_id>/{grasp_result.json, C2R.npy, cam_param/,
+  vid/<camera_serial>.mp4 (about 23 cameras), raw/{arm,hand,timestamps}/*.npy}``
+  plus ``metadata/episodes.parquet``
+  (episode_id, embodiment, object_id, sequence_id, split, success, has_tactile, num_frames,
+  fps=30). Hand dirs: human, allegro_v5, inspire_dftp, inspire_f1, robotiq_2f85.
+- Episode id used here: ``"<hand>/<object>/<scene_id>"`` (the trial directory relative to root).
+- allegro_v5: ``raw/hand/tactile.npy`` int32 (T, 4), one scalar per fingertip; time base
+  ``raw/hand/time.npy``. INCLUDED.
+- inspire_dftp: ``raw/hand/force.npy`` int64 (T, 6), one scalar per DOF/finger. INCLUDED.
+- inspire_f1: ``raw/hand/right_tactile.npy`` is a pickled per-frame object array whose internal
+  layout is NOT verified; load() raises NotImplementedError. robotiq_2f85: no tactile or force
+  file at all; load() raises NotImplementedError. human: no robot; load() raises. All three are
+  still returned by discover() (the verifier, not the adapter, decides what to keep).
+- Units and per-finger semantics are undocumented ("sensor specifications vary across
+  platforms"); values are kept in raw sensor units, abs() taken, and NOT comparable across hands.
+- Time bases: every stream has its own time file (``<stem>_time.npy`` or ``time.npy`` next to
+  the data, else ``raw/timestamps/<stem>.npy``); if none is found a uniform ``fps`` grid
+  (episodes.parquet fps, default 30) is assumed. Streams are aligned by nearest sample.
+- Gripper: no gripper scalar exists; the hand closure proxy is the mean over columns of
+  ``raw/hand/position.npy``, min/max-normalized per trial to 0 (open) .. 1 (closed). This is a
+  PROXY: it assumes larger joint values mean more closed, and is flagged in
+  ``meta["gripper_is_proxy"]``.
+- Cameras: the first camera serial (sorted) in ``vid/`` is used as "scene". UNVERIFIED which
+  serial is a sensible scene view; ``cam_param/`` or cameras.parquet may carry roles.
+- Clock: the sync of the mp4s to the sensor time files is not documented. ASSUMPTION: the first
+  video frame coincides with the earliest sample of the used sensor streams, so
+  ``meta["clock_offset_s"]`` is that earliest timestamp. Not verified.
+- Native label: outcome 5 if ``grasp_result.json`` grasp_success is true, else 1 (binary;
+  criterion in the paper: lifted and held 10 s). No label when success is null/absent (human).
+- Session / split key: hand type. Every episode goes to split "benchmark".
+- License: CC-BY-NC-4.0. Metadata may predate the robotiq upload (2026-09-20).
 """
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
+from typing import Any
 
-from tactile_flora.schema import Episode, Label
-from tactile_flora.sources.base import register_source
+import numpy as np
+
+from tactile_flora.config import SourceConfig
+from tactile_flora.schema import (
+    Episode,
+    ForceStream,
+    GripperStream,
+    Label,
+    PadArmForce,
+)
+from tactile_flora.sources._eval_common import nearest_index, probe_video, rate_from_times
+from tactile_flora.sources.base import register_source, strip_outcome_words
+
+LICENSE = "CC-BY-NC-4.0"
+DEFAULT_FPS = 30.0
+# hand -> (tactile file, time-file stem)
+_TACTILE_FILES = {"allegro_v5": "tactile", "inspire_dftp": "force"}
+_UNSUPPORTED = {
+    "inspire_f1": "raw/hand/right_tactile.npy is a pickled per-frame object array with an "
+    "unverified internal layout",
+    "robotiq_2f85": "it has no tactile or force file",
+    "human": "there is no robot, hence no tactile or force stream",
+}
+
+
+def _read_time(trial: Path, stem: str, n: int, fps: float) -> np.ndarray:
+    """Return the time base (seconds) of raw/hand/<stem>.npy, or a uniform grid."""
+    candidates = [
+        trial / "raw" / "hand" / f"{stem}_time.npy",
+        trial / "raw" / "hand" / "time.npy",
+        trial / "raw" / "timestamps" / f"{stem}.npy",
+        trial / "raw" / "timestamps" / "hand.npy",
+    ]
+    for path in candidates:
+        if path.is_file():
+            t = np.asarray(np.load(path), dtype=np.float64).reshape(-1)
+            if len(t) == n:
+                return t
+    return np.arange(n, dtype=np.float64) / fps
 
 
 @register_source("hrdexdb")
 class HrdexdbAdapter:
-    """Adapter for HRDexDB (eval only); every method is a stub until milestone 5."""
+    """Adapter for HRDexDB (eval only)."""
 
     name = "hrdexdb"
 
+    def __init__(self, cfg: SourceConfig) -> None:
+        self.cfg = cfg
+        self._root = Path(cfg.root)
+        self._ids: list[str] | None = None
+        self._fps: dict[str, float] = {}
+
     def discover(self, root: Path) -> list[str]:
-        """Return every episode id under ``root``."""
-        raise NotImplementedError("milestone 5")
+        """Return every trial id ``<hand>/<object>/<scene_id>`` under ``root`` (no filtering)."""
+        self._root = Path(root)
+        ids: list[str] = []
+        for hand in sorted(p for p in self._root.iterdir() if p.is_dir()):
+            for obj in sorted(p for p in hand.iterdir() if p.is_dir()):
+                for scene in sorted(p for p in obj.iterdir() if p.is_dir()):
+                    if (scene / "grasp_result.json").is_file() or (scene / "raw").is_dir():
+                        ids.append(f"{hand.name}/{obj.name}/{scene.name}")
+        self._ids = ids
+        self._load_fps()
+        return list(ids)
+
+    def _load_fps(self) -> None:
+        """Read per-trial fps from metadata/episodes.parquet when present (best effort)."""
+        path = self._root / "metadata" / "episodes.parquet"
+        self._fps = {}
+        if not path.is_file():
+            return
+        import pandas as pd
+
+        df = pd.read_parquet(path)
+        needed = {"embodiment", "object_id", "sequence_id", "fps"}
+        if not needed <= set(df.columns):
+            return
+        keys = zip(df["embodiment"], df["object_id"], df["sequence_id"], strict=True)
+        for key, fps in zip(keys, df["fps"].astype(float).tolist(), strict=True):
+            self._fps["/".join(str(k) for k in key)] = fps
+
+    def _trial(self, episode_id: str) -> Path:
+        return self._root / episode_id
+
+    def _ensure(self) -> None:
+        if self._ids is None:
+            self.discover(self._root)
+
+    def _result(self, episode_id: str) -> dict[str, Any]:
+        path = self._trial(episode_id) / "grasp_result.json"
+        if not path.is_file():
+            return {}
+        data = json.loads(path.read_text())
+        return data if isinstance(data, dict) else {}
 
     def load(self, episode_id: str) -> Episode:
-        """Load a full episode on the episode clock."""
-        raise NotImplementedError("milestone 5")
+        """Load one trial on the episode clock (allegro_v5 and inspire_dftp only)."""
+        self._ensure()
+        hand, obj, scene = episode_id.split("/")
+        if hand in _UNSUPPORTED:
+            raise NotImplementedError(
+                f"hrdexdb hand {hand!r} is not loadable: {_UNSUPPORTED[hand]}; "
+                "verify/ decides what to keep, so discover() still lists it"
+            )
+        if hand not in _TACTILE_FILES:
+            raise NotImplementedError(f"hrdexdb hand {hand!r} has no known tactile layout")
+        trial = self._trial(episode_id)
+        fps = self._fps.get(episode_id, DEFAULT_FPS)
+        stem = _TACTILE_FILES[hand]
+        raw = np.abs(np.asarray(np.load(trial / "raw" / "hand" / f"{stem}.npy"), dtype=np.float64))
+        raw = raw.reshape(len(raw), -1)
+        t_raw = _read_time(trial, stem, len(raw), fps)
+
+        pos = np.asarray(np.load(trial / "raw" / "hand" / "position.npy"), dtype=np.float64)
+        pos = pos.reshape(len(pos), -1)
+        t_pos = _read_time(trial, "position", len(pos), fps)
+
+        offset = float(min(t_raw[0], t_pos[0]))
+        t = t_raw - offset
+        top = np.argsort(-raw.mean(axis=0), kind="stable")[:2]
+        top = np.concatenate([top, top[:1]]) if len(top) == 1 else top
+        f_a, f_b = raw[:, top[0]], raw[:, top[1]]
+
+        closure = pos.mean(axis=1)
+        span = float(closure.max() - closure.min())
+        closure = (closure - closure.min()) / span if span > 0 else np.zeros_like(closure)
+        g = closure[nearest_index(t_pos - offset, t)]
+
+        vids = sorted((trial / "vid").glob("*.mp4"))
+        if not vids:
+            raise FileNotFoundError(f"no videos under {trial / 'vid'}")
+        scene_ref = probe_video(vids[0])
+        duration = scene_ref.n_frames / scene_ref.fps if scene_ref.n_frames else float(t[-1])
+        rate = rate_from_times(t, fps)
+        return Episode(
+            source=self.name,
+            episode_id=episode_id,
+            session=hand,
+            task=strip_outcome_words(f"grasp and lift the {obj.replace('_', ' ')}"),
+            duration_s=duration,
+            cameras={"scene": scene_ref},
+            force=ForceStream(
+                channel="pad",
+                arms={"R": PadArmForce(f_a=f_a.tolist(), f_b=f_b.tolist())},
+                rate_hz=rate,
+                t=t.tolist(),
+            ),
+            gripper=GripperStream(arms={"R": g.tolist()}, rate_hz=rate, t=t.tolist()),
+            labels=self.native_labels(episode_id),
+            license=LICENSE,
+            meta={
+                "clock_offset_s": offset,
+                "hand": hand,
+                "object": obj,
+                "scene_id": scene,
+                "camera_serial": vids[0].stem,
+                "tactile_file": f"raw/hand/{stem}.npy",
+                "tactile_channels": [int(top[0]), int(top[1])],
+                "force_units": "raw sensor units (undocumented), abs value",
+                "gripper_is_proxy": True,
+                "fps": fps,
+            },
+        )
 
     def splits(self) -> dict[str, list[str]]:
-        """Return the session-level split assignment."""
-        raise NotImplementedError("milestone 5")
+        """Eval only: every episode is in split "benchmark"."""
+        self._ensure()
+        return {"benchmark": list(self._ids or [])}
 
     def native_labels(self, episode_id: str) -> list[Label]:
-        """Return the source's own labels."""
-        raise NotImplementedError("milestone 5")
+        """Binary outcome (5 if grasp_success else 1); empty when success is unknown."""
+        self._ensure()
+        success = self._result(episode_id).get("grasp_success")
+        if success is None:
+            return []
+        return [Label(kind="outcome", origin="source", outcome=5 if success else 1)]

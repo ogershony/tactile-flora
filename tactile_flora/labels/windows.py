@@ -8,9 +8,16 @@ Must never: rendering force or building prompts.
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping, Sequence
 
-from tactile_flora.prompts.parse import GROUP_S, N_GROUPS, WINDOW_PRE_S
-from tactile_flora.schema import Episode, Label, Span, Window
+from tactile_flora.prompts.parse import (
+    GROUP_S,
+    MAX_DENSE_RATIONALE,
+    MAX_OUTCOME_RATIONALE,
+    N_GROUPS,
+    WINDOW_PRE_S,
+)
+from tactile_flora.schema import Episode, Label, Span, Split, Window
 
 N_POSITIONS = 64
 FPS = 4.0
@@ -19,9 +26,58 @@ FINAL_OFFSET_S = 9.75  # final window anchor = t_last - 9.75
 KEPT_GROUPS = 24  # groups 1-24 cover [alpha - 2, alpha + 10) == the 10 s stride
 
 
-def make_windows(episode: Episode) -> list[Window]:
-    """Public entry point of this module (needs force rendering; wired in a later milestone)."""
-    raise NotImplementedError("milestone 4")
+def make_windows(
+    episode: Episode,
+    force_lines_per_anchor: Mapping[float, Sequence[str]] | None,
+    merged: list[Label],
+    split: Split,
+    *,
+    outcome_force_lines: Sequence[str] = (),
+) -> list[Window]:
+    """Dense windows for every anchor plus one outcome window, from merged labels.
+
+    ``merged`` is the output of labels.merge.merge_labels. Dense windows are emitted only when
+    ``merged`` holds a dense/event label (an empty one means "all normal"); an outcome window only
+    when it holds an outcome label (frame times come from the scene camera). Force lines are
+    rendered elsewhere: dense lines are looked up by anchor (default empty, the control
+    condition), outcome lines come from ``outcome_force_lines``.
+    """
+    ref = f"{episode.source}/{episode.episode_id}"
+    lines = force_lines_per_anchor or {}
+    out: list[Window] = []
+    dense = [lab for lab in merged if lab.kind in ("dense", "event")]
+    if dense:
+        spans = [s for lab in dense for s in lab.spans]
+        for anchor in dense_anchors(episode.duration_s):
+            out.append(
+                Window(
+                    episode_ref=ref,
+                    prompt_kind="dense",
+                    anchor_s=anchor,
+                    frame_times=tuple(dense_frame_times(anchor)),
+                    force_lines=tuple(lines.get(anchor, ())),
+                    target=to_flora_dense_target(spans, anchor, episode.duration_s),
+                    split=split,
+                )
+            )
+    outcome = next((lab for lab in merged if lab.kind == "outcome" and lab.outcome), None)
+    if outcome is not None:
+        cam = episode.cameras.get("scene")
+        if cam is None:
+            raise ValueError(f"{ref}: outcome label but no scene camera")
+        idx = outcome_frame_indices(cam.n_frames, cam.fps)
+        out.append(
+            Window(
+                episode_ref=ref,
+                prompt_kind="outcome",
+                anchor_s=0.0,
+                frame_times=tuple(i / cam.fps for i in idx),
+                force_lines=tuple(outcome_force_lines),
+                target=to_flora_outcome_target(outcome, with_rationale=True),
+                split=split,
+            )
+        )
+    return out
 
 
 def dense_anchors(t_last: float) -> list[float]:
@@ -159,26 +215,42 @@ def _run_rationale(
     return " ".join(best[2].split()) if best else ""
 
 
-def to_flora_dense_target(spans: list[Span], anchor: float, duration: float) -> str:
-    """Exact dense answer string; the grammar is defined in prompts/parse.py.
+DENSE_PLACEHOLDER_RATIONALE = "non-normal action"
+OUTCOME_PLACEHOLDER_RATIONALE = "no rationale"
 
-    One rationale line per maximal run of equal non-normal digits.
+
+def _clip_text(text: str, limit: int, placeholder: str) -> str:
+    """Whitespace-collapse, truncate to ``limit`` chars; ``placeholder`` when empty."""
+    out = " ".join(text.split())[:limit].rstrip()
+    return out or placeholder
+
+
+def to_flora_dense_target(spans: list[Span], anchor: float, duration: float) -> str:
+    r"""Exact dense answer string; the grammar is defined in prompts/parse.py.
+
+    Layout: ``Worst: w\nQuality:\n<32 digits>\nRationales:`` then one ``first-last text``
+    line per maximal run of equal non-normal digits. Rationale text is whitespace-collapsed and
+    truncated to 240 chars; a run with no rationale gets the deterministic placeholder
+    "non-normal action" so the line still satisfies the grammar (text must be 1..240 chars).
     """
     digits = dense_group_labels(spans, anchor, duration)
     lines = ["Rationales:"]
     for first, last, d in _runs(digits):
         text = _run_rationale(spans, first, last, d, anchor, duration)
-        lines.append(f"{first}-{last} {text}" if text else f"{first}-{last}")
-    return f"Worst: {min(digits)}\nQuality: {''.join(map(str, digits))}\n" + "\n".join(lines)
+        text = _clip_text(text, MAX_DENSE_RATIONALE, DENSE_PLACEHOLDER_RATIONALE)
+        lines.append(f"{first}-{last} {text}")
+    return f"Worst: {min(digits)}\nQuality:\n{''.join(map(str, digits))}\n" + "\n".join(lines)
 
 
 def to_flora_outcome_target(label: Label, with_rationale: bool) -> str:
-    r"""Outcome answer: ``Rationale: <text>\nScore: <1-5>`` or ``Score: <d>`` (score-only)."""
+    r"""Outcome answer: ``Rationale: <text>\n\nScore: <1-5>`` or ``Score: <d>`` (score-only).
+
+    Rationale text is whitespace-collapsed, truncated to 512 chars, and "no rationale" when empty.
+    """
     if label.outcome is None:
         raise ValueError("label has no outcome score")
     if not with_rationale:
         return f"Score: {label.outcome}"
-    text = ""
-    if label.spans:
-        text = " ".join(label.spans[0].rationale.split())
-    return f"Rationale: {text}\nScore: {label.outcome}"
+    text = label.spans[0].rationale if label.spans else ""
+    text = _clip_text(text, MAX_OUTCOME_RATIONALE, OUTCOME_PLACEHOLDER_RATIONALE)
+    return f"Rationale: {text}\n\nScore: {label.outcome}"

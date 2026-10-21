@@ -7,10 +7,12 @@ Must never: hold configuration (see config.py), import from any sibling stage, o
 
 from __future__ import annotations
 
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, Protocol, runtime_checkable
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+from tactile_flora.config import RenderConfig, ResampleConfig
 
 Arm = Literal["L", "R"]
 Quality = Literal[1, 2, 3]
@@ -223,13 +225,107 @@ class CheckResult(BaseModel):
     detail: str = ""
 
 
+@runtime_checkable
+class FrameReader(Protocol):
+    """Pluggable video decoding used by verification (PyAV in production, in-memory in tests)."""
+
+    def frame_count(self, episode: Episode, role: str) -> int:
+        """Return the number of decodable frames of camera ``role``; raise if it cannot decode."""
+        ...
+
+    def read_frame(self, episode: Episode, role: str, index: int) -> np.ndarray:
+        """Return frame ``index`` of camera ``role`` as an (H, W, 3) uint8 RGB array."""
+        ...
+
+
+class BenchmarkHashRow(BaseModel):
+    """One benchmark episode's first, middle and last frame pHashes (16 hex chars each)."""
+
+    source: str
+    episode_id: str
+    h_first: str
+    h_mid: str
+    h_last: str
+
+
+class VerifyThresholds(BaseModel):
+    """Thresholds of the verification checks; defaults follow the spec table."""
+
+    rate_tol_frames: float = 2.0  # video duration vs episode duration, in frame periods
+    rate_tol_frac: float = 0.2  # median force dt vs declared rate
+    noise_floor: float = 1e-4  # minimum channel standard deviation (raw units)
+    saturation_frac: float = 0.01
+    baseline_sigma: float = 2.0
+    baseline_window_s: float = 0.5
+    sync_grid_s: float = 0.025
+    sync_search_s: float = 1.0
+    sync_median_s: float = 0.1  # source-level median |lag|
+    sync_max_s: float = 0.25  # per-episode max |lag|
+    norm_grasp_tol: float = 0.35  # |median grasp - 1.0|
+    norm_free_tol: float = 0.15  # median free space F'
+    norm_p99_max: float = 3.0
+    label_rate_factor: float = 2.0
+    spot_n: int = 20
+    spot_min_pass: int = 17
+    overlap_max_distance: int = 6
+
+
 class VerifyContext(BaseModel):
-    """Minimal context handed to every verification check."""
+    """Everything the verification checks need; all fields beyond ``source`` have defaults.
+
+    ``norm`` is a force.normalize.NormConstants (typed Any to keep schema free of stage imports).
+    ``windows`` maps episode id to its candidate Windows; ``split_of`` maps episode id to its
+    assigned split. ``baseline_stats`` maps "session/arm/channel" to (mean, std) of per-episode
+    baselines. ``observed_label_rate`` is the source-level fraction of episodes with a bad label.
+    """
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     source: str
     holdout_ids: frozenset[str] = frozenset()
-    license_allowed: list[str] = Field(default_factory=list)
+    license_allowed: list[str] = Field(default_factory=lambda: list[str]())
     seed: int = 0
+    reader: FrameReader | None = None
+    norm: Any = None
+    resample_cfg: ResampleConfig | None = None
+    render_cfg: RenderConfig | None = None
+    thresholds: VerifyThresholds = Field(default_factory=VerifyThresholds)
+    benchmark_index: list[BenchmarkHashRow] = Field(
+        default_factory=lambda: list[BenchmarkHashRow]()
+    )
+    hash_cache: Any = None
+    expected_label_rate: float | None = None
+    observed_label_rate: float | None = None
+    spot_n: int = 0
+    spot_reviewer_pass: int | None = None
+    windows: dict[str, list[Window]] = Field(default_factory=lambda: dict[str, list[Window]]())
+    split_of: dict[str, str] = Field(default_factory=lambda: dict[str, str]())
+    baseline_stats: dict[str, tuple[float, float]] = Field(
+        default_factory=lambda: dict[str, tuple[float, float]]()
+    )
+
+
+class HoldoutFile(BaseModel):
+    """The frozen split file (data/manifest/holdout_ids.json), written once.
+
+    ``splits`` maps "source/episode_id" to the split every manifest row of that episode had when
+    the file was frozen; a later build may never change one. Held-out ids are those not in train.
+    """
+
+    version: int = 1
+    git_hash: str = "unknown"
+    manifests: dict[str, str] = Field(default_factory=lambda: dict[str, str]())
+    splits: dict[str, Split]
+
+    @property
+    def held_out_ids(self) -> frozenset[str]:
+        """Keys ("source/episode_id") whose frozen split is not train."""
+        return frozenset(k for k, v in self.splits.items() if v != "train")
+
+
+def episode_key(source: str, episode_id: str) -> str:
+    """Return the "source/episode_id" key used in the holdout file."""
+    return f"{source}/{episode_id}"
 
 
 class ArmFeatures(BaseModel):

@@ -82,4 +82,4 @@ def test_outcome_indices() -> None:
 def test_outcome_target() -> None:
     lab = Label(kind="outcome", origin="human", outcome=4)
     assert to_flora_outcome_target(lab, False) == "Score: 4"
-    assert to_flora_outcome_target(lab, True) == "Rationale: \nScore: 4"
+    assert to_flora_outcome_target(lab, True) == "Rationale: no rationale\n\nScore: 4"
