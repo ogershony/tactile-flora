@@ -321,7 +321,7 @@ def write_spot_strips(
         n_frames = reader.frame_count(ep, role)  # type: ignore[attr-defined]
         for j, s in enumerate(sel):
             idx = min(max(int(round(win.frame_times[s] * ref.fps)), 0), n_frames - 1)
-            frame = np.asarray(reader.read_frame(ep, role, idx), dtype=np.uint8)  # type: ignore[attr-defined]
+            frame = np.asarray(reader.read(ep, role, idx), dtype=np.uint8)  # type: ignore[attr-defined]
             strip.paste(Image.fromarray(frame).resize((cell, cell)), (j * cell, 0))
         draw = ImageDraw.Draw(strip)
         draw.text(

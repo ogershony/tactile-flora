@@ -2,7 +2,7 @@
 """Model backends for FLORA-Rewarder inference: a Protocol, a stub, an HF and a vLLM backend.
 
 Owns: Backend, GenerateResult, StubBackend, HFBackend, VLLMBackend, expected_score, progress,
-mosaic_frames and the decoding-budget constants.
+clip_array and the decoding-budget constants.
 Must never: import torch / transformers / vllm / outlines at module level (the tests, the CLI
 help and CI import this module on machines without them), build prompts, or parse answers.
 
@@ -38,6 +38,8 @@ from pydantic import BaseModel
 
 from tactile_flora.prompts.flora import VideoSpec
 from tactile_flora.schema import Episode, FrameReader
+from tactile_flora.video.mosaic import clip_frames, source_frame_count, video_metadata
+from tactile_flora.video.readers import AutoReader
 
 DENSE_MAX_NEW_TOKENS = 640
 SCORE_ONLY_MAX_NEW_TOKENS = 12
@@ -45,7 +47,6 @@ RATIONALE_MAX_NEW_TOKENS = 160
 TOP_LOGPROBS = 20
 DIGITS = ("1", "2", "3", "4", "5")
 MODEL_ID = "nvidia/Flora-Rewarder"
-BLANK_GRAY = 128
 # Substrings of the released system prompts, used by the stub to tell the tasks apart.
 _DENSE_MARK = "dense action-quality reward model"
 _SCORE_ONLY_MARK = "Do not provide a rationale"
@@ -180,50 +181,21 @@ class StubBackend:
         return GenerateResult(text=text, score_token_logprobs=lp, latency_s=0.0)
 
 
-def mosaic_frames(
-    episode: Episode,
-    video: VideoSpec,
-    reader: FrameReader,
-) -> np.ndarray:
-    """Tile the cameras of ``video.roles`` into one (T, H, W, 3) uint8 mosaic clip.
-
-    Each view is resized to a ``cell_px`` square-bounded cell (aspect kept, padded with black)
-    and placed row-major in ``video.layout`` (scene first = upper left). ``video.blank``
-    replaces every frame with mid-gray of the same shape (the video_blank ablation).
-    """
-    from PIL import Image
-
-    rows, cols = video.layout
-    cell = video.cell_px
-    frames = np.zeros((len(video.frame_indices), rows * cell, cols * cell, 3), dtype=np.uint8)
-    if video.blank:
-        frames[:] = BLANK_GRAY
-        return frames
-    for t, idx in enumerate(video.frame_indices):
-        for k, role in enumerate(video.roles):
-            img = Image.fromarray(reader.read_frame(episode, role, idx))
-            img.thumbnail((cell, cell))
-            r, c = divmod(k, cols)
-            frames[t, r * cell : r * cell + img.height, c * cell : c * cell + img.width] = (
-                np.asarray(img)
-            )
-    return frames
+def clip_array(episode: Episode, video: VideoSpec, reader: FrameReader) -> np.ndarray:
+    """Return the (T, H, W, 3) uint8 clip for ``video`` via video.mosaic.clip_frames."""
+    frames = clip_frames(
+        episode,
+        reader,
+        video.frame_times,
+        video.roles,
+        blank=video.blank,
+        cell_px=video.cell_px,
+    )
+    return np.stack(frames)
 
 
-def _video_metadata(video: VideoSpec, n_frames: int) -> dict[str, Any]:
-    """Frame-clock metadata so timestamp tokens are absolute episode seconds."""
-    return {
-        "total_num_frames": int(n_frames),
-        "fps": float(video.fps),
-        "frames_indices": [int(i) for i in video.frame_indices],
-        "duration": float(n_frames) / float(video.fps),
-        "do_sample_frames": False,
-    }
-
-
-def _scene_frames(episode: Episode) -> int:
-    cam = episode.cameras.get("scene") or next(iter(episode.cameras.values()))
-    return cam.n_frames
+def _video_metadata(video: VideoSpec, episode: Episode) -> dict[str, Any]:
+    return video_metadata(video.frame_indices, video.fps, source_frame_count(episode))
 
 
 def _merge_digit_logprobs(entries: Sequence[tuple[str, float]]) -> dict[str, float]:
@@ -258,7 +230,7 @@ class HFBackend:
     ) -> None:
         """Remember what to load; nothing heavy happens until the first ``generate``."""
         self.checkpoint = checkpoint
-        self.reader = reader
+        self.reader: FrameReader = reader if reader is not None else AutoReader()
         self.model_id = model_id
         self.adapter = (
             adapter if adapter is not None else (None if checkpoint == "released" else checkpoint)
@@ -312,16 +284,16 @@ class HFBackend:
         episode: Episode | None = None,
     ) -> GenerateResult:
         """Greedy-decode one answer; ``score_token_logprobs`` holds digits found in the top-k."""
-        if episode is None or self.reader is None:
-            raise RuntimeError("HFBackend needs an episode and a FrameReader to read video")
+        if episode is None:
+            raise RuntimeError("HFBackend needs the episode to read video")
         import torch  # pyright: ignore[reportMissingImports]
 
         self.load()
-        frames = mosaic_frames(episode, video, self.reader)
+        frames = clip_array(episode, video, self.reader)
         prompt = self._processor.apply_chat_template(
             list(messages), tokenize=False, add_generation_prompt=True, enable_thinking=False
         )
-        meta = _video_metadata(video, _scene_frames(episode))
+        meta = _video_metadata(video, episode)
         inputs = self._processor(
             text=[prompt],
             videos=[frames],
@@ -378,7 +350,7 @@ class VLLMBackend:
     ) -> None:
         """Remember engine settings; the engine is created on first use."""
         self.checkpoint = checkpoint
-        self.reader = reader
+        self.reader: FrameReader = reader if reader is not None else AutoReader()
         self.model_id = model_id if checkpoint == "released" else checkpoint
         self.max_model_len = max_model_len
         self.tensor_parallel_size = tensor_parallel_size
@@ -416,13 +388,13 @@ class VLLMBackend:
         episode: Episode | None = None,
     ) -> GenerateResult:
         """Greedy, regex-constrained generation through vLLM with top-k logprobs."""
-        if episode is None or self.reader is None:
-            raise RuntimeError("VLLMBackend needs an episode and a FrameReader to read video")
+        if episode is None:
+            raise RuntimeError("VLLMBackend needs the episode to read video")
         self.load()
         from vllm import SamplingParams  # type: ignore[import-not-found]
         from vllm.sampling_params import StructuredOutputsParams  # type: ignore[import-not-found]
 
-        frames = mosaic_frames(episode, video, self.reader)
+        frames = clip_array(episode, video, self.reader)
         prompt = self._processor.apply_chat_template(
             list(messages), tokenize=False, add_generation_prompt=True, enable_thinking=False
         )
@@ -432,7 +404,7 @@ class VLLMBackend:
             logprobs=top_logprobs or None,
             structured_outputs=StructuredOutputsParams(regex=regex) if regex else None,
         )
-        meta = _video_metadata(video, _scene_frames(episode))
+        meta = _video_metadata(video, episode)
         t0 = time.perf_counter()
         (res,) = self._llm.generate(
             [

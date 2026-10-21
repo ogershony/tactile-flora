@@ -73,10 +73,10 @@ def test_hf_backend_importable_without_heavy_deps() -> None:
         I.make_backend("nope")
 
 
-def test_mosaic_frames_layout_and_blank() -> None:
+def test_clip_array_layout_and_blank() -> None:
     ep = make_pad_episode(0)
     b = build_prompt(window("outcome"), None, camera_roles=("scene",), fps=4.0)
-    clip = I.mosaic_frames(ep, b.video, SyntheticFrameReader())
+    clip = I.clip_array(ep, b.video, SyntheticFrameReader())
     assert clip.shape == (8, 96, 96, 3) and clip.dtype == np.uint8 and clip.std() > 0
-    blank = I.mosaic_frames(ep, b.video.model_copy(update={"blank": True}), SyntheticFrameReader())
+    blank = I.clip_array(ep, b.video.model_copy(update={"blank": True}), SyntheticFrameReader())
     assert blank.shape == clip.shape and set(np.unique(blank)) == {128}

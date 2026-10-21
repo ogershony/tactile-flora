@@ -61,7 +61,7 @@ def episode_hashes(episode: Episode, reader: FrameReader, role: str = SCENE_ROLE
     n = reader.frame_count(episode, role)
     if n < 1:
         raise ValueError(f"{episode.episode_id}: no frames to hash")
-    return [phash64(to_gray(reader.read_frame(episode, role, i))) for i in (0, n // 2, n - 1)]
+    return [phash64(to_gray(reader.read(episode, role, i))) for i in (0, n // 2, n - 1)]
 
 
 def cached_hashes(

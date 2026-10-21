@@ -77,7 +77,7 @@ def verify(
 ) -> None:
     """Run every verification check over a source and write its report."""
     from tactile_flora.verify import run_verify
-    from tactile_flora.verify.video import PyAVFrameReader
+    from tactile_flora.video.readers import AutoReader
 
     cfg = load_config(config, SourceConfig)
     if cfg.name != source:
@@ -88,9 +88,7 @@ def verify(
     out = data_root / "verified" / source
 
     def _entry() -> None:
-        summary = run_verify(
-            cfg, fcfg, data_root, PyAVFrameReader(Path(cfg.root)), spot_pass=spot_pass
-        )
+        summary = run_verify(cfg, fcfg, data_root, AutoReader(Path(cfg.root)), spot_pass=spot_pass)
         for name, ok in summary.source_verdicts.items():
             typer.echo(f"{name}: {'pass' if ok else 'FAIL'}")
         n_ok = sum(summary.episode_ok.values())
@@ -164,7 +162,6 @@ def pseudo(
     limit: Annotated[int | None, typer.Option(help="Cap on episodes (smoke runs).")] = None,
 ) -> None:
     """Vision-only FLORA pseudo-labeling (refuses eval-only sources)."""
-    from tactile_flora.eval.harness import SourceRootReader
     from tactile_flora.eval.inference import make_backend
     from tactile_flora.labels import pseudo as ps
 
@@ -179,6 +176,8 @@ def pseudo(
     out = data_root / "verified" / source / "pseudo.parquet"
 
     def _entry() -> None:
+        from tactile_flora.video.readers import SourceRootReader
+
         be = make_backend(backend, "released", SourceRootReader(sources_dir))
         path = ps.run_pseudo(cfg, data_root, be, seed=cfg.seed, limit=limit)
         typer.echo(f"wrote {path}")
@@ -250,7 +249,9 @@ def eval_run(
     out = harness.cell_dir(data_root, checkpoint, benchmark, force_mode)
 
     def _entry() -> None:
-        be = make_backend(backend, checkpoint, harness.SourceRootReader(sdir))
+        from tactile_flora.video.readers import SourceRootReader
+
+        be = make_backend(backend, checkpoint, SourceRootReader(sdir))
         cell = harness.run_eval(
             checkpoint, benchmark, force_mode, cfg, fcfg, data_root, be,  # type: ignore[arg-type]
             seed=seed, sources_dir=sdir,
@@ -280,7 +281,9 @@ def eval_grid(
     fcfg, sdir = _eval_common(force_config, sources_dir)
 
     def _entry() -> None:
-        reader = harness.SourceRootReader(sdir)
+        from tactile_flora.video.readers import SourceRootReader
+
+        reader = SourceRootReader(sdir)
         cells = harness.run_grid(
             cfg, ecfg, fcfg, data_root, lambda ck: make_backend(backend, ck, reader),
             sources_dir=sdir,

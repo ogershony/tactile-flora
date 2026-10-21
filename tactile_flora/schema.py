@@ -7,6 +7,7 @@ Must never: hold configuration (see config.py), import from any sibling stage, o
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Annotated, Any, Literal, Protocol, runtime_checkable
 
 import numpy as np
@@ -227,14 +228,18 @@ class CheckResult(BaseModel):
 
 @runtime_checkable
 class FrameReader(Protocol):
-    """Pluggable video decoding used by verification (PyAV in production, in-memory in tests)."""
+    """Pluggable video decoding shared by verification, eval and training (video/readers.py)."""
 
     def frame_count(self, episode: Episode, role: str) -> int:
         """Return the number of decodable frames of camera ``role``; raise if it cannot decode."""
         ...
 
-    def read_frame(self, episode: Episode, role: str, index: int) -> np.ndarray:
-        """Return frame ``index`` of camera ``role`` as an (H, W, 3) uint8 RGB array."""
+    def read(self, episode: Episode, role: str, index: int) -> np.ndarray:
+        """Return episode frame ``index`` of camera ``role`` as an (H, W, 3) uint8 RGB array."""
+        ...
+
+    def read_many(self, episode: Episode, role: str, indices: Sequence[int]) -> list[np.ndarray]:
+        """Return the frames at ``indices`` (same order) with one pass over the file."""
         ...
 
 

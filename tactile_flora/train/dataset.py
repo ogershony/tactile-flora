@@ -35,11 +35,11 @@ from tactile_flora.eval.ablations import apply_force_mode
 from tactile_flora.force import normalize, render
 from tactile_flora.force.resample import resample
 from tactile_flora.prompts.flora import VideoSpec, build_prompt, prompt_diff, to_messages
-from tactile_flora.schema import ManifestRow, ResampledForce, Window
+from tactile_flora.schema import Episode, ManifestRow, ResampledForce, Window
 from tactile_flora.verify import manifest as manifest_mod
+from tactile_flora.video.mosaic import VISUAL_TOKEN_CAP
 
 IGNORE_INDEX = -100
-VISUAL_TOKEN_CAP = 14_336  # paper: a 64-frame clip is capped at 14,336 visual tokens
 
 
 class Tokenizer(Protocol):
@@ -66,6 +66,7 @@ class WindowItem(BaseModel):
     camera_roles: tuple[str, ...] = ("scene",)
     fps: float | None = None
     features: ResampledForce | None = None  # normalized features at window.frame_times
+    episode: Episode | None = None  # where the video frames come from
 
 
 WindowsSource = Callable[[ManifestRow], WindowItem | None]
@@ -77,6 +78,7 @@ class Sample(BaseModel):
     window_id: str
     messages: list[dict[str, Any]]
     video: VideoSpec
+    episode: Episode | None = None
     force_block: str | None
     target: str
     input_ids: list[int]
@@ -159,6 +161,7 @@ def build_samples(
                 window_id=row.window_id,
                 messages=messages,
                 video=bundle.video,
+                episode=item.episode,
                 force_block=block,
                 target=w.target,
                 input_ids=list(full_ids),
@@ -227,6 +230,7 @@ def adapter_windows_source(data_root: Path, force_cfg: ForceConfig) -> WindowsSo
                     camera_roles=tuple(ep.cameras) or ("scene",),
                     fps=cam.fps if cam is not None else None,
                     features=feats,
+                    episode=ep,
                 )
             cache[key] = out
         return cache[key].get(row.window_id)

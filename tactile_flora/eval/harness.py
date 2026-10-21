@@ -68,6 +68,7 @@ from tactile_flora.prompts.parse import (
 from tactile_flora.schema import Episode, ManifestRow, ResampledForce, Window
 from tactile_flora.sources.base import get_source
 from tactile_flora.verify import full_git_hash, manifest
+from tactile_flora.video.readers import SourceRootReader as SourceRootReader
 
 log = logging.getLogger(__name__)
 
@@ -561,33 +562,3 @@ def write_report(eval_cfg: EvalConfig, data_root: Path, out: Path | None = None)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines), "utf-8")
     return path
-
-
-class SourceRootReader:
-    """FrameReader that routes by ``episode.source`` to a PyAVFrameReader rooted at that source.
-
-    The root is ``root`` of ``<sources_dir>/<source>.yaml``; sources without a config (e.g.
-    roboreward, whose cached video paths are absolute) resolve against the working directory.
-    """
-
-    def __init__(self, sources_dir: Path = DEFAULT_SOURCES_DIR) -> None:
-        """Remember where the per-source configs live."""
-        self.sources_dir = sources_dir
-        self._readers: dict[str, Any] = {}
-
-    def _reader(self, episode: Episode) -> Any:
-        from tactile_flora.verify.video import PyAVFrameReader
-
-        if episode.source not in self._readers:
-            cfg_path = self.sources_dir / f"{episode.source}.yaml"
-            root = load_config(cfg_path, SourceConfig).root if cfg_path.exists() else "."
-            self._readers[episode.source] = PyAVFrameReader(Path(root))
-        return self._readers[episode.source]
-
-    def frame_count(self, episode: Episode, role: str) -> int:
-        """Delegate to the source's reader."""
-        return int(self._reader(episode).frame_count(episode, role))
-
-    def read_frame(self, episode: Episode, role: str, index: int) -> Any:
-        """Delegate to the source's reader."""
-        return self._reader(episode).read_frame(episode, role, index)

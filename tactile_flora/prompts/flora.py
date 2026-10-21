@@ -18,11 +18,9 @@ from pydantic import BaseModel
 
 from tactile_flora.prompts import templates as T
 from tactile_flora.schema import Window
+from tactile_flora.video.mosaic import MOSAIC_CELL_PX, mosaic_layout
 
 DENSE_FPS = 4.0
-MOSAIC_CELL_PX = 96  # multiple of 32 nearest the paper's ~105 px per view
-MAX_VIEWS = 4
-_LAYOUTS: dict[int, tuple[int, int]] = {1: (1, 1), 2: (1, 2), 3: (1, 3), 4: (2, 2)}
 
 
 class VideoSpec(BaseModel):
@@ -45,14 +43,6 @@ class PromptBundle(BaseModel):
     user_text_after_video: str
     video: VideoSpec
     answer_prefix: str = ""
-
-
-def mosaic_layout(roles: Sequence[str]) -> tuple[tuple[int, int], list[str]]:
-    """Pick 1x1/1x2/1x3/2x2 by number of views (max 4), scene first so it is upper left."""
-    ordered = sorted(dict.fromkeys(roles), key=lambda r: r != "scene")[:MAX_VIEWS]
-    if not ordered:
-        raise ValueError("at least one camera role is required")
-    return _LAYOUTS[len(ordered)], ordered
 
 
 def _assemble(system: str, clip_line: str, force_block: str | None) -> tuple[str, str]:

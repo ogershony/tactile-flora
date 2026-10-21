@@ -39,9 +39,11 @@ from collections.abc import Callable, Iterable, Iterator, Sequence
 from pathlib import Path
 from typing import Any, Protocol
 
+import numpy as np
 import yaml
 
 from tactile_flora.config import ForceConfig, TrainConfig
+from tactile_flora.schema import FrameReader
 from tactile_flora.train.dataset import (
     IGNORE_INDEX,
     QwenTokenizerAdapter,
@@ -53,6 +55,8 @@ from tactile_flora.train.dataset import (
     token_histogram,
 )
 from tactile_flora.verify import full_git_hash, holdout_path, manifest
+from tactile_flora.video.mosaic import clip_frames, source_frame_count, video_metadata
+from tactile_flora.video.readers import SourceRootReader
 
 log = logging.getLogger("tactile_flora.train")
 
@@ -334,18 +338,23 @@ class HFBackend:
     ``cfg.lora.target_modules`` restricted to ``language_model``), so the vision encoder and
     merger stay frozen; enable gradient checkpointing; wrap with FSDP when world_size > 1,
     otherwise move to the single device. Mixed bf16/fp32 parameters need FSDP
-    ``use_orig_params=True``. Video frames are produced by ``video_loader`` (mosaic composition
-    is not part of this milestone) and passed to the Qwen processor with the sample's messages.
+    ``use_orig_params=True``. Video frames come from ``video_loader``; the default decodes
+    ``sample.episode`` through video.mosaic.clip_frames with ``reader`` (the same path eval uses)
+    and passes the source frame indices and fps to the processor as video metadata.
     """
 
     def __init__(
-        self, cfg: TrainConfig, video_loader: Callable[[Sample], Any] | None = None
+        self,
+        cfg: TrainConfig,
+        video_loader: Callable[[Sample], Any] | None = None,
+        reader: FrameReader | None = None,
     ) -> None:
         torch = _torch()
         transformers = importlib.import_module("transformers")
         peft = importlib.import_module("peft")
         self.cfg = cfg
-        self.video_loader = video_loader
+        self.reader: FrameReader = reader if reader is not None else SourceRootReader()
+        self.video_loader = video_loader or self.load_clip
         self.rank = int(torch.distributed.get_rank()) if torch.distributed.is_initialized() else 0
         self.world_size = (
             int(torch.distributed.get_world_size()) if torch.distributed.is_initialized() else 1
@@ -381,20 +390,32 @@ class HFBackend:
         """LoRA parameters."""
         return [p for p in self.model.parameters() if p.requires_grad]
 
+    def load_clip(self, sample: Sample) -> Any:
+        """Default video_loader: the (T, H, W, 3) uint8 mosaic clip of ``sample``."""
+        if sample.episode is None:
+            raise ValueError(f"{sample.window_id}: sample has no episode to read video from")
+        v = sample.video
+        frames = clip_frames(
+            sample.episode, self.reader, v.frame_times, v.roles, blank=v.blank, cell_px=v.cell_px
+        )
+        return np.stack(frames)
+
     def make_batch(self, sample: Sample) -> dict[str, Any]:
         """Run the processor on the sample's chat and decoded clip; mask all but the answer."""
-        if self.video_loader is None:
-            raise NotImplementedError("HFBackend needs a video_loader (mosaic frame composition)")
         msgs = list(sample.messages)
         prompt = self.processor.apply_chat_template(
             msgs, tokenize=False, add_generation_prompt=True
         )
         full = prompt + sample.target + "<|im_end|>\n"
         video = self.video_loader(sample)
-        enc = self.processor(text=[full], videos=[video], return_tensors="pt")
-        n_prompt = int(
-            self.processor(text=[prompt], videos=[video], return_tensors="pt")["input_ids"].size(1)
-        )
+        kw: dict[str, Any] = {"videos": [video], "return_tensors": "pt"}
+        if sample.episode is not None:
+            meta = video_metadata(
+                sample.video.frame_indices, sample.video.fps, source_frame_count(sample.episode)
+            )
+            kw["videos_kwargs"] = {"video_metadata": [meta], "do_sample_frames": False}
+        enc = self.processor(text=[full], **kw)
+        n_prompt = int(self.processor(text=[prompt], **kw)["input_ids"].size(1))
         labels = enc["input_ids"].clone()
         labels[:, :n_prompt] = IGNORE_INDEX
         enc["labels"] = labels
