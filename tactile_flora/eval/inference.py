@@ -38,7 +38,12 @@ from pydantic import BaseModel
 
 from tactile_flora.prompts.flora import VideoSpec
 from tactile_flora.schema import Episode, FrameReader
-from tactile_flora.video.mosaic import clip_frames, source_frame_count, video_metadata
+from tactile_flora.video.mosaic import (
+    VideoMetadataDict,
+    clip_frames,
+    source_frame_count,
+    video_metadata,
+)
 from tactile_flora.video.readers import AutoReader
 
 DENSE_MAX_NEW_TOKENS = 640
@@ -194,7 +199,7 @@ def clip_array(episode: Episode, video: VideoSpec, reader: FrameReader) -> np.nd
     return np.stack(frames)
 
 
-def _video_metadata(video: VideoSpec, episode: Episode) -> dict[str, Any]:
+def _video_metadata(video: VideoSpec, episode: Episode) -> VideoMetadataDict:
     return video_metadata(video.frame_indices, video.fps, source_frame_count(episode))
 
 

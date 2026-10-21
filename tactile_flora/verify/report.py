@@ -15,7 +15,7 @@ import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from tactile_flora.schema import CheckResult
+from tactile_flora.schema import CheckResult, VerifyThresholds
 
 Results = dict[str, dict[str, CheckResult]]
 SOURCE_LEVEL = ("normalization", "label_sanity", "spot_check", "prompt_diff")
@@ -67,6 +67,15 @@ def source_verdicts(results: Results) -> dict[str, bool]:
             out[name] = _pooled_normalization_ok(seen)
         else:
             out[name] = all(c.passed for c in seen)
+    # Derive this gate from the persisted checks too, so manifest construction cannot
+    # bypass the source median gate enforced by the verify command.
+    lags = [
+        abs(r["sync"].value)
+        for r in results.values()
+        if "sync" in r and r["sync"].value is not None
+    ]
+    if lags:
+        out["sync_median"] = float(np.median(lags)) < VerifyThresholds().sync_median_s
     return out
 
 

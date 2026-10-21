@@ -73,6 +73,17 @@ def test_source_failure_blocks_manifest(tmp_path: Path) -> None:
     assert not (tmp_path / "m.parquet").exists()
 
 
+def test_source_sync_median_failure_blocks_manifest(tmp_path: Path) -> None:
+    # Each episode passes the 250 ms gate, but the source median must be under 100 ms.
+    bad = {
+        e: {**r, "sync": CheckResult(passed=True, value=-0.15, action="shift")}
+        for e, r in RESULTS.items()
+    }
+    with pytest.raises(mf.SourceFailedError, match="sync_median"):
+        _build(tmp_path / "m.parquet", results=bad)
+    assert not (tmp_path / "m.parquet").exists()
+
+
 def test_caps_and_seed_are_byte_identical(tmp_path: Path) -> None:
     capped = CFG.model_copy(update={"max_episodes": 4, "max_windows": 3})
     a, b = tmp_path / "a.parquet", tmp_path / "b.parquet"
@@ -118,6 +129,8 @@ def test_eval_only_source_refuses_train_rows(tmp_path: Path) -> None:
 
 def test_shift_s_and_drop_channel(tmp_path: Path) -> None:
     res = {e: dict(r) for e, r in RESULTS.items()}
+    for per in res.values():
+        per["sync"] = CheckResult(passed=True, value=0.0)
     res["pad-0"]["sync"] = CheckResult(passed=True, value=0.25, action="shift")
     res["pad-1"]["sensor_health"] = CheckResult(passed=False, action="drop_channel", detail="arm=L")
     rows = _build(tmp_path / "a.parquet", results=res)

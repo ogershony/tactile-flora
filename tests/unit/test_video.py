@@ -16,6 +16,7 @@ from tactile_flora.video.mosaic import (
     compose_mosaic,
     frame_indices,
     mosaic_layout,
+    video_metadata,
     visual_token_estimate,
 )
 from tactile_flora.video.readers import (
@@ -28,6 +29,16 @@ from tests.fixtures.lerobot_writer import write_mp4
 from tests.fixtures.synthetic import make_pad_episode
 
 FIX = Path(__file__).parents[1] / "fixtures"
+
+
+def test_video_metadata_matches_transformers_contract() -> None:
+    """Timestamp metadata must construct the real processor's metadata object."""
+    pytest.importorskip("transformers")
+    from transformers.video_utils import VideoMetadata
+
+    meta = VideoMetadata(**video_metadata([0, 0, 15, 29], 15.0, 30))
+    assert meta.total_num_frames == 30
+    assert meta.timestamps == pytest.approx([0, 0, 1, 29 / 15])
 
 
 def _ep(roles: tuple[str, ...], n: int = 10, fps: float = 4.0) -> Episode:

@@ -20,7 +20,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-train = ["torch", "transformers", "peft", "accelerate", "tokenizers"]
+train = ["torch", "torchvision", "transformers", "peft", "accelerate", "tokenizers"]
 baxter = ["pyserial", "rospkg"]
 dev = ["pytest", "ruff", "pyright", "wandb", "pandas-stubs", "types-pyyaml"]
 

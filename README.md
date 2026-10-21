@@ -14,7 +14,7 @@ uv run ruff check . && uv run ruff format --check . && uv run pyright
 uv run tf --help
 ```
 
-Extras: `[train]` torch, transformers, peft, accelerate, tokenizers; `[baxter]` pyserial, rospkg; `[dev]` pytest, ruff, pyright, wandb, type stubs. Python is pinned to 3.11 and `uv.lock` pins every dependency. `scripts/tf` is a thin wrapper around `uv run tf "$@"`.
+Extras: `[train]` torch, torchvision, transformers, peft, accelerate, tokenizers; `[baxter]` pyserial, rospkg; `[dev]` pytest, ruff, pyright, wandb, type stubs. Python is pinned to 3.11 and `uv.lock` pins every dependency. `scripts/tf` is a thin wrapper around `uv run tf "$@"`.
 
 Every command takes `--config`, and prints the config path, the git hash and the output path before doing work. No command writes outside `data/` (Baxter capture writes to its configured `output_dir`).
 
@@ -27,6 +27,39 @@ export TF_TORCH_INDEX=https://download.pytorch.org/whl/rocm6.2   # MI210s (gfx90
 # export TF_TORCH_INDEX=https://download.pytorch.org/whl/cu124   # cloud RTX Pro 6000
 UV_EXTRA_INDEX_URL=$TF_TORCH_INDEX uv sync --extra train
 ```
+
+### Real-data and training acceptance
+
+Download a bounded PHANTOM subset (one contact training success, one training failure,
+and one validation success), then run verification separately from production artifacts:
+
+```bash
+uv run python scripts/download_phantom.py --max-bytes 250000000
+uv run tf verify --config configs/sources/phantom.yaml --source phantom --data-root data/acceptance/phantom
+```
+
+The downloader resolves a commit revision, checks the byte limit before downloading, and writes
+checksums and provenance to `data/raw/phantom/manifests/download.json`. Supply `--revision SHA`
+to reproduce a subset. Three episodes check adapter compatibility; they do not establish benchmark
+coverage. Verification reports pending spot review and any failed data gates without creating an
+accepted training manifest.
+
+Run the tiny random-model LoRA smoke on an allocated GPU with
+`uv run --extra train python scripts/cluster/smoke_train.py`. It supports `--device cpu` for a
+functional check. [Cluster smoke instructions](scripts/cluster/README.md) describe launch options,
+recorded versions, and artifact validation. A fresh Slurm GPU run passed 20 steps and adapter
+validation under `data/acceptance/cluster-gpu-smoke`.
+
+Prepare real PHANTOM clips with the released processor and tokenizer before loading weights:
+
+```sh
+uv run --extra train python scripts/cluster/smoke_inference.py --prepare-only
+```
+
+This writes four input/token-count records and `force.real-tokenizer.yaml` under
+`data/acceptance/released-inference`. Preparation passed; full generation remains blocked by
+the unavailable MI210 nodes and insufficient GPU memory in the RTX 2080 Ti allocation.
+On a suitable GPU, omit `--prepare-only` to run the dense/outcome parser gate.
 
 ## Commands
 
@@ -95,11 +128,11 @@ Key schemas in `tactile_flora/schema.py`: `Episode` (video refs, `ForceStream` o
 | 2 | Force channel (resample, normalize, render, ablations) | Built and tested on fixtures |
 | 3 | Prompts, parsers, window geometry | Built and tested on fixtures |
 | 4 | Labels (mapping, events, merge) | Built and tested on fixtures |
-| 5 | Source adapters (5 training, 3 eval-only) | Built and tested on fixtures; no adapter has run on a real episode |
+| 5 | Source adapters (5 training, 3 eval-only) | PHANTOM loads three real episodes; source sync gate fails; other sources remain fixture-only |
 | 6 | Verification and manifest | Built and tested on fixtures |
-| 7 | Released-model inference | Code complete; never run against the real checkpoint or a GPU. This is the ROCm gate |
+| 7 | Released-model inference | Real processor/video/tokenizer preparation passes; generation blocked by GPU availability. This is the ROCm gate |
 | 8 | Pseudo-labeling | Code complete; only the stub backend has run |
-| 9 | Training | Code complete; dry run and a smoke run exist on fixtures only, no real GPU run |
+| 9 | Training | Tiny random Qwen3.5 LoRA GPU smoke recorded; configurable smoke rerun on CPU; production SFT unverified |
 | 10 | Eval harness | Code complete; only the stub backend has run. roboreward_500 and phantom_val numbers do not exist yet |
 | 11 | Baxter stack | Code complete; untested on hardware. The FSR part (ASIN B0CZ6L5NMM) is unconfirmed, so `sensor_confirmed: false` in `configs/baxter.yaml` |
 

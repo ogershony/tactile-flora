@@ -25,6 +25,7 @@ from typing import Any
 import numpy as np
 
 from tactile_flora.schema import Episode
+from tactile_flora.video.zarr_compat import open_group
 
 ZARR_SUFFIX = "camera_scene_color"
 _RESEEK_GAP = 64  # decode forward through gaps up to this many frames, otherwise seek again
@@ -135,11 +136,9 @@ class ZarrJpegReader(_Base):
         self._groups: dict[Path, Any] = {}
 
     def _data(self, episode: Episode, role: str) -> Any:
-        import zarr
-
         path = video_path(self.root, episode, role)
         if path not in self._groups:
-            group: Any = zarr.open_group(str(path), mode="r")
+            group: Any = open_group(path)
             self._groups[path] = group["data"]
         return self._groups[path]
 

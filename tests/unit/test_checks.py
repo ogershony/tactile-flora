@@ -109,6 +109,29 @@ def test_sensor_health_saturation_and_baseline() -> None:
     assert not checks.check_sensor_health(EP, make_ctx(EPS, baseline_stats=stats)).passed
 
 
+def test_sensor_health_uses_native_fraction_before_upsampling() -> None:
+    data = EP.force.arms["L"]
+    assert isinstance(data, PadArmForce)
+    clipped = [min(v, 1.5) for v in data.f_a]
+    force = EP.force.model_copy(
+        update={"arms": {**EP.force.arms, "L": data.model_copy(update={"f_a": clipped})}}
+    )
+    bad = EP.model_copy(update={"force": force})
+    assert not checks.check_sensor_health(bad, CTX).passed
+    native = bad.model_copy(update={"meta": {"native_saturation": {"L/f_a": 0.005}}})
+    assert checks.check_sensor_health(native, CTX).passed
+    # A configured ADC rail must still catch clipping even with a native maximum fraction.
+    rail_ctx = CTX.model_copy(
+        update={"thresholds": CTX.thresholds.model_copy(update={"saturation_value": 1.5})}
+    )
+    assert not checks.check_sensor_health(native, rail_ctx).passed
+
+
+def test_sensor_health_native_saturation_still_rejects_clipped_data() -> None:
+    clipped = EP.model_copy(update={"meta": {"native_saturation": {"L/f_a": 0.03}}})
+    assert not checks.check_sensor_health(clipped, CTX).passed
+
+
 def test_sync_clean_records_small_lag() -> None:
     r = checks.check_sync(EP, CTX)
     assert r.passed and r.value is not None and abs(r.value) < 0.1
