@@ -19,3 +19,16 @@ topics:
     L: /robot/end_effector/left_gripper/state
     R: /robot/end_effector/right_gripper/state
   policy_status: /policy/status
+  zero: /tactile/zero
+# UNCONFIRMED: set sensor_confirmed true only after the sensor (ASIN B0CZ6L5NMM) is identified and
+# r_ref_ohm / the calibration are redone for it. The node and calibrate CLI warn while false.
+sensor_confirmed: false
+adc_max_counts: 4095
+saturation_counts: 4090      # UNCONFIRMED: sensor-dependent
+saturation_frac_max: 0.05
+flat_variance: 0.25          # counts^2 over 1 s; below this a channel is flat
+health_period_s: 1.0
+health_max_age_s: 3.0
+gripper_open_max: 0.1        # closure 0 open .. 1 closed
+calibration_weights_g: [100, 200, 500, 1000, 2000]
+calibration_samples: 200

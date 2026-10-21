@@ -124,6 +124,11 @@ class GridConfig(_Strict):
     checkpoints: list[str]
     modes: dict[str, list[ForceMode]]
     seed: int
+    # Optional per-checkpoint cap on modes (e.g. released and control run omitted only);
+    # a checkpoint not listed runs every mode its benchmark allows.
+    checkpoint_modes: dict[str, list[ForceMode]] = Field(
+        default_factory=lambda: dict[str, list[ForceMode]]()
+    )
 
 
 class BaxterTopics(_Strict):
@@ -135,6 +140,7 @@ class BaxterTopics(_Strict):
     cameras: dict[str, str]
     gripper_state: dict[str, str]
     policy_status: str
+    zero: str = "/tactile/zero"
 
 
 class BaxterConfig(_Strict):
@@ -150,6 +156,20 @@ class BaxterConfig(_Strict):
     camera_fps: float
     topics: BaxterTopics
     output_dir: str
+    # Additive fields (milestone 11); all sensor-dependent values stay UNCONFIRMED until the
+    # Amazon part (ASIN B0CZ6L5NMM) is identified.
+    sensor_confirmed: bool = False
+    adc_max_counts: int = 4095
+    saturation_counts: int = 4090
+    saturation_frac_max: float = 0.05
+    flat_variance: float = 0.25
+    health_period_s: float = 1.0
+    health_max_age_s: float = 3.0
+    gripper_open_max: float = 0.1
+    calibration_weights_g: list[float] = Field(
+        default_factory=lambda: [100.0, 200.0, 500.0, 1000.0, 2000.0]
+    )
+    calibration_samples: int = 200
 
 
 M = TypeVar("M", bound=BaseModel)
