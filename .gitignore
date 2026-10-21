@@ -1,0 +1,15 @@
+# data stages live on disk, never in git
+data/
+# python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.pyright/
+dist/
+build/
+# local
+.env
+.DS_Store
