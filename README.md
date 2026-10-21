@@ -25,6 +25,7 @@ uv run ruff check . && uv run ruff format --check . && uv run pyright && uv run 
 - `tf eval run --config configs/eval/benchmarks.yaml --checkpoint released --benchmark phantom_val --force-mode omitted`: one eval cell.
 - `tf eval grid --config configs/eval/grid.yaml`: expand the whole ablation grid, skipping finished cells.
 - `tf eval report --config configs/eval/benchmarks.yaml`: markdown tables per benchmark.
+- `tf eval make-roboreward --config configs/eval/benchmarks.yaml --metadata RoboReward/test/metadata.jsonl --n 500 --seed 0`: stratified roboreward_500 manifest + windows sidecar. Eval/pseudo/grid take `--backend stub|hf|vllm` (default hf; hf/vllm need the [train] extra and are gated on milestone 7).
 - `tf baxter calibrate|record|label|to-lerobot --config configs/baxter.yaml`: Baxter capture stack.
 
 ## Training

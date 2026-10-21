@@ -1,5 +1,9 @@
 seed: 0
 checkpoints: [released, data/runs/control, data/runs/force]
+# released and control are force-free models: only the omitted row is meaningful for them.
+checkpoint_modes:
+  released: [omitted]
+  data/runs/control: [omitted]
 modes:
   phantom_val: [omitted, zero, real, shuffled, video_blank]
   reassemble_test: [omitted, zero, real, shuffled, video_blank]
