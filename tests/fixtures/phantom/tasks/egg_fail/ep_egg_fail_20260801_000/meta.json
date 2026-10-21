@@ -1,0 +1,1 @@
+{"task": "egg_fail", "text": "Pick up the egg gently, failure demo: over-squeeze", "operator": "op1", "tags": ["deliberate_failure"], "success": true, "status": "finalized"}

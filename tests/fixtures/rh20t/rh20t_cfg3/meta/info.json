@@ -1,0 +1,49 @@
+{
+ "codebase_version": "v3.0",
+ "fps": 10,
+ "total_episodes": 1,
+ "total_frames": 10,
+ "data_path": "data/chunk-{chunk_index:03d}/file-{file_index:03d}.parquet",
+ "video_path": "videos/{video_key}/chunk-{chunk_index:03d}/file-{file_index:03d}.mp4",
+ "features": {
+  "observation.robot_ft": {
+   "dtype": "float32",
+   "shape": [
+    6
+   ],
+   "names": null
+  },
+  "observation.state.gripper": {
+   "dtype": "float32",
+   "shape": [
+    1
+   ],
+   "names": null
+  },
+  "meta.rating": {
+   "dtype": "float32",
+   "shape": [
+    1
+   ],
+   "names": null
+  },
+  "observation.images.cam_f0001": {
+   "dtype": "video",
+   "shape": [
+    32,
+    32,
+    3
+   ],
+   "names": null
+  },
+  "observation.images.cam_f0002": {
+   "dtype": "video",
+   "shape": [
+    32,
+    32,
+    3
+   ],
+   "names": null
+  }
+ }
+}

@@ -1,6 +1,6 @@
 name: sharpadex
 root: data/raw/sharpadex
-license_allowed: [CC-BY-4.0]
+license_allowed: [CC-BY-NC-4.0]
 max_windows: 600
 max_episodes: 200
 eval_only: false

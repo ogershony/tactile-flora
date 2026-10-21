@@ -1,0 +1,1 @@
+{"episode": "ep_egg_fail_20260801_000", "task": "egg_fail", "success": true, "failure_demo": true, "tactile_contact": true, "split": "val", "session": "20260801", "operator": "op1", "duration_s": 0.6, "peak_force_N": 10.0, "max_contact_mm2": 55.0, "path": "tasks/egg_fail/ep_egg_fail_20260801_000"}
