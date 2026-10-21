@@ -228,3 +228,49 @@ class VerifyContext(BaseModel):
     holdout_ids: frozenset[str] = frozenset()
     license_allowed: list[str] = Field(default_factory=list)
     seed: int = 0
+
+
+class ArmFeatures(BaseModel):
+    """Per-frame force features for one arm; every list has one entry per frame time.
+
+    ``F``, ``delta`` and ``dF`` are raw units out of the resampler and normalized units after
+    ``normalize.apply``. ``F`` is NaN for a frame whose window held no samples. ``delta`` is None
+    for wrist channels, ``g`` is None when no gripper stream exists, and ``c`` (contact flag,
+    0 or 1) is None until the features have been normalized. ``raw_groups`` holds one raw 100 Hz
+    slice of the scalar F series (pad: f_a + f_b, wrist: wrench force magnitude) per 0.5 s
+    group, always in raw units, so a learned encoder can reuse it later.
+    """
+
+    F: list[float]
+    delta: list[float] | None = None
+    dF: list[float]
+    g: list[float] | None = None
+    c: list[int] | None = None
+    raw_groups: list[list[float]] = Field(default_factory=lambda: list[list[float]]())
+
+    @model_validator(mode="after")
+    def _equal_lengths(self) -> ArmFeatures:
+        n = len(self.F)
+        for name in ("delta", "dF", "g", "c"):
+            col = getattr(self, name)
+            if col is not None and len(col) != n:
+                raise ValueError(f"{name} length {len(col)} != len(F) {n}")
+        return self
+
+
+class ResampledForce(BaseModel):
+    """Frame-aligned force features for every arm of one episode window."""
+
+    channel: Literal["pad", "wrist"]
+    frame_times: list[float]
+    arms: dict[Arm, ArmFeatures]
+    norm_version: str | None = None
+
+    @model_validator(mode="after")
+    def _lengths(self) -> ResampledForce:
+        for arm, feats in self.arms.items():
+            if len(feats.F) != len(self.frame_times):
+                raise ValueError(
+                    f"arm {arm} has {len(feats.F)} frames, expected {len(self.frame_times)}"
+                )
+        return self

@@ -7,7 +7,10 @@ resample:
 render:
   header: "Force (normalized: 0 free space, 1 median grasp, max 3):"
   decimals: 2
-  max_tokens: 1500
+  # Spec asked for 1,500, but with the Qwen3 tokenizer the exact spec line format costs
+  # 40 tokens per one-arm pad line and 68 per two-arm line (64 lines: 2,560 / 4,352).
+  # 2,800 covers every single-arm window; two-arm windows need a format decision (see README).
+  max_tokens: 2800
   clip_max: 3.0
 events:
   grasp_g: 0.6
