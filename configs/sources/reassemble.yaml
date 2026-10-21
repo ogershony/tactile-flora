@@ -1,6 +1,6 @@
 name: reassemble
 root: data/raw/reassemble
-license_allowed: [open]
+license_allowed: [CC-BY-4.0]
 max_windows: 150
 max_episodes: 300
 eval_only: false

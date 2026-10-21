@@ -1,6 +1,6 @@
 name: airoa
 root: data/raw/airoa
-license_allowed: [check-card]
+license_allowed: [CC-BY-NC-SA-4.0]
 max_windows: 100
 max_episodes: 200
 eval_only: false
