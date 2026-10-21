@@ -1,0 +1,28 @@
+output_dir: data/eval
+benchmarks:
+  phantom_val:
+    manifest: data/manifest/phantom_val.parquet
+    prompts: [dense, outcome]
+    metrics: [mae, macro_f1, balanced_acc, bad_action_f1, failure_recall]
+  reassemble_test:
+    manifest: data/manifest/reassemble_test.parquet
+    prompts: [dense, outcome]
+    metrics: [mae, failure_recall, bad_action_f1]
+  hrdexdb:
+    manifest: data/manifest/hrdexdb.parquet
+    prompts: [outcome]
+    metrics: [accuracy, auroc]
+    score_only: true
+  softvtbench:
+    manifest: data/manifest/softvtbench.parquet
+    prompts: [dense, outcome]
+    metrics: [mae, failure_recall]
+  baxter:
+    manifest: data/manifest/baxter.parquet
+    prompts: [dense, outcome]
+    metrics: [mae, macro_f1, balanced_acc, bad_action_f1, failure_recall]
+  roboreward_500:
+    manifest: data/manifest/roboreward_500.parquet
+    prompts: [outcome]
+    metrics: [mae]
+    score_only: true

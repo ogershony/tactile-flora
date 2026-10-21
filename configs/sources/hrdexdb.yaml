@@ -1,0 +1,11 @@
+name: hrdexdb
+root: data/raw/hrdexdb
+license_allowed: [check-card]
+max_windows: 0
+max_episodes: 0
+eval_only: true
+expected_label_rate: 0.5
+split_rules:
+  by: session
+  note: placeholder until milestone 5
+seed: 0

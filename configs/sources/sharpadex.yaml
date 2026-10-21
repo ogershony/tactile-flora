@@ -1,0 +1,11 @@
+name: sharpadex
+root: data/raw/sharpadex
+license_allowed: [CC-BY-4.0]
+max_windows: 600
+max_episodes: 200
+eval_only: false
+expected_label_rate: 0.3
+split_rules:
+  by: session
+  note: placeholder until milestone 5
+seed: 0

@@ -1,0 +1,11 @@
+name: phantom
+root: data/raw/phantom
+license_allowed: [check-card]
+max_windows: 300
+max_episodes: 100
+eval_only: false
+expected_label_rate: 0.3
+split_rules:
+  by: session
+  note: placeholder until milestone 5
+seed: 0

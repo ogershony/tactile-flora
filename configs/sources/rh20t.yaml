@@ -1,0 +1,11 @@
+name: rh20t
+root: data/raw/rh20t
+license_allowed: [CC-BY-SA-4.0, CC-BY-NC-4.0]
+max_windows: 300
+max_episodes: 300
+eval_only: false
+expected_label_rate: 0.3
+split_rules:
+  by: session
+  note: placeholder until milestone 5
+seed: 0

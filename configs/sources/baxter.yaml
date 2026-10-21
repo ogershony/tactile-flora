@@ -1,0 +1,11 @@
+name: baxter
+root: data/raw/baxter
+license_allowed: [internal]
+max_windows: 0
+max_episodes: 0
+eval_only: true
+expected_label_rate: 0.35
+split_rules:
+  by: session
+  note: placeholder until milestone 5
+seed: 0

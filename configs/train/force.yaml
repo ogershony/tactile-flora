@@ -1,0 +1,14 @@
+manifest: data/manifest/train.parquet
+base_model: nvidia/Flora-Rewarder
+force_mode: real
+seed: 0
+epochs: 1
+learning_rate: 1.0e-4
+warmup_frac: 0.03
+grad_clip: 1.0
+effective_batch: 16
+lora:
+  rank: 32
+  alpha: 64
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+output_dir: data/runs

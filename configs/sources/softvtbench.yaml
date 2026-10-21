@@ -1,0 +1,11 @@
+name: softvtbench
+root: data/raw/softvtbench
+license_allowed: [Apache-2.0]
+max_windows: 0
+max_episodes: 0
+eval_only: true
+expected_label_rate: 0.5
+split_rules:
+  by: session
+  note: placeholder until milestone 5
+seed: 0

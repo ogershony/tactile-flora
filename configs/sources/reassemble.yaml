@@ -1,0 +1,11 @@
+name: reassemble
+root: data/raw/reassemble
+license_allowed: [open]
+max_windows: 150
+max_episodes: 300
+eval_only: false
+expected_label_rate: 0.3
+split_rules:
+  by: session
+  note: placeholder until milestone 5
+seed: 0

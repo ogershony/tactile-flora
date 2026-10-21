@@ -1,0 +1,9 @@
+seed: 0
+checkpoints: [released, data/runs/control, data/runs/force]
+modes:
+  phantom_val: [omitted, zero, real, shuffled, video_blank]
+  reassemble_test: [omitted, zero, real, shuffled, video_blank]
+  hrdexdb: [omitted, zero, real, shuffled, video_blank]
+  softvtbench: [omitted, zero, real, shuffled, video_blank]
+  baxter: [omitted, zero, real, shuffled, video_blank]
+  roboreward_500: [omitted]

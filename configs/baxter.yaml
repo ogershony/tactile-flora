@@ -1,0 +1,21 @@
+serial_port: /dev/ttyACM0
+baud: 115200
+sample_rate_hz: 200.0
+r_ref_ohm: 4700.0
+channels: [L_a, L_b, R_a, R_b]
+clock_refit_s: 5.0
+calibration_path: configs/baxter_calibration.json
+camera_fps: 30.0
+output_dir: data/raw/baxter
+topics:
+  raw: /tactile/raw
+  force: /tactile/force
+  health: /tactile/health
+  cameras:
+    scene: /cameras/head_camera/image
+    wrist_left: /cameras/left_hand_camera/image
+    wrist_right: /cameras/right_hand_camera/image
+  gripper_state:
+    L: /robot/end_effector/left_gripper/state
+    R: /robot/end_effector/right_gripper/state
+  policy_status: /policy/status
