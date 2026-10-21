@@ -122,6 +122,50 @@ outcome force uses 2,615, below the configured 3,000 budget. Real preparation un
 fixed the unsupported `do_sample_frames` field inside video metadata; the option is passed
 through processor kwargs instead.
 
-As of 2026-10-21 both MI210 nodes are down. The RTX 2080 Ti preflight correctly reports
+The initial RTX 2080 Ti preflight correctly reported
 `blocked` (about 11.2 GB free, 55.6 GB weights), recorded separately under
-`data/acceptance/released-gate-status`. Released generation has not passed.
+`data/acceptance/released-gate-status` while both MI210 nodes were down.
+
+## Two-MI210 acceptance (passed, 2026-10-21)
+
+`matthew` returned with two gfx90a MI210s, each with ~64 GiB VRAM. Slurm allocation 6274
+used both with 8 CPUs and 64 GB host RAM. A 128 GB host-memory request failed the account's
+group memory limit. Both devices passed bf16 matrix multiplication. A separate 20-step LoRA
+smoke passed (4.895 to 3.561 loss) with readable adapter weights under
+`data/acceptance/mi210-training-smoke`.
+
+The successful full released-model command, from this checkout, was:
+
+```sh
+srun --jobid=6274 --overlap --ntasks=1 \
+  env OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 TOKENIZERS_PARALLELISM=false \
+  HF_HUB_DISABLE_PROGRESS_BARS=1 \
+  TRITON_CACHE_DIR="$PWD/data/cluster/triton-cache" \
+  TORCHINDUCTOR_CACHE_DIR="$PWD/data/cluster/torchinductor-cache" \
+  data/cluster/rocm-venv/bin/python -u scripts/cluster/smoke_inference.py \
+  --revision 7de68d22c4a9decec5ddb7f86ddcaee8f82d3367
+```
+
+Replace the job ID with your own two-MI210 allocation. The ROCm environment uses torch
+`2.12.1+rocm7.1`, torchvision `0.27.1+rocm7.1`, HIP `7.1.52802`, transformers `5.8.1`,
+Triton ROCm `3.7.1`, PEFT `0.21.2`, accelerate `1.15.0`, tokenizers `0.22.2`.
+It was installed separately from `.venv`. The torch wheel was downloaded from the official
+ROCm 7.1 index and verified against SHA-256
+`d17d23b7bf440b154ee460521fc81d807927dc5c7dca25f1454eb8bf52855248` before installation.
+
+All four responses parsed: dense omitted/real took 14.03/11.22 seconds; outcome omitted/real
+took 5.21/8.03 seconds and both returned score 5. This is input/output acceptance on one
+episode, not a benchmark or evidence of a learned force benefit. Peak GPU allocations were
+35.80/40.68 GiB. Model placement spans both GPUs without CPU offload. Gated DeltaNet stored
+weights are fp32 with bf16 autocast; the remaining model weights are bf16. Optional FLA and
+causal-conv1d were absent, so their fast kernels remain unverified.
+
+Two bugs surfaced in the real HF path and are now regression-tested: the mixed dtypes require
+autocast; and the checkpoint generation EOS differs from the tokenizer's chat-end EOS, so
+generation must stop on either. Without the latter fix the model repeated assistant turns
+until the token cap. The first failure is saved in `first-mi210-failure.json`; no parser rule
+was relaxed. ROCm also distributes Triton under `triton-rocm`, now handled by version reporting.
+
+`data/acceptance/released-inference/` contains the passing `result.json`, `hardware.json`,
+`slurm-job.txt`, `rocm-requirements.txt`, `mi210.log`, the earlier preparation record and the
+revision-pinned checkpoint cache. Production FSDP training and data acceptance remain open.

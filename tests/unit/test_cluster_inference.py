@@ -1,6 +1,7 @@
 """Acceptance input geometry and failure records for the released-model smoke."""
 
 import json
+from importlib.metadata import PackageNotFoundError
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -8,6 +9,17 @@ import pytest
 
 from scripts.cluster import smoke_inference
 from tests.fixtures.synthetic import make_pad_episode
+
+
+def test_rocm_triton_distribution_version(monkeypatch: pytest.MonkeyPatch) -> None:
+    def version(name: str) -> str:
+        if name == "triton-rocm":
+            return "3.7.1"
+        raise PackageNotFoundError(name)
+
+    monkeypatch.setattr(smoke_inference.importlib.metadata, "version", version)
+    assert smoke_inference.package_version("triton") == "3.7.1"
+    assert smoke_inference.package_version("absent") == "unavailable"
 
 
 def test_acceptance_windows_need_no_training_labels() -> None:

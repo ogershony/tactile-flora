@@ -6,17 +6,17 @@ clip_array and the decoding-budget constants.
 Must never: import torch / transformers / vllm / outlines at module level (the tests, the CLI
 help and CI import this module on machines without them), build prompts, or parse answers.
 
-MILESTONE 7 GATE (not yet passed). HFBackend and VLLMBackend are written from the released
-inference code and the paper but have NOT been run against the real checkpoint: the first
-real run is milestone 7, "the released model produces a parsable dense output on one window"
-on the MI210s (ROCm; Gated DeltaNet kernels come from the Triton flash-linear-attention
-library, gfx90a is supported but not the tested path) with the cloud RTX Pro 6000 as the
-fallback. Record the torch / ROCm / transformers / FLA versions that worked in the README.
+MILESTONE 7 PASSED (2026-10-21). HFBackend generated parsable dense and outcome answers,
+with force omitted and included, on one real PHANTOM episode across two MI210s. Tested:
+torch 2.12.1+rocm7.1, HIP 7.1.52802, transformers 5.8.1, Triton ROCm 3.7.1. DeltaNet used
+the PyTorch fallback; flash-linear-attention and causal-conv1d were not installed. This
+checks loading and output parsing, not model quality, production training or the fast kernels.
+VLLMBackend remains untested. Details and artifacts are in scripts/cluster/README.md.
 Released requirements (nvidia/Flora-Rewarder batch_utils/requirements.txt): vllm 0.24.0,
 transformers 5.8.1, qwen-vl-utils 0.0.14 (plus decord 0.6.0, av >= 15, Pillow < 13). The
 released vLLM run uses bf16, ``gdn_prefill_backend="triton"``, prefix caching, structured
 outputs by regex, ``mm_processor_kwargs={"do_sample_frames": False}`` and per-video metadata
-{total_num_frames, fps, frames_indices, duration, do_sample_frames: False} so the timestamp
+{total_num_frames, fps, frames_indices, duration} so the timestamp
 tokens are absolute episode seconds. Everything here mirrors those settings.
 
 Decoding (paper): greedy, thinking disabled, 640 new tokens for the dense grammar, 12 for
@@ -305,19 +305,32 @@ class HFBackend:
             videos_kwargs={"video_metadata": [meta], "do_sample_frames": False},
             return_tensors="pt",
         ).to(self._model.device)
+        tok = self._processor.tokenizer
+        # The released generation config names endoftext, while its chat tokenizer ends
+        # assistant turns with im_end. Stop on either instead of generating more turns.
+        eos = self._model.generation_config.eos_token_id
+        eos_ids = list(eos) if isinstance(eos, (list, tuple)) else ([] if eos is None else [eos])
+        if tok.eos_token_id is not None and tok.eos_token_id not in eos_ids:
+            eos_ids.append(tok.eos_token_id)
         t0 = time.perf_counter()
-        with torch.no_grad():
+        # DeltaNet parameters stay fp32 while activations and the remaining weights are
+        # bf16. Autocast reconciles projection inputs without changing stored weights.
+        with (
+            torch.no_grad(),
+            torch.autocast(device_type=self._model.device.type, dtype=torch.bfloat16),
+        ):
             out = self._model.generate(
                 **inputs,
                 max_new_tokens=max_new_tokens,
                 do_sample=False,
+                eos_token_id=eos_ids or None,
+                pad_token_id=tok.pad_token_id,
                 output_scores=top_logprobs > 0,
                 return_dict_in_generate=True,
                 logits_processor=self._processor_logits(regex) or None,
             )
         latency = time.perf_counter() - t0
         new_ids = out.sequences[0, inputs["input_ids"].shape[1] :]
-        tok = self._processor.tokenizer
         text = str(tok.decode(new_ids, skip_special_tokens=True))
         lp: dict[str, float] | None = None
         if top_logprobs > 0 and getattr(out, "scores", None):
@@ -338,7 +351,7 @@ class HFBackend:
 class VLLMBackend:
     """vLLM backend mirroring the released engine (offline ``LLM`` with regex structured output).
 
-    Sketch, same status as HFBackend (unrun until milestone 7). vllm is imported inside
+    Untested; milestone 7 was run through HFBackend. vllm is imported inside
     ``load``; install vllm==0.24.0 alongside transformers==5.8.1 and qwen-vl-utils==0.0.14.
     """
 

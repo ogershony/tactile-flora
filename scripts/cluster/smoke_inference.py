@@ -46,6 +46,17 @@ from tactile_flora.video.readers import AutoReader
 PROCESSOR_FILES = ["*.json", "*.txt", "*.jinja", "*.model"]
 
 
+def package_version(name: str) -> str:
+    """Resolve Triton's CUDA/ROCm distribution names without requiring either stack."""
+    candidates = ("triton", "triton-rocm", "pytorch-triton-rocm") if name == "triton" else (name,)
+    for distribution in candidates:
+        try:
+            return importlib.metadata.version(distribution)
+        except importlib.metadata.PackageNotFoundError:
+            continue
+    return "unavailable"
+
+
 def make_parser() -> argparse.ArgumentParser:
     """Build a CLI usable without importing the training dependencies."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -97,15 +108,21 @@ def run(args: argparse.Namespace) -> int:
         "git_dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], text=True)),
     }
     path = output / "result.json"
+
+    def record(stage: str) -> None:
+        result["stage"] = stage
+        path.write_text(json.dumps(result, indent=2) + "\n")
+        print(stage, flush=True)
+
     # Clear a prior success before any download, decode or model load can fail.
-    path.write_text(json.dumps(result, indent=2) + "\n")
+    record("initializing")
     try:
         import torch
         from huggingface_hub import HfApi, snapshot_download
         from transformers import AutoProcessor
 
         result["versions"] = {
-            name: importlib.metadata.version(name)
+            name: package_version(name)
             if importlib.util.find_spec(module) is not None
             else "unavailable"
             for name, module in (
@@ -134,6 +151,7 @@ def run(args: argparse.Namespace) -> int:
             result["status"] = "blocked"
             result["reason"] = "Insufficient free GPU memory for released weights + 20% headroom"
             return 2
+        record("checkpoint download")
         snapshot = Path(
             snapshot_download(
                 MODEL_ID,
@@ -164,6 +182,16 @@ def run(args: argparse.Namespace) -> int:
         result["norm_version"] = consts.version()
         reader = AutoReader()
         backend = HFBackend(model_id=str(snapshot), reader=reader)
+        if not args.prepare_only:
+            record("loading released model")
+            backend.load()
+            result["model_device_map"] = backend._model.hf_device_map
+            result["parameter_dtypes"] = {}
+            for param in backend._model.parameters():
+                dtype = str(param.dtype)
+                result["parameter_dtypes"][dtype] = (
+                    result["parameter_dtypes"].get(dtype, 0) + param.numel()
+                )
         for window in windows_for(episode):
             feats = normalize.apply(
                 resample_shifted(episode, window.frame_times, force_cfg.resample),
@@ -216,6 +244,7 @@ def run(args: argparse.Namespace) -> int:
                 }
                 result["cases"].append(case)
                 if not args.prepare_only:
+                    record(f"generating {window.prompt_kind}/{mode}")
                     dense = window.prompt_kind == "dense"
                     generated = backend.generate(
                         messages,
@@ -229,6 +258,10 @@ def run(args: argparse.Namespace) -> int:
                     case.update(generation=generated.model_dump(), parsed=parsed.model_dump())
                     if parsed.parse_failed:
                         raise RuntimeError(f"{window.prompt_kind}/{mode} output failed parsing")
+                    result["peak_gpu_memory_bytes"] = [
+                        torch.cuda.max_memory_allocated(i) for i in range(torch.cuda.device_count())
+                    ]
+                record(f"completed {window.prompt_kind}/{mode}")
         result["status"] = "prepared" if args.prepare_only else "passed"
         result["gate_passed"] = not args.prepare_only
         return 0

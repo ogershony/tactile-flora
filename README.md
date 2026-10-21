@@ -20,12 +20,13 @@ Every command takes `--config`, and prints the config path, the git hash and the
 
 ### Choosing the torch wheel (ROCm or CUDA)
 
-Set `TF_TORCH_INDEX` to a PyTorch wheel index URL and pass it to uv:
+The verified MI210 environment uses a separate venv so CUDA and ROCm wheels stay independent:
 
 ```bash
-export TF_TORCH_INDEX=https://download.pytorch.org/whl/rocm6.2   # MI210s (gfx90a)
-# export TF_TORCH_INDEX=https://download.pytorch.org/whl/cu124   # cloud RTX Pro 6000
-UV_EXTRA_INDEX_URL=$TF_TORCH_INDEX uv sync --extra train
+uv venv --python 3.11 data/cluster/rocm-venv
+uv pip install --python data/cluster/rocm-venv/bin/python \
+  torch==2.12.1 torchvision==0.27.1 --index-url https://download.pytorch.org/whl/rocm7.1
+uv pip install --python data/cluster/rocm-venv/bin/python -e '.[train]'
 ```
 
 ### Real-data and training acceptance
@@ -57,9 +58,10 @@ uv run --extra train python scripts/cluster/smoke_inference.py --prepare-only
 ```
 
 This writes four input/token-count records and `force.real-tokenizer.yaml` under
-`data/acceptance/released-inference`. Preparation passed; full generation remains blocked by
-the unavailable MI210 nodes and insufficient GPU memory in the RTX 2080 Ti allocation.
-On a suitable GPU, omit `--prepare-only` to run the dense/outcome parser gate.
+`data/acceptance/released-inference`. Full released-model generation also passed on two MI210s:
+dense and outcome prompts, with force omitted and included, all parse successfully.
+On an allocated GPU, omit `--prepare-only` to repeat that gate. The successful ROCm command and
+versions are in [the cluster instructions](scripts/cluster/README.md).
 
 ## Commands
 
@@ -79,7 +81,7 @@ One line per top-level command. All of them accept `--help`.
 - `tf baxter label --config configs/baxter.yaml --labeler alice`: label recorded episodes from video only (force is never shown); `--merge alice --merge bob` merges two labelers.
 - `tf baxter to-lerobot --config configs/baxter.yaml`: convert episode directories to a LeRobot v3 dataset, ready for `tf verify --source baxter`.
 
-`--backend stub|hf|vllm` (default `hf`) applies to `pseudo`, `eval run` and `eval grid`; `hf` and `vllm` need the `[train]` extra and the released checkpoint, and are untested (see status below). `stub` is a deterministic fake model used by the tests and for dry runs of the pipeline.
+`--backend stub|hf|vllm` (default `hf`) applies to `pseudo`, `eval run` and `eval grid`; `hf` and `vllm` need the `[train]` extra and the released checkpoint. HF passed the one-episode inference gate on two MI210s; vllm remains untested. `stub` is a deterministic fake model used by the tests and for dry runs of the pipeline.
 
 ## Data flow
 
@@ -118,7 +120,7 @@ Key schemas in `tactile_flora/schema.py`: `Episode` (video refs, `ForceStream` o
 - It refuses to start unless `data/manifest/holdout_ids.json` exists and every manifest row's `report_version` equals the current full git hash. `--allow-stale-manifest` skips only the second check and is for development; never use it for a reported run.
 - `--dry-run` tokenizes the whole manifest with the Qwen3.5 processor, prints the token histogram (min/p50/p90/max/total) and the estimated wall-clock (9 s/window default), writes `dry_run.json`, and exits 0.
 - A run writes `data/runs/<config stem>/` with `config.yaml`, `manifest_hash.txt`, `git_hash.txt`, `loss.csv`, `log.jsonl` (loss, lr, tok/s, GPU memory every 10 steps) and `adapter/`.
-- The heavy dependencies are the `[train]` extra and are imported lazily. Choose the torch wheel index with `TF_TORCH_INDEX` as described in the quickstart.
+- The heavy dependencies are the `[train]` extra and are imported lazily. Install the torch and torchvision wheels for the allocated hardware as described in the quickstart.
 
 ## Milestone status
 
@@ -130,9 +132,9 @@ Key schemas in `tactile_flora/schema.py`: `Episode` (video refs, `ForceStream` o
 | 4 | Labels (mapping, events, merge) | Built and tested on fixtures |
 | 5 | Source adapters (5 training, 3 eval-only) | PHANTOM loads three real episodes; source sync gate fails; other sources remain fixture-only |
 | 6 | Verification and manifest | Built and tested on fixtures |
-| 7 | Released-model inference | Real processor/video/tokenizer preparation passes; generation blocked by GPU availability. This is the ROCm gate |
+| 7 | Released-model inference | Passed on two MI210s: four real dense/outcome, omitted/force prompts produce parsable answers via HF; PyTorch DeltaNet fallback |
 | 8 | Pseudo-labeling | Code complete; only the stub backend has run |
-| 9 | Training | Tiny random Qwen3.5 LoRA GPU smoke recorded; configurable smoke rerun on CPU; production SFT unverified |
+| 9 | Training | Tiny random Qwen3.5 LoRA smoke passes on CUDA and MI210/ROCm; production SFT and FSDP unverified |
 | 10 | Eval harness | Code complete; only the stub backend has run. roboreward_500 and phantom_val numbers do not exist yet |
 | 11 | Baxter stack | Code complete; untested on hardware. The FSR part (ASIN B0CZ6L5NMM) is unconfirmed, so `sensor_confirmed: false` in `configs/baxter.yaml` |
 
@@ -141,10 +143,10 @@ Key schemas in `tactile_flora/schema.py`: `Episode` (video refs, `ForceStream` o
 ## Environment facts
 
 - Python 3.11 (`requires-python = ">=3.11,<3.12"`), uv, `uv.lock` committed.
-- Released FLORA inference code requires vllm 0.24.0, transformers 5.8.1 and qwen-vl-utils 0.0.14 (from its `batch_utils/requirements.txt`). `pyproject.toml` does not yet pin transformers or vllm for the `[train]` extra; reconcile at milestone 7.
+- Released FLORA inference code requires vllm 0.24.0, transformers 5.8.1 and qwen-vl-utils 0.0.14 (from its `batch_utils/requirements.txt`). The verified HF path needs no vllm or qwen-vl-utils. `[train]` pins transformers 5.8.1, peft 0.21.2 and accelerate 1.15.0; the lock resolves tokenizers 0.22.2.
 - Machines: 5x AMD MI210 (primary training and eval; ROCm risk: Gated DeltaNet kernels come from Triton-based flash-linear-attention, gfx90a is not the tested path), cloud RTX Pro 6000 96 GB (fallback if ROCm blocks milestone 7), 8x RTX 2080 (decode, verify, CI; never load the 27B), Baxter workstation (ROS 1, `[baxter]` extra).
-- Exact versions that worked, to be filled in after milestone 7 passes:
-  - MI210 / ROCm: torch `TBD`, ROCm `TBD`, transformers `TBD`, flash-linear-attention `TBD`, triton `TBD`
+- Exact versions that worked:
+  - Two MI210s / ROCm: torch `2.12.1+rocm7.1`, HIP `7.1.52802`, torchvision `0.27.1+rocm7.1`, transformers `5.8.1`, Triton ROCm `3.7.1`; flash-linear-attention and causal-conv1d absent (native PyTorch fallback). Peak GPU allocations: 35.80 and 40.68 GiB.
   - Cloud CUDA: torch `TBD`, CUDA `TBD`, transformers `TBD`, flash-linear-attention `TBD`
 
 ## Gates

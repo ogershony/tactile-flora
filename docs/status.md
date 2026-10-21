@@ -2,8 +2,8 @@
 
 The original implementation was checked with synthetic fixtures on CPU. Continuation work now
 uses a revision-pinned three-episode PHANTOM subset, a fresh Slurm GPU smoke and the released
-checkpoint's real processor/tokenizer. No released checkpoint generation or Baxter hardware
-acceptance has passed.
+checkpoint's real processor/tokenizer. Released HF inference now passes milestone 7 on two
+MI210s. Baxter hardware and production training remain unverified.
 
 ## Continuation acceptance
 
@@ -50,14 +50,31 @@ acceptance has passed.
   `force.real-tokenizer.yaml`. The processor required the missing torchvision dependency;
   it also exposed an invalid `do_sample_frames` metadata field, now removed (the option stays
   in processor kwargs). A separate real-tokenizer training prefix probe also passed.
-- Released generation is blocked: both MI210 nodes (`matthew`, `monster`) are down. Slurm
+- Initial released generation was blocked: both MI210 nodes (`matthew`, `monster`) were down. Slurm
   preflight on the RTX 2080 Ti records about 11.2 GB free versus 55.6 GB checkpoint weights in
   `data/acceptance/released-gate-status/result.json`. No released weights were downloaded.
+- `matthew` returned with two MI210s; allocation 6274 reserved both with 64 GB host RAM.
+  Both cards passed bf16 matrix multiplication and report gfx90a, 104 CUs, ~64 GiB VRAM.
+  The requested 128 GB host allocation exceeded the account's memory limit; 64 GB succeeded.
+- Released inference **passed** on both cards in `data/acceptance/released-inference/result.json`:
+  dense omitted/real took 14.03/11.22 s; outcome omitted/real took 5.21/8.03 s. All four outputs
+  parsed. GPU peak allocations were 35.80/40.68 GiB. Device placement uses both GPUs with no
+  CPU offload. Runtime: torch 2.12.1+rocm7.1, torchvision 0.27.1+rocm7.1, HIP 7.1.52802,
+  transformers 5.8.1, Triton ROCm 3.7.1. The native PyTorch DeltaNet fallback was used, so
+  flash-linear-attention / causal-conv1d and their performance are still unverified.
+- The real run exposed two HF inference bugs: mixed fp32 DeltaNet/bf16 projections needed
+  autocast, and the checkpoint's generation EOS differs from its tokenizer's chat-end EOS.
+  Both are fixed and regression-tested. The first failed raw output is preserved separately;
+  the successful run generates one complete answer without truncating or relaxing parsing.
+- The ROCm LoRA smoke also passed 20 steps (loss 4.895 to 3.561) with a validated 40-tensor
+  adapter under `data/acceptance/mi210-training-smoke`. This is still a tiny random-model test,
+  not production FSDP training. The isolated environment is `data/cluster/rocm-venv`;
+  hardware, package versions, Slurm allocation and logs accompany the inference artifact.
 - Downloader and smoke launch instructions are in the README and `scripts/cluster/README.md`.
   Data and generated acceptance artifacts remain gitignored.
 
 ## Numbers
-- Tests: 324 passed, no skips, including the installed torch CPU checks. Original implementation:
+- Tests: 326 passed, no skips, including the installed torch CPU checks. Original implementation:
   288 passed, 3 skipped before the train extra was installed.
 - The full continuation suite passed using `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1`
   and a temporary `/tmp` selector polling workaround for this managed shell's missed cross-thread
@@ -90,8 +107,8 @@ acceptance has passed.
 6. Verification and manifest: all spec checks, perceptual frame hashing and overlap detection,
    per-source report, manifest writer, one-shot holdout freeze, sync shift applied.
    Built, tested.
-7. Released-model inference (`eval/inference.py`, backends stub|hf|vllm): released processor
-   preparation passes via `scripts/cluster/smoke_inference.py`; generation remains blocked.
+7. Released-model inference (`eval/inference.py`, backends stub|hf|vllm): milestone 7 passes
+   for HF on two MI210s via `scripts/cluster/smoke_inference.py`; vLLM remains untested.
 8. Pseudo-labeling (`labels/pseudo.py`, `tf pseudo`): code complete, stub only; refuses
    eval-only sources and held-out ids.
 9. Training (`train/dataset.py`, `train/sft.py`): code complete; dry run and a tiny smoke run
@@ -109,9 +126,9 @@ in `docs/deviations.md`.
 
 ## NOT verified
 
-- Anything needing a GPU: released-model loading, the ROCm / Gated DeltaNet / flash-linear-
-  attention path, vllm, FSDP, real throughput (the 9 s/window estimate is a default), loss
-  decreasing on real data, regex-constrained decoding against the real model.
+- Production GPU paths: flash-linear-attention / causal-conv1d, vllm, FSDP, throughput over
+  the full input distribution, loss decreasing on real data, regex-constrained decoding.
+  HF loading and unconstrained greedy outputs validated by parsing now pass on two MI210s.
 - Other real datasets: adapters besides PHANTOM have only seen synthetic fixtures. The list of
   adapter facts guessed from dataset cards is in `docs/deviations.md` section 5. `discover()`
   counts have not been compared with the dataset cards for the complete releases.
@@ -122,8 +139,10 @@ in `docs/deviations.md`.
   force-video sync (under 100 ms gate), and the FSR part itself.
 - Scores: no benchmark number exists. roboreward_500 (about 40.0 MAE expected), phantom_val and
   every ablation row are empty.
-- `[train]` dependency versions: the released FLORA code wants vllm 0.24.0, transformers 5.8.1,
-  qwen-vl-utils 0.0.14; `pyproject.toml` does not pin them.
+- The optional vLLM stack: the released FLORA code wants vllm 0.24.0 and qwen-vl-utils 0.0.14;
+  neither was needed for the HF gate. The training extra now pins transformers 5.8.1,
+  peft 0.21.2 and accelerate 1.15.0. Tokenizers 0.22.2 matches Transformers' declared range;
+  the former tokenizers>=0.23.3 requirement made a clean install unsatisfiable and was relaxed.
 
 ## Open questions from the spec
 
@@ -152,10 +171,9 @@ in `docs/deviations.md`.
    source and run adapter acceptance (`discover()` count vs the dataset card, `load()` on the
    episode clock, `tf verify`). Fix the UNVERIFIED items in `docs/deviations.md` section 5 as
    you go. Do not treat the three-episode subset as full benchmark coverage.
-4. Run milestone 7 on the MI210s: load the released checkpoint, one PHANTOM window, dense and
-   outcome prompts, check for a parsable output. If ROCm blocks it, move to the cloud GPU.
-   Record the working torch / ROCm / transformers / FLA versions in the README placeholders and
-   pin the `[train]` extra. Set `render.tokenizer_json` and rerun `tf train --dry-run`.
+4. Milestone 7 is passed on two MI210s. After the data gates pass, use the generated real-tokenizer
+   force config and run `tf train --dry-run` over the accepted manifest. Validate production
+   FSDP and measure training memory before starting force/control SFT.
 5. Run the released no-force baselines on phantom_val and roboreward_500 (gate 4), then the
    pseudo-labeling, `tf manifest`, `tf manifest freeze-holdout`, and the force and control runs.
 6. Confirm the sensor part (B0CZ6L5NMM): two-wire thin-film FSR, about 10 mm, at least 50 N.
