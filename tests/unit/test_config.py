@@ -53,6 +53,7 @@ def test_force_and_control_differ_in_force_mode_only() -> None:
     assert a.keys() == b.keys()
     diff = {k for k in a if a[k] != b[k]}
     assert diff == {"force_mode"}
+    assert (a["force_mode"], b["force_mode"]) == ("real", "omitted")
 
 
 def test_extra_keys_forbidden(tmp_path: Path) -> None:
