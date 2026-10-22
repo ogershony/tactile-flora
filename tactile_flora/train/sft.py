@@ -26,16 +26,18 @@ on the MI210s or .../cu124 on the cloud GPU); see README "Training".
 
 from __future__ import annotations
 
+import copy
 import csv
 import importlib
 import itertools
 import json
 import logging
 import math
+import os
 import random
 import shutil
 import time
-from collections.abc import Callable, Iterable, Iterator, Sequence
+from collections.abc import Callable, Collection, Iterable, Iterator, Sequence
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -141,6 +143,7 @@ def train_steps(
     device: Any = None,
     keep_logits: bool = False,
     params: Sequence[Any] | None = None,
+    autocast_bf16: bool = False,
 ) -> list[float]:
     """Run the loop over ``batches`` (one micro-batch each); return the loss of every step.
 
@@ -175,18 +178,28 @@ def train_steps(
                 if device is not None:
                     batch = {k: v.to(device) if hasattr(v, "to") else v for k, v in batch.items()}
                 labels = batch["labels"]
-                inputs = {k: v for k, v in batch.items() if k != "labels"}
+                weight = float(batch.get("loss_weight", 1.0))
+                inputs = {k: v for k, v in batch.items() if k not in ("labels", "loss_weight")}
                 kept: int | None = None
                 if keep_logits:
                     kept = labels.size(1) - max(0, _first_answer(labels) - 1)
                     inputs["logits_to_keep"] = kept
-                out = model(**inputs)
-                logits = getattr(out, "logits", out)
-                loss = _answer_loss(logits, labels, kept) / len(group)
+                with torch.autocast(
+                    device_type=torch.device(device or "cpu").type,
+                    dtype=torch.bfloat16,
+                    enabled=autocast_bf16,
+                ):
+                    out = model(**inputs)
+                    logits = getattr(out, "logits", out)
+                    loss = _answer_loss(logits, labels, kept) * weight / len(group)
                 loss.backward()
                 total += float(loss.detach())
                 tokens += int(labels.size(1))
-            torch.nn.utils.clip_grad_norm_(clip_params, grad_clip)
+            clip = getattr(model, "clip_grad_norm_", None)
+            if callable(clip):
+                clip(grad_clip)  # FSDP computes the norm across shards, including nested wrappers.
+            else:
+                torch.nn.utils.clip_grad_norm_(clip_params, grad_clip)
             optimizer.step()
             lr = float(optimizer.param_groups[0]["lr"])
             scheduler.step()
@@ -225,7 +238,10 @@ def ordered_groups(
     groups = [
         list(samples[i : i + effective_batch]) for i in range(0, len(samples), effective_batch)
     ]
+    tail = groups.pop() if groups and len(groups[-1]) < effective_batch else None
     random.Random(seed).shuffle(groups)
+    if tail:
+        groups.append(tail)  # keep a partial group last so accumulation cannot cross its boundary
     return groups
 
 
@@ -234,8 +250,13 @@ def _batches(
 ) -> Iterator[dict[str, Any]]:
     for _ in range(epochs):
         for g in groups:
-            for s in g[backend.rank :: backend.world_size]:
-                yield backend.make_batch(s)
+            padded = math.ceil(len(g) / backend.world_size) * backend.world_size
+            for pos in range(backend.rank, padded, backend.world_size):
+                batch = backend.make_batch(g[pos % len(g)])
+                # Every rank must run the same collectives, even for an uneven final group.
+                # Zero-weight padding contributes no gradient; scaling preserves the true mean.
+                batch["loss_weight"] = padded / len(g) if pos < len(g) else 0.0
+                yield batch
 
 
 def _check_preconditions(
@@ -269,6 +290,7 @@ def train(
     allow_stale_manifest: bool = False,
     tokenizer: Tokenizer | None = None,
     windows_source: WindowsSource | None = None,
+    eval_only_sources: Collection[str] | None = None,
     s_per_window: float = DEFAULT_S_PER_WINDOW,
     report_version: str | None = None,
 ) -> Path:
@@ -277,38 +299,46 @@ def train(
     mp = _check_preconditions(cfg, data_root, allow_stale_manifest, version)
     run_dir = Path(cfg.output_dir) / (run_name or f"sft-{cfg.force_mode}")
     run_dir.mkdir(parents=True, exist_ok=True)
+    rank = int(os.environ.get("RANK", "0"))
     tok = tokenizer or QwenTokenizerAdapter(cfg.base_model)
     samples = build_samples(
         mp, cfg.force_mode, force_cfg, data_root, tokenizer=tok, windows_source=windows_source,
-        seed=cfg.seed,
+        seed=cfg.seed, eval_only_sources=eval_only_sources,
     )  # fmt: skip
     hist = token_histogram(samples)
     eta_s = estimate_wallclock(samples, s_per_window) * cfg.epochs
-    print(f"samples: {len(samples)}  force_mode: {cfg.force_mode}")
-    print("tokens: " + "  ".join(f"{k}={v:.0f}" for k, v in hist.items()))
-    print(f"estimated wall-clock: {eta_s / 3600:.2f} h at {s_per_window:g} s/window")
+    if rank == 0:
+        print(f"samples: {len(samples)}  force_mode: {cfg.force_mode}")
+        print("tokens: " + "  ".join(f"{k}={v:.0f}" for k, v in hist.items()))
+        print(f"estimated wall-clock: {eta_s / 3600:.2f} h at {s_per_window:g} s/window")
     if dry_run:
-        (run_dir / "dry_run.json").write_text(
-            json.dumps({"n_samples": len(samples), "histogram": hist, "eta_s": eta_s}, indent=2),
-            encoding="utf-8",
-        )
+        if rank == 0:
+            (run_dir / "dry_run.json").write_text(
+                json.dumps(
+                    {"n_samples": len(samples), "histogram": hist, "eta_s": eta_s}, indent=2
+                ),
+                encoding="utf-8",
+            )
         return run_dir
     if not samples:
         raise TrainRefused("no training samples")
 
-    (run_dir / "config.yaml").write_text(
-        yaml.safe_dump(cfg.model_dump(), sort_keys=True), encoding="utf-8"
-    )
-    (run_dir / "manifest_hash.txt").write_text(manifest.manifest_hash(mp) + "\n", encoding="utf-8")
-    (run_dir / "git_hash.txt").write_text(version + "\n", encoding="utf-8")
+    if rank == 0:
+        (run_dir / "config.yaml").write_text(
+            yaml.safe_dump(cfg.model_dump(), sort_keys=True), encoding="utf-8"
+        )
+        (run_dir / "manifest_hash.txt").write_text(
+            manifest.manifest_hash(mp) + "\n", encoding="utf-8"
+        )
+        (run_dir / "git_hash.txt").write_text(version + "\n", encoding="utf-8")
 
-    backend = (backend_factory or HFBackend)(cfg)
     torch = _torch()
     torch.manual_seed(cfg.seed)
+    backend = (backend_factory or HFBackend)(cfg)
     params = backend.trainable_parameters()
     optimizer = torch.optim.AdamW(params, lr=cfg.learning_rate)
     groups = ordered_groups(samples, cfg.effective_batch, cfg.seed)
-    accum = max(1, cfg.effective_batch // backend.world_size)
+    accum = max(1, math.ceil(cfg.effective_batch / backend.world_size))
     total_steps = len(groups) * cfg.epochs
     scheduler = make_scheduler(optimizer, total_steps, cfg.warmup_frac)
     train_steps(
@@ -318,13 +348,17 @@ def train(
         scheduler,
         accum=accum,
         grad_clip=cfg.grad_clip,
-        run_dir=run_dir,
+        run_dir=run_dir if backend.rank == 0 else None,
         device=backend.device,
         keep_logits=isinstance(backend, HFBackend),
         params=params,
+        autocast_bf16=isinstance(backend, HFBackend),
     )
     adapter_dir = run_dir / "adapter"
-    shutil.rmtree(adapter_dir, ignore_errors=True)
+    if backend.rank == 0:
+        shutil.rmtree(adapter_dir, ignore_errors=True)
+    if backend.world_size > 1:
+        torch.distributed.barrier()
     backend.save_adapter(adapter_dir)
     return run_dir
 
@@ -355,15 +389,20 @@ class HFBackend:
         self.cfg = cfg
         self.reader: FrameReader = reader if reader is not None else SourceRootReader()
         self.video_loader = video_loader or self.load_clip
+        local_rank = int(os.environ.get("LOCAL_RANK", "0"))
+        if int(os.environ.get("WORLD_SIZE", "1")) > 1 and not torch.distributed.is_initialized():
+            torch.cuda.set_device(local_rank)
+            torch.distributed.init_process_group("nccl")
         self.rank = int(torch.distributed.get_rank()) if torch.distributed.is_initialized() else 0
         self.world_size = (
             int(torch.distributed.get_world_size()) if torch.distributed.is_initialized() else 1
         )
-        self.device = torch.device("cuda", self.rank) if torch.cuda.is_available() else "cpu"
+        self.device = torch.device("cuda", local_rank) if torch.cuda.is_available() else "cpu"
         self.processor = transformers.AutoProcessor.from_pretrained(cfg.base_model)
         model = transformers.AutoModelForImageTextToText.from_pretrained(
-            cfg.base_model, torch_dtype=torch.bfloat16
+            cfg.base_model, dtype=torch.bfloat16
         )
+        model.config.use_cache = False
         for name, p in model.named_parameters():
             p.requires_grad = False
             if "linear_attn" in name:
@@ -375,12 +414,28 @@ class HFBackend:
             target_modules=rf".*language_model.*\.({targets})",
         )
         model = peft.get_peft_model(model, lcfg)
+        # Capture canonical PEFT export keys before nested FSDP wrappers change the module tree.
+        self._adapter_saved_keys = set(peft.get_peft_model_state_dict(model))
         model.gradient_checkpointing_enable()
         model.enable_input_require_grads()
         if self.world_size > 1:
             fsdp = importlib.import_module("torch.distributed.fsdp")
+            peft_policy = peft.utils.other.fsdp_auto_wrap_policy(model)
+
+            def wrap_policy(module: Any, recurse: bool, nonwrapped_numel: int) -> bool:
+                # PEFT separates trainable fp32 LoRA leaves from frozen bf16 blocks.
+                # DeltaNet also needs its own fp32 FSDP unit inside each decoder block.
+                return type(module).__name__ == "Qwen3_5GatedDeltaNet" or peft_policy(
+                    module, recurse, nonwrapped_numel
+                )
+
             model = fsdp.FullyShardedDataParallel(
-                model, use_orig_params=True, device_id=self.device
+                model,
+                use_orig_params=True,
+                device_id=self.device,
+                auto_wrap_policy=wrap_policy,
+                sync_module_states=True,
+                limit_all_gathers=True,
             )
         else:
             model = model.to(self.device)
@@ -404,7 +459,7 @@ class HFBackend:
         """Run the processor on the sample's chat and decoded clip; mask all but the answer."""
         msgs = list(sample.messages)
         prompt = self.processor.apply_chat_template(
-            msgs, tokenize=False, add_generation_prompt=True
+            msgs, tokenize=False, add_generation_prompt=True, enable_thinking=False
         )
         full = prompt + sample.target + "<|im_end|>\n"
         video = self.video_loader(sample)
@@ -415,13 +470,48 @@ class HFBackend:
             )
             kw["videos_kwargs"] = {"video_metadata": [meta], "do_sample_frames": False}
         enc = self.processor(text=[full], **kw)
-        n_prompt = int(self.processor(text=[prompt], **kw)["input_ids"].size(1))
+        prefix = self.processor(text=[prompt], **kw)["input_ids"]
+        n_prompt = int(prefix.size(1))
+        if enc["input_ids"].size(1) <= n_prompt or not _torch().equal(
+            enc["input_ids"][:, :n_prompt], prefix
+        ):
+            raise TrainRefused("multimodal prompt+answer tokens must extend the prompt exactly")
         labels = enc["input_ids"].clone()
         labels[:, :n_prompt] = IGNORE_INDEX
         enc["labels"] = labels
         return dict(enc)
 
     def save_adapter(self, path: Path) -> None:
-        """Save LoRA weights (rank 0 only under FSDP; full state dict gathering is not handled)."""
-        if self.rank == 0:
+        """Gather full adapter tensors collectively, then serialize on rank zero."""
+        if self.world_size > 1:
+            fsdp = importlib.import_module("torch.distributed.fsdp")
+            state: dict[str, Any] = {}
+            # LoRA leaves have their own FSDP units. Gather only those tensors: gathering
+            # the entire frozen 27B base would consume tens of GB of unnecessary host RAM.
+            for name, unit in self.model.named_modules():
+                if not isinstance(unit, fsdp.FullyShardedDataParallel):
+                    continue
+                direct = dict(unit.module.named_parameters(recurse=False))
+                if not any(p.requires_grad for p in direct.values()):
+                    continue
+                with fsdp.FullyShardedDataParallel.summon_full_params(
+                    unit, recurse=False, writeback=False, rank0_only=True, offload_to_cpu=True
+                ):
+                    if self.rank == 0:
+                        prefix = name.replace("_fsdp_wrapped_module.", "")
+                        for key, parameter in unit.module.named_parameters(recurse=False):
+                            export_key = f"{prefix}.{key}".replace(".default.", ".")
+                            if export_key in self._adapter_saved_keys:
+                                state[export_key] = parameter.detach().cpu().contiguous().clone()
+            if self.rank == 0:
+                if not state or set(state) != self._adapter_saved_keys:
+                    raise RuntimeError("FSDP export did not gather every expected adapter tensor")
+                from safetensors.torch import save_file
+
+                path.mkdir(parents=True, exist_ok=True)
+                config = copy.deepcopy(self.model.module.peft_config["default"])
+                config.inference_mode = True
+                config.save_pretrained(path)
+                save_file(state, path / "adapter_model.safetensors", metadata={"format": "pt"})
+        elif self.rank == 0:
             self.model.save_pretrained(path)

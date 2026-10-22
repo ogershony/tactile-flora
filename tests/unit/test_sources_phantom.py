@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+import json
+import shutil
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from tactile_flora.config import SourceConfig
-from tactile_flora.sources.phantom import PhantomAdapter
+from tactile_flora.sources.phantom import LEFT_STREAM, RIGHT_STREAM, PhantomAdapter, _read_group
+from tactile_flora.video.readers import AutoReader
 
 ROOT = Path(__file__).parents[1] / "fixtures" / "phantom"
 EID = "ep_egg_fail_20260801_000"
@@ -65,6 +69,23 @@ def test_outcome_words_stripped() -> None:
     assert "failure" not in task.lower() and task.startswith("Pick up the egg")
 
 
+def test_saturation_statistics_use_native_observations() -> None:
+    adapter = PhantomAdapter(_cfg())
+    adapter.discover(ROOT)
+    episode = adapter.load(EID)
+    for channel, stream in (("f_a", LEFT_STREAM), ("f_b", RIGHT_STREAM)):
+        raw = _read_group(ROOT / "tasks" / "egg_fail" / EID, stream)
+        assert raw is not None
+        values = np.abs(np.asarray(raw[0][:])[:, 2])
+        assert episode.meta["native_saturation"][f"R/{channel}"] == pytest.approx(
+            np.mean(values == values.max())
+        )
+        timestamps = raw[1]
+        timing = episode.meta["native_timing"][f"R/{channel}"]
+        assert timing["samples"] == len(timestamps)
+        assert timing["median_interval_s"] == pytest.approx(np.median(np.diff(timestamps)))
+
+
 def test_splits_force_failure_demos_to_train() -> None:
     a = PhantomAdapter(_cfg())
     a.discover(ROOT)
@@ -76,3 +97,33 @@ def test_native_labels_shape() -> None:
     a = PhantomAdapter(_cfg())
     a.discover(ROOT)
     assert all(lb.origin == "source" for lb in a.native_labels(EID))
+
+
+def test_zarr_suffix_and_legacy_vlen_bytes_fill_metadata(tmp_path: Path) -> None:
+    """Read published *.zarr streams whose VLenBytes fill value is numeric zero."""
+    root = tmp_path / "phantom"
+    shutil.copytree(ROOT, root)
+    ep_dir = root / "tasks" / "egg_fail" / EID
+    for stream in ep_dir.iterdir():
+        if stream.is_dir() and not stream.name.endswith(".zarr"):
+            stream.rename(stream.with_name(f"{stream.name}.zarr"))
+
+    zarray_path = ep_dir / "camera_scene_color.zarr" / "data" / ".zarray"
+    metadata = json.loads(zarray_path.read_text())
+    assert metadata["dtype"] == "|O"
+    assert any(codec["id"] == "vlen-bytes" for codec in metadata["filters"])
+    metadata["fill_value"] = 0
+    zarray_path.write_text(json.dumps(metadata))
+
+    adapter = PhantomAdapter(_cfg().model_copy(update={"root": str(root)}))
+    assert adapter.discover(root) == [EID]
+    ep = adapter.load(EID)
+    assert ep.cameras["scene"].path.endswith("camera_scene_color.zarr")
+    reader = AutoReader()
+    assert reader.frame_count(ep, "scene") == 10
+    frames = reader.read_many(ep, "scene", [0, 4, 9])
+    assert [frame.shape for frame in frames] == [(24, 32, 3)] * 3
+    assert frames[0].dtype.name == "uint8"
+    assert abs(int(frames[-1][..., 0].mean()) - 180) <= 12
+    # The adapter's compatibility layer adjusts metadata only in memory.
+    assert json.loads(zarray_path.read_text())["fill_value"] == 0

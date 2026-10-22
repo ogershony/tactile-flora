@@ -109,6 +109,58 @@ def test_sensor_health_saturation_and_baseline() -> None:
     assert not checks.check_sensor_health(EP, make_ctx(EPS, baseline_stats=stats)).passed
 
 
+def test_sensor_health_uses_native_fraction_before_upsampling() -> None:
+    data = EP.force.arms["L"]
+    assert isinstance(data, PadArmForce)
+    clipped = [min(v, 1.5) for v in data.f_a]
+    force = EP.force.model_copy(
+        update={"arms": {**EP.force.arms, "L": data.model_copy(update={"f_a": clipped})}}
+    )
+    bad = EP.model_copy(update={"force": force})
+    assert not checks.check_sensor_health(bad, CTX).passed
+    native = bad.model_copy(update={"meta": {"native_saturation": {"L/f_a": 0.005}}})
+    assert checks.check_sensor_health(native, CTX).passed
+    # A configured ADC rail must still catch clipping even with a native maximum fraction.
+    rail_ctx = CTX.model_copy(
+        update={"thresholds": CTX.thresholds.model_copy(update={"saturation_value": 1.5})}
+    )
+    assert not checks.check_sensor_health(native, rail_ctx).passed
+
+
+def test_sensor_health_native_saturation_still_rejects_clipped_data() -> None:
+    clipped = EP.model_copy(update={"meta": {"native_saturation": {"L/f_a": 0.03}}})
+    assert not checks.check_sensor_health(clipped, CTX).passed
+
+
+def test_short_recording_single_maximum_is_not_clipping() -> None:
+    values = np.linspace(0.0, 1.0, 50).tolist()
+    stream = EP.force.model_copy(
+        update={
+            "t": EP.force.t[:50],
+            "arms": {"L": PadArmForce(f_a=values, f_b=values)},
+        }
+    )
+    short = EP.model_copy(update={"force": stream})
+    assert checks.check_sensor_health(short, CTX).passed
+    # Even a singleton is a violation when the instrument's actual rail is known.
+    known_rail = CTX.model_copy(
+        update={"thresholds": CTX.thresholds.model_copy(update={"saturation_value": 1.0})}
+    )
+    assert not checks.check_sensor_health(short, known_rail).passed
+    # Duplicating that peak on a common grid must not make it independent evidence.
+    values[-2:] = [1.0, 1.0]
+    upsampled = short.model_copy(
+        update={
+            "force": stream.model_copy(update={"arms": {"L": PadArmForce(f_a=values, f_b=values)}}),
+            "meta": {
+                "native_saturation": {"L/f_a": 0.02, "L/f_b": 0.02},
+                "native_max_counts": {"L/f_a": 1, "L/f_b": 1},
+            },
+        }
+    )
+    assert checks.check_sensor_health(upsampled, CTX).passed
+
+
 def test_sync_clean_records_small_lag() -> None:
     r = checks.check_sync(EP, CTX)
     assert r.passed and r.value is not None and abs(r.value) < 0.1

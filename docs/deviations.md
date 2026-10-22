@@ -113,7 +113,9 @@ such rows from the metrics instead.
 - PHANTOM is HapticWAM (`armteam/hapticwam-teleop-raw`, CC-BY-4.0). Layout is per-episode
   zarr plus JSON manifests, not LeRobot. Scene video is per-frame JPEG bytes in zarr at
   15 Hz. Fingertip force is a 6-D wrench per pad at about 6 Hz, not DM-Tac raw; it is
-  nearest-sampled to a 10 Hz grid. Failure demos are forced into the train split; the
+  nearest-sampled to a 10 Hz grid. Sensor saturation fractions are measured before this
+  upsampling, which otherwise duplicates maxima and falsely rejects short episodes.
+  Failure demos are forced into the train split; the
   `failure_demo` manifest flag is reliable, `success` is not for some `*_fail` batches.
 - REASSEMBLE: one episode is a whole recording (many actions); see Labels above.
 - RH20T community ports carry no fingertip tactile in any config, so RH20T feeds the wrist
@@ -134,7 +136,7 @@ can fail or silently mislead. Source: grep for unverified/guess in `tactile_flor
 
 | Module | Unverified fact |
 |--------|-----------------|
-| `sources/phantom.py` | Whether newer exports use zarr v2 or v3 stores (zarr>=3 reads both). |
+| `sources/phantom.py` | Three real revision-pinned episodes now checked: published streams use `*.zarr` v2 groups and JPEG VLenBytes metadata needs a read-only numeric-fill compatibility shim. Newer v3 exports remain untested. All three pass sensor health after fixing duplicated-max saturation; source verification fails median sync and awaits spot review. |
 | `sources/sharpadex.py` | Index of the right-index MCP joint when `info.json` has no names (`RIGHT_INDEX_MCP_FALLBACK_INDEX = 40`, a placeholder); polarity of that joint (larger = more closed?); exact schema of `meta/subtasks.parquet`; force units (not documented). |
 | `sources/rh20t.py` | Whether `observation.robot_ft` is tared or raw (cfg3 is clipped to +-300, cfg7 Fz min -571 N); whether a larger gripper value means closed; semantics of `meta.rating`. |
 | `sources/reassemble.py` | Exact names of the per-sensor timestamp keys beyond "one per sensor"; units and open/closed polarity of `gripper_positions` (closure = 1 - w / max w assumes larger width = more open). |

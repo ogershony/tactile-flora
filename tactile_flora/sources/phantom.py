@@ -43,7 +43,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import zarr
 
 from tactile_flora.config import SourceConfig
 from tactile_flora.schema import (
@@ -56,6 +55,7 @@ from tactile_flora.schema import (
 )
 from tactile_flora.sources._common import median_rate, nearest_index, py
 from tactile_flora.sources.base import register_source, strip_outcome_words
+from tactile_flora.video.zarr_compat import open_group
 
 LICENSE = "CC-BY-4.0"
 SCENE_STREAM = "camera_scene_color"
@@ -68,12 +68,18 @@ GRIPPER_STREAM = "gripper"
 MANIFEST_SPLITS = {"train": "train", "val": "val", "test": "test"}
 
 
+def _stream_path(ep_dir: Path, name: str) -> Path:
+    """Resolve published ``*.zarr`` streams and legacy extensionless exports."""
+    published = ep_dir / f"{name}.zarr"
+    return published if published.exists() else ep_dir / name
+
+
 def _read_group(ep_dir: Path, name: str) -> tuple[Any, np.ndarray] | None:
     """Open one zarr stream group; return (data array handle, ts float64) or None if absent."""
-    path = ep_dir / name
+    path = _stream_path(ep_dir, name)
     if not path.exists():
         return None
-    group: Any = zarr.open_group(str(path), mode="r")
+    group: Any = open_group(path)
     return group["data"], np.asarray(group["ts"][:], dtype=np.float64)
 
 
@@ -125,6 +131,9 @@ class PhantomAdapter:
 
         grid = np.arange(0.0, duration + 1e-9, 1.0 / FORCE_RATE_HZ)
         pads: list[np.ndarray] = []
+        native_saturation: dict[str, float] = {}
+        native_max_counts: dict[str, int] = {}
+        native_timing: dict[str, dict[str, float | int]] = {}
         for name in (LEFT_STREAM, RIGHT_STREAM):
             stream = _read_group(ep_dir, name)
             if stream is None:
@@ -132,6 +141,20 @@ class PhantomAdapter:
                 break
             data, ts = stream
             fz = np.abs(np.asarray(data[:], dtype=np.float64)[:, FZ_COLUMN])
+            key = f"R/{'f_a' if name == LEFT_STREAM else 'f_b'}"
+            if ts.size > 1:
+                native_timing[key] = {
+                    "samples": int(ts.size),
+                    "median_interval_s": float(np.median(np.diff(ts))),
+                    "max_interval_s": float(np.max(np.diff(ts))),
+                    "first_s": float(ts[0] - offset),
+                    "last_s": float(ts[-1] - offset),
+                }
+            # Health statistics must use independent observations, before nearest sampling
+            # duplicates a single maximum onto several points of the common force grid.
+            if fz.size:
+                native_saturation[key] = float(np.mean(fz == fz.max()))
+                native_max_counts[key] = int(np.count_nonzero(fz == fz.max()))
             pads.append(fz[nearest_index(ts - offset, grid)])
         if pads:
             force = ForceStream(
@@ -172,6 +195,9 @@ class PhantomAdapter:
             "tags": py(meta_json.get("tags", [])),
             "clock_offset_s": offset,
             "manifest_split": row.get("split"),
+            "native_saturation": native_saturation,
+            "native_max_counts": native_max_counts,
+            "native_timing": native_timing,
         }
         return Episode(
             source=self.name,
@@ -181,7 +207,7 @@ class PhantomAdapter:
             duration_s=duration,
             cameras={
                 "scene": VideoRef(
-                    path=str(ep_dir / SCENE_STREAM),
+                    path=str(_stream_path(ep_dir, SCENE_STREAM).resolve()),
                     fps=SCENE_FPS,
                     n_frames=int(scene_data.shape[0]),
                 )

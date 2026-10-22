@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -83,6 +84,56 @@ def test_make_scheduler_and_groups() -> None:
         opt.step()
         sch.step()
     assert lrs[0] < lrs[2] <= 1.0 and lrs[-1] < 0.01 and max(lrs) == pytest.approx(1.0, abs=0.01)
+
+
+def test_distributed_batches_pad_with_zero_weight_and_preserve_the_true_mean() -> None:
+    samples: list[Any] = list(range(5))
+    groups = sft.ordered_groups(samples, 3, seed=0)
+    assert [len(g) for g in groups] == [3, 2]
+    per_rank = []
+    for rank in range(2):
+        backend: Any = SimpleNamespace(
+            rank=rank, world_size=2, make_batch=lambda sample: {"value": sample}
+        )
+        per_rank.append(list(sft._batches(groups, backend, 1)))
+    assert len(per_rank[0]) == len(per_rank[1]) == 3
+    for start, stop, expected in ((0, 2, 1.0), (2, 3, 3.5)):
+        actual = sum(
+            b["value"] * b["loss_weight"] for rank in per_rank for b in rank[start:stop]
+        ) / (2 * (stop - start))
+        assert actual == pytest.approx(expected)
+    assert per_rank[1][1]["loss_weight"] == 0
+
+
+def test_partial_global_batch_stays_last_after_shuffle() -> None:
+    samples: list[Any] = list(range(17))
+    groups = sft.ordered_groups(samples, 4, seed=7)
+    assert [len(g) for g in groups] == [4, 4, 4, 4, 1]
+    assert {id(x) for g in groups for x in g} == {id(x) for x in samples}
+
+
+def test_training_autocast_handles_mixed_stored_dtypes() -> None:
+    torch = pytest.importorskip("torch")
+    model = torch.nn.Sequential(
+        torch.nn.Embedding(VOCAB, 8).to(dtype=torch.bfloat16), torch.nn.Linear(8, VOCAB)
+    )
+    optimizer = torch.optim.AdamW(model.parameters(), lr=0.01)
+    scheduler = sft.make_scheduler(optimizer, 2, 0.03)
+    ids = torch.ones((1, 8), dtype=torch.long)
+    labels = ids.clone()
+    labels[:, :4] = -100
+    losses = sft.train_steps(
+        _Wrap(model),
+        [{"input_ids": ids, "labels": labels}] * 2,
+        optimizer,
+        scheduler,
+        accum=1,
+        grad_clip=1,
+        device="cpu",
+        autocast_bf16=True,
+    )
+    assert len(losses) == 2 and all(torch.isfinite(torch.tensor(losses)))
+    assert model[0].weight.dtype == torch.bfloat16 and model[1].weight.dtype == torch.float32
 
 
 def test_smoke_twenty_steps(tmp_path: Path) -> None:

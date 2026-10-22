@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
+from typing import TypedDict
 
 import numpy as np
 from PIL import Image
@@ -130,14 +131,22 @@ def source_frame_count(episode: Episode) -> int:
     return cam.n_frames
 
 
-def video_metadata(frame_indices_: Sequence[int], fps: float, n_frames: int) -> dict[str, object]:
+class VideoMetadataDict(TypedDict):
+    """Frame-clock fields accepted by the Transformers video processor."""
+
+    total_num_frames: int
+    fps: float
+    frames_indices: list[int]
+    duration: float
+
+
+def video_metadata(frame_indices_: Sequence[int], fps: float, n_frames: int) -> VideoMetadataDict:
     """Frame-clock metadata so the processor's timestamp tokens are absolute episode seconds."""
     return {
         "total_num_frames": int(n_frames),
         "fps": float(fps),
         "frames_indices": [int(i) for i in frame_indices_],
         "duration": float(n_frames) / float(fps),
-        "do_sample_frames": False,
     }
 
 

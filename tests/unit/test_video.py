@@ -16,6 +16,7 @@ from tactile_flora.video.mosaic import (
     compose_mosaic,
     frame_indices,
     mosaic_layout,
+    video_metadata,
     visual_token_estimate,
 )
 from tactile_flora.video.readers import (
@@ -28,6 +29,16 @@ from tests.fixtures.lerobot_writer import write_mp4
 from tests.fixtures.synthetic import make_pad_episode
 
 FIX = Path(__file__).parents[1] / "fixtures"
+
+
+def test_video_metadata_matches_transformers_contract() -> None:
+    """Timestamp metadata must construct the real processor's metadata object."""
+    pytest.importorskip("transformers")
+    from transformers.video_utils import VideoMetadata
+
+    meta = VideoMetadata(**video_metadata([0, 0, 15, 29], 15.0, 30))
+    assert meta.total_num_frames == 30
+    assert meta.timestamps == pytest.approx([0, 0, 1, 29 / 15])
 
 
 def _ep(roles: tuple[str, ...], n: int = 10, fps: float = 4.0) -> Episode:
@@ -94,18 +105,18 @@ def test_pyav_reader_offset_and_count(tmp_path: Path) -> None:
     first = make_pad_episode(0).model_copy(update={"cameras": {"scene": ref}})
     second = first.model_copy(update={"meta": {"video_from_s": {"scene": 1.0}}})
     r = PyAVReader(tmp_path)
-    assert r.frame_count(first, "scene") == 20 and r.frame_count(second, "scene") == 10
+    assert r.frame_count(first, "scene") == 10 and r.frame_count(second, "scene") == 10
     # write_mp4 shade of in-file frame k is 10 * k
-    a = r.read_many(first, "scene", [0, 3, 3, 19])
+    a = r.read_many(first, "scene", [0, 3, 3, 9])
     b = r.read_many(second, "scene", [0, 3, 9])
     assert [x.shape for x in a] == [(32, 32, 3)] * 4 and a[1].dtype == np.uint8
-    for got, k in zip(a, [0, 3, 3, 19], strict=True):
+    for got, k in zip(a, [0, 3, 3, 9], strict=True):
         assert abs(int(got.mean()) - 10 * k) <= 6
     for got, k in zip(b, [10, 13, 19], strict=True):
         assert abs(int(got.mean()) - 10 * k) <= 6
     assert np.array_equal(a[1], a[2]) and np.array_equal(r.read(first, "scene", 3), a[1])
     with pytest.raises(IndexError):
-        r.read(first, "scene", 25)
+        r.read(first, "scene", 10)
 
 
 def test_auto_reader_dispatches_zarr_and_mp4(tmp_path: Path) -> None:

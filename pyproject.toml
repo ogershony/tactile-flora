@@ -16,13 +16,20 @@ dependencies = [
     "pillow>=13.0.0",
     "zarr>=3.1.6",
     "h5py>=3.16.0",
-    "tokenizers>=0.23.3",
+    "tokenizers>=0.22,<0.24",
 ]
 
 [project.optional-dependencies]
-train = ["torch", "transformers", "peft", "accelerate", "tokenizers"]
+train = [
+    "torch",
+    "torchvision",
+    "transformers==5.8.1",
+    "peft==0.21.2",
+    "accelerate==1.15.0",
+    "tokenizers",
+]
 baxter = ["pyserial", "rospkg"]
-dev = ["pytest", "ruff", "pyright", "wandb", "pandas-stubs", "types-pyyaml"]
+dev = ["pytest", "ruff", "pyright", "wandb", "pandas-stubs", "types-pyyaml", "matplotlib"]
 
 [project.scripts]
 tf = "tactile_flora.cli:app"

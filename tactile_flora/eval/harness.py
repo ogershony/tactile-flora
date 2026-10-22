@@ -153,6 +153,7 @@ def adapter_provider(
     rows: list[ManifestRow],
     source_cfgs: Mapping[str, SourceConfig],
     force_cfg: ForceConfig,
+    data_root: Path | None = None,
 ) -> Provider:
     """Return a provider that reloads manifest episodes via their adapter and re-derives windows."""
     by_ep: dict[tuple[str, str], list[ManifestRow]] = {}
@@ -161,30 +162,54 @@ def adapter_provider(
 
     def _iter() -> Iterator[EpisodeBatch]:
         adapters: dict[str, Any] = {}
+        inputs: dict[str, Any] = {}
+        consts_by_source: dict[str, normalize.NormConstants] = {}
         for (src, eid), rs in sorted(by_ep.items()):
             if src not in adapters:
                 a = make_adapter(src, source_cfgs[src])
                 a.discover(Path(source_cfgs[src].root))
                 adapters[src] = a
+                if data_root is not None:
+                    from tactile_flora.verify import report
+                    from tactile_flora.verify.windowing import build_source_inputs
+
+                    vdir = data_root / "verified" / src
+                    consts = normalize.load(vdir / "norm.json")
+                    consts_by_source[src] = consts
+                    results = report.read_checks(vdir) if (vdir / "checks.parquet").exists() else {}
+                    inputs[src] = build_source_inputs(
+                        a, force_cfg, consts, vdir, sorted(results), results
+                    )
             ep: Episode = adapters[src].load(eid)
+            inp = inputs.get(src)
             wins = {
                 manifest.window_id(src, eid, w.prompt_kind, w.anchor_s): w
-                for w in _episode_windows(ep, force_cfg, rs[0].split)
+                for w in _episode_windows(
+                    ep, force_cfg, rs[0].split, inp, consts_by_source.get(src)
+                )
             }
             missing = [r.window_id for r in rs if r.window_id not in wins]
             if missing:
                 raise RuntimeError(f"{src}/{eid}: manifest windows not reproducible: {missing[:3]}")
             ids = [r.window_id for r in rs]
-            shift = float(getattr(rs[0], "shift_s", 0.0) or 0.0)
+            shift = float(
+                inp.shift_of(eid) if inp is not None else getattr(rs[0], "shift_s", 0.0) or 0.0
+            )
             yield EpisodeBatch(ep, [wins[i] for i in ids], ids, shift)
 
     return _iter
 
 
-def _episode_windows(ep: Episode, force_cfg: ForceConfig, split: str) -> list[Window]:
+def _episode_windows(
+    ep: Episode,
+    force_cfg: ForceConfig,
+    split: str,
+    inputs: Any | None = None,
+    consts: normalize.NormConstants | None = None,
+) -> list[Window]:
     from tactile_flora.verify.windowing import episode_windows
 
-    return episode_windows(ep, force_cfg, None, split, with_force=False)  # type: ignore[arg-type]
+    return episode_windows(ep, force_cfg, consts, split, with_force=False, inputs=inputs)  # type: ignore[arg-type]
 
 
 def cached_provider(items: list[wcache.CachedWindow]) -> Provider:
@@ -204,6 +229,7 @@ def make_provider(
     force_cfg: ForceConfig,
     sources_dir: Path,
     source_cfgs: Mapping[str, SourceConfig] | None,
+    data_root: Path | None = None,
 ) -> Provider:
     """Windows sidecar if one exists next to the manifest, else the adapter rebuild."""
     sidecar = wcache.cache_path(manifest_path)
@@ -213,7 +239,7 @@ def make_provider(
         )
     rows = [r for r in manifest.read_manifest(manifest_path) if r.prompt_kind in kinds]
     cfgs = _load_source_cfgs({r.source for r in rows}, sources_dir, source_cfgs)
-    return adapter_provider(rows, cfgs, force_cfg)
+    return adapter_provider(rows, cfgs, force_cfg, data_root)
 
 
 def window_features(
@@ -378,7 +404,9 @@ def run_eval(
     out = cell_dir(data_root, checkpoint, benchmark, force_mode)
     out.mkdir(parents=True, exist_ok=True)
     (out / "metrics.json").unlink(missing_ok=True)  # last file written: absent while running
-    prov = provider or make_provider(mpath, set(spec.prompts), force_cfg, sources_dir, source_cfgs)
+    prov = provider or make_provider(
+        mpath, set(spec.prompts), force_cfg, sources_dir, source_cfgs, data_root
+    )
     batches = _load_batches(prov)  # every episode is loaded and windowed exactly once
 
     need_force = force_mode != "omitted"

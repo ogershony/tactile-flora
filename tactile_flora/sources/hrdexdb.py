@@ -22,7 +22,8 @@ verified 2026-10-21 from the HF API and file headers (docs/research/datasets.md 
   file at all; load() raises NotImplementedError. human: no robot; load() raises. All three are
   still returned by discover() (the verifier, not the adapter, decides what to keep).
 - Units and per-finger semantics are undocumented ("sensor specifications vary across
-  platforms"); values are kept in raw sensor units, abs() taken, and NOT comparable across hands.
+  platforms"); uint16-range samples are decoded as signed int16 before abs() is taken. Values
+  remain in raw sensor units and are NOT comparable across hands.
 - Time bases: every stream has its own time file (``<stem>_time.npy`` or ``time.npy`` next to
   the data, else ``raw/timestamps/<stem>.npy``); if none is found a uniform ``fps`` grid
   (episodes.parquet fps, default 30) is assumed. Streams are aligned by nearest sample.
@@ -86,6 +87,23 @@ def _read_time(trial: Path, stem: str, n: int, fps: float) -> np.ndarray:
             if len(t) == n:
                 return t
     return np.arange(n, dtype=np.float64) / fps
+
+
+def _signed_force(values: np.ndarray) -> np.ndarray:
+    """Decode unsigned 16-bit bit patterns used for signed force samples.
+
+    HRDexDB's ``force.npy`` files are often serialized as int64 despite containing values in
+    the uint16 range. Values above 32767 encode negative int16 readings (for example 65517 is
+    -19); taking abs before decoding turns those small readings into artificial full-scale
+    forces. Preserve already-signed arrays and values outside the uint16 range.
+    """
+    raw = np.asarray(values)
+    out = np.asarray(raw, dtype=np.float64)
+    if np.issubdtype(raw.dtype, np.unsignedinteger) or (
+        out.size and float(np.nanmin(out)) >= 0 and float(np.nanmax(out)) <= 65535
+    ):
+        out = np.where(out >= 32768, out - 65536, out)
+    return out
 
 
 @register_source("hrdexdb")
@@ -157,7 +175,7 @@ class HrdexdbAdapter:
         trial = self._trial(episode_id)
         fps = self._fps.get(episode_id, DEFAULT_FPS)
         stem = _TACTILE_FILES[hand]
-        raw = np.abs(np.asarray(np.load(trial / "raw" / "hand" / f"{stem}.npy"), dtype=np.float64))
+        raw = np.abs(_signed_force(np.load(trial / "raw" / "hand" / f"{stem}.npy")))
         raw = raw.reshape(len(raw), -1)
         t_raw = _read_time(trial, stem, len(raw), fps)
 
@@ -179,7 +197,9 @@ class HrdexdbAdapter:
         vids = sorted((trial / "vid").glob("*.mp4"))
         if not vids:
             raise FileNotFoundError(f"no videos under {trial / 'vid'}")
-        scene_ref = probe_video(vids[0])
+        # SourceRootReader prepends the configured root to relative VideoRef paths. Resolve here
+        # because ``trial`` already includes that root (which may itself be a relative path).
+        scene_ref = probe_video(vids[0].resolve())
         duration = scene_ref.n_frames / scene_ref.fps if scene_ref.n_frames else float(t[-1])
         rate = rate_from_times(t, fps)
         return Episode(
@@ -206,7 +226,7 @@ class HrdexdbAdapter:
                 "camera_serial": vids[0].stem,
                 "tactile_file": f"raw/hand/{stem}.npy",
                 "tactile_channels": [int(top[0]), int(top[1])],
-                "force_units": "raw sensor units (undocumented), abs value",
+                "force_units": "raw sensor units (undocumented), signed-int16 decoded then abs",
                 "gripper_is_proxy": True,
                 "fps": fps,
             },

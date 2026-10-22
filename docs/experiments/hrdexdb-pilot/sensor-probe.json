@@ -1,0 +1,403 @@
+{
+  "selection": "leave-one-training-object-out; accuracy then AUROC",
+  "selected": {
+    "model": "extra-None",
+    "subset": "position",
+    "cv_accuracy": 0.78125,
+    "cv_auroc": 0.75390625
+  },
+  "train_episodes": 32,
+  "val_episodes": 16,
+  "train_objects": [
+    "baby_beaker",
+    "blue_alarm",
+    "cactus",
+    "frame_oak",
+    "green_attached_container",
+    "grey_pot",
+    "lemon_squeezer",
+    "metal_scoop_big",
+    "pastel_light_green_bowl",
+    "pepper_tuna",
+    "pingpong",
+    "pringles",
+    "rectangular_frying_pan",
+    "spam_can",
+    "work_lamp",
+    "yellow_wash_tub"
+  ],
+  "val_accuracy": 0.5,
+  "val_auroc": 0.453125,
+  "candidates": [
+    {
+      "model": "extra-None",
+      "subset": "position",
+      "cv_accuracy": 0.78125,
+      "cv_auroc": 0.75390625
+    },
+    {
+      "model": "rbf-1",
+      "subset": "position",
+      "cv_accuracy": 0.78125,
+      "cv_auroc": 0.751953125
+    },
+    {
+      "model": "extra-4",
+      "subset": "position",
+      "cv_accuracy": 0.75,
+      "cv_auroc": 0.77734375
+    },
+    {
+      "model": "extra-2",
+      "subset": "position",
+      "cv_accuracy": 0.75,
+      "cv_auroc": 0.75390625
+    },
+    {
+      "model": "forest-2",
+      "subset": "position",
+      "cv_accuracy": 0.75,
+      "cv_auroc": 0.703125
+    },
+    {
+      "model": "extra-2",
+      "subset": "all",
+      "cv_accuracy": 0.71875,
+      "cv_auroc": 0.73046875
+    },
+    {
+      "model": "forest-4",
+      "subset": "position",
+      "cv_accuracy": 0.6875,
+      "cv_auroc": 0.73046875
+    },
+    {
+      "model": "forest-None",
+      "subset": "position",
+      "cv_accuracy": 0.6875,
+      "cv_auroc": 0.73046875
+    },
+    {
+      "model": "extra-2",
+      "subset": "force",
+      "cv_accuracy": 0.6875,
+      "cv_auroc": 0.71875
+    },
+    {
+      "model": "logistic-0.001",
+      "subset": "force",
+      "cv_accuracy": 0.6875,
+      "cv_auroc": 0.66796875
+    },
+    {
+      "model": "extra-4",
+      "subset": "all",
+      "cv_accuracy": 0.65625,
+      "cv_auroc": 0.72265625
+    },
+    {
+      "model": "extra-4",
+      "subset": "force",
+      "cv_accuracy": 0.65625,
+      "cv_auroc": 0.71484375
+    },
+    {
+      "model": "logistic-0.001",
+      "subset": "all",
+      "cv_accuracy": 0.65625,
+      "cv_auroc": 0.7109375
+    },
+    {
+      "model": "rbf-1",
+      "subset": "all",
+      "cv_accuracy": 0.65625,
+      "cv_auroc": 0.6875
+    },
+    {
+      "model": "logistic-0.01",
+      "subset": "position",
+      "cv_accuracy": 0.65625,
+      "cv_auroc": 0.6875
+    },
+    {
+      "model": "logistic-0.01",
+      "subset": "all",
+      "cv_accuracy": 0.65625,
+      "cv_auroc": 0.66796875
+    },
+    {
+      "model": "logistic-0.01",
+      "subset": "force",
+      "cv_accuracy": 0.65625,
+      "cv_auroc": 0.65234375
+    },
+    {
+      "model": "extra-None",
+      "subset": "all",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.70703125
+    },
+    {
+      "model": "extra-None",
+      "subset": "force",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.70703125
+    },
+    {
+      "model": "forest-2",
+      "subset": "all",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.703125
+    },
+    {
+      "model": "logistic-0.001",
+      "subset": "position",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.6796875
+    },
+    {
+      "model": "forest-4",
+      "subset": "all",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.67578125
+    },
+    {
+      "model": "forest-None",
+      "subset": "all",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.67578125
+    },
+    {
+      "model": "forest-4",
+      "subset": "force",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.640625
+    },
+    {
+      "model": "forest-None",
+      "subset": "force",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.640625
+    },
+    {
+      "model": "logistic-0.1",
+      "subset": "all",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.58203125
+    },
+    {
+      "model": "logistic-0.1",
+      "subset": "position",
+      "cv_accuracy": 0.59375,
+      "cv_auroc": 0.65234375
+    },
+    {
+      "model": "forest-2",
+      "subset": "force",
+      "cv_accuracy": 0.59375,
+      "cv_auroc": 0.64453125
+    },
+    {
+      "model": "logistic-0.1",
+      "subset": "force",
+      "cv_accuracy": 0.59375,
+      "cv_auroc": 0.6328125
+    },
+    {
+      "model": "logistic-1",
+      "subset": "position",
+      "cv_accuracy": 0.5625,
+      "cv_auroc": 0.625
+    },
+    {
+      "model": "logistic-10",
+      "subset": "position",
+      "cv_accuracy": 0.5625,
+      "cv_auroc": 0.625
+    },
+    {
+      "model": "rbf-1",
+      "subset": "force",
+      "cv_accuracy": 0.5625,
+      "cv_auroc": 0.58203125
+    },
+    {
+      "model": "logistic-10",
+      "subset": "all",
+      "cv_accuracy": 0.5625,
+      "cv_auroc": 0.5546875
+    },
+    {
+      "model": "rbf-10",
+      "subset": "position",
+      "cv_accuracy": 0.5625,
+      "cv_auroc": 0.5234375
+    },
+    {
+      "model": "logistic-1",
+      "subset": "force",
+      "cv_accuracy": 0.53125,
+      "cv_auroc": 0.578125
+    },
+    {
+      "model": "rbf-10",
+      "subset": "all",
+      "cv_accuracy": 0.53125,
+      "cv_auroc": 0.576171875
+    },
+    {
+      "model": "logistic-1",
+      "subset": "all",
+      "cv_accuracy": 0.53125,
+      "cv_auroc": 0.57421875
+    },
+    {
+      "model": "logistic-10",
+      "subset": "force",
+      "cv_accuracy": 0.5,
+      "cv_auroc": 0.57421875
+    },
+    {
+      "model": "rbf-0.001",
+      "subset": "all",
+      "cv_accuracy": 0.5,
+      "cv_auroc": 0.5
+    },
+    {
+      "model": "rbf-0.01",
+      "subset": "all",
+      "cv_accuracy": 0.5,
+      "cv_auroc": 0.5
+    },
+    {
+      "model": "rbf-0.001",
+      "subset": "force",
+      "cv_accuracy": 0.5,
+      "cv_auroc": 0.5
+    },
+    {
+      "model": "rbf-0.01",
+      "subset": "force",
+      "cv_accuracy": 0.5,
+      "cv_auroc": 0.5
+    },
+    {
+      "model": "rbf-0.001",
+      "subset": "position",
+      "cv_accuracy": 0.5,
+      "cv_auroc": 0.5
+    },
+    {
+      "model": "rbf-0.01",
+      "subset": "position",
+      "cv_accuracy": 0.5,
+      "cv_auroc": 0.5
+    },
+    {
+      "model": "rbf-10",
+      "subset": "force",
+      "cv_accuracy": 0.4375,
+      "cv_auroc": 0.376953125
+    },
+    {
+      "model": "rbf-0.1",
+      "subset": "force",
+      "cv_accuracy": 0.34375,
+      "cv_auroc": 0.34375
+    },
+    {
+      "model": "rbf-0.1",
+      "subset": "all",
+      "cv_accuracy": 0.34375,
+      "cv_auroc": 0.26171875
+    },
+    {
+      "model": "rbf-0.1",
+      "subset": "position",
+      "cv_accuracy": 0.3125,
+      "cv_auroc": 0.2734375
+    }
+  ],
+  "predictions": [
+    {
+      "episode_id": "inspire_dftp/cactus2/1",
+      "success_probability": 0.7155555555555555,
+      "label": 0
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/0",
+      "success_probability": 0.6758333333333334,
+      "label": 1
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/0",
+      "success_probability": 0.5725,
+      "label": 0
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/1",
+      "success_probability": 0.6294444444444446,
+      "label": 1
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/0",
+      "success_probability": 0.711388888888889,
+      "label": 0
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/1",
+      "success_probability": 0.6466666666666666,
+      "label": 1
+    },
+    {
+      "episode_id": "inspire_dftp/knife_sharpener/2",
+      "success_probability": 0.35055555555555556,
+      "label": 0
+    },
+    {
+      "episode_id": "inspire_dftp/knife_sharpener/0",
+      "success_probability": 0.37333333333333335,
+      "label": 1
+    },
+    {
+      "episode_id": "inspire_dftp/lotion/1",
+      "success_probability": 0.6583333333333337,
+      "label": 0
+    },
+    {
+      "episode_id": "inspire_dftp/lotion/3",
+      "success_probability": 0.6244444444444446,
+      "label": 1
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/1",
+      "success_probability": 0.4533333333333333,
+      "label": 0
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/0",
+      "success_probability": 0.40388888888888885,
+      "label": 1
+    },
+    {
+      "episode_id": "inspire_dftp/plant_pot/1",
+      "success_probability": 0.5908333333333332,
+      "label": 0
+    },
+    {
+      "episode_id": "inspire_dftp/plant_pot/0",
+      "success_probability": 0.5777777777777777,
+      "label": 1
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/5",
+      "success_probability": 0.49777777777777754,
+      "label": 0
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/0",
+      "success_probability": 0.48333333333333334,
+      "label": 1
+    }
+  ]
+}

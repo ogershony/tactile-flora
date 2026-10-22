@@ -9,7 +9,7 @@ import pytest
 
 from tactile_flora.config import SourceConfig
 from tactile_flora.sources.base import get_source
-from tactile_flora.sources.hrdexdb import HrdexdbAdapter
+from tactile_flora.sources.hrdexdb import HrdexdbAdapter, _signed_force
 
 ROOT = Path(__file__).parents[1] / "fixtures" / "hrdexdb" / "data"
 EID = "allegro_v5/retry_mug/20260101_000000"
@@ -57,6 +57,14 @@ def test_outcome_words_stripped() -> None:
     ep = HrdexdbAdapter(_cfg()).load(EID)
     assert "retry" not in ep.task.lower()
     assert ep.task == "grasp and lift the mug"
+
+
+def test_unsigned_force_bit_patterns_are_decoded_before_absolute_value() -> None:
+    encoded = np.array([0, 19, 32767, 32768, 65517, 65535], dtype=np.int64)
+    np.testing.assert_array_equal(_signed_force(encoded), [0, 19, 32767, -32768, -19, -1])
+    # Arrays already represented as signed int16 remain signed.
+    signed = np.array([-19, 0, 19], dtype=np.int16)
+    np.testing.assert_array_equal(_signed_force(signed), [-19, 0, 19])
 
 
 def test_splits_and_labels() -> None:

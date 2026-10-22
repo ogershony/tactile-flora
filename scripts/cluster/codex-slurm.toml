@@ -1,0 +1,18 @@
+# Configuration fragment for a new Codex session; creating this file does not activate it.
+# Merge into the launcher-owned config outside the restricted session, then restart.
+# Remove legacy sandbox_mode and sandbox_workspace_write settings when using profiles.
+# Managed policies or launcher overrides may still prohibit this profile.
+default_permissions = "slurm"
+approval_policy = "never"
+
+[permissions.slurm]
+description = "Workspace edits with networking for Slurm cluster commands."
+extends = ":workspace"
+
+[permissions.slurm.network]
+enabled = true
+allow_local_binding = true
+
+# This grants command networking generally, including native Slurm TCP traffic.
+# It is not a Slurm-only destination allowlist or an HTTP proxy configuration.
+# Filesystem permissions remain inherited from :workspace.

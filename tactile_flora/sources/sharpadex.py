@@ -158,7 +158,8 @@ class SharpadexAdapter:
             if role is None:
                 continue
             path, from_ts = ds.video(idx, key)
-            cameras[role] = VideoRef(path=str(path), fps=ds.fps, n_frames=n)
+            # Persist absolute paths so SourceRootReader does not prepend the source root twice.
+            cameras[role] = VideoRef(path=str(path.resolve()), fps=ds.fps, n_frames=n)
             video_from[role] = from_ts
 
         tasks = py(rec.get("tasks")) or []

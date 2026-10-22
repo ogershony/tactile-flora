@@ -25,6 +25,7 @@ from typing import Any
 import numpy as np
 
 from tactile_flora.schema import Episode
+from tactile_flora.video.zarr_compat import open_group
 
 ZARR_SUFFIX = "camera_scene_color"
 _RESEEK_GAP = 64  # decode forward through gaps up to this many frames, otherwise seek again
@@ -90,14 +91,16 @@ class PyAVReader(_Base):
             self._total[path] = n
         total = self._total[path]
         start = file_offset_frames(episode, role)
-        if start == 0:
-            return total
         return max(0, min(total - start, episode.cameras[role].n_frames))
 
     def read_many(self, episode: Episode, role: str, indices: Sequence[int]) -> list[np.ndarray]:
         """Decode the requested frames in one pass over the file."""
         import av
 
+        n_frames = episode.cameras[role].n_frames
+        invalid = [i for i in indices if i < 0 or i >= n_frames]
+        if invalid:
+            raise IndexError(f"episode frame {invalid[0]} outside [0, {n_frames})")
         path = video_path(self.root, episode, role)
         wanted = sorted({_file_index(episode, role, int(i)) for i in indices})
         found: dict[int, np.ndarray] = {}
@@ -135,11 +138,9 @@ class ZarrJpegReader(_Base):
         self._groups: dict[Path, Any] = {}
 
     def _data(self, episode: Episode, role: str) -> Any:
-        import zarr
-
         path = video_path(self.root, episode, role)
         if path not in self._groups:
-            group: Any = zarr.open_group(str(path), mode="r")
+            group: Any = open_group(path)
             self._groups[path] = group["data"]
         return self._groups[path]
 

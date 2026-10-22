@@ -11,7 +11,7 @@ Resolved open questions (verified 2026-10-21, docs/research/datasets.md):
   per-action structure is in ``meta["segments"]``. ``Episode.task`` is the first segment's text
   (e.g. "Insert USB."); windowing code must use the segment texts for finer prompts.
 - HDF5: ``robot_state/{measured_force, measured_torque, compensated_base_force,
-  compenseted_base_torque [sic], gripper_positions, ...}``, ``timestamps/<sensor>`` (N x 1,
+  compensated_base_torque, gripper_positions, ...}``, ``timestamps/<sensor>`` (N x 1,
   seconds on the sensor clock, own rate; F/T ~1.7 kHz), top-level mp4 bytes ``hama1``, ``hama2``,
   ``hand``, and ``segments_info/<i>/{start,end,success,text}`` with ``Low_level/<j>/...``.
 - Force: ``measured_force`` + ``measured_torque`` -> WristArmForce arm "R" (channel wrist, raw
@@ -43,6 +43,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+import av
 import h5py
 import numpy as np
 
@@ -75,7 +76,7 @@ KNOWN_ISSUES: dict[str, list[str]] = {
 EXTRACTED_DIR = "extracted"
 VIDEO_ROLES = {"hama1": "scene", "hama2": "scene_2", "hand": "wrist_right"}
 FORCE_KEYS = ("measured_force", "measured_torque")
-FALLBACK_FORCE_KEYS = ("compensated_base_force", "compenseted_base_torque")
+FALLBACK_FORCE_KEYS = ("compensated_base_force", "compensated_base_torque")
 EXTRACT_HINT = (
     'python -c "import h5py,sys; f=h5py.File(sys.argv[1]); '
     "[open(sys.argv[2]+'/'+k+'.mp4','wb').write(f[k][()].tobytes()) "
@@ -153,6 +154,11 @@ class ReassembleAdapter:
             offset = float(cam_t[0])
             duration = float(cam_t[-1] - offset)
             cam_fps = median_rate(cam_t - offset, default=1.0)
+            camera_times = {
+                key: np.asarray(ts_group[key][:], dtype=np.float64).reshape(-1) - offset
+                for key in VIDEO_ROLES
+                if key in ts_group
+            }
 
             fkey, tkey = FORCE_KEYS if FORCE_KEYS[0] in rs else FALLBACK_FORCE_KEYS
             force_raw = np.asarray(rs[fkey][:], dtype=np.float64).reshape(-1, 3)
@@ -191,7 +197,18 @@ class ReassembleAdapter:
         for key, role in VIDEO_ROLES.items():
             mp4 = extracted / f"{key}.mp4"
             if mp4.exists():
-                cameras[role] = VideoRef(path=str(mp4), fps=cam_fps, n_frames=len(cam_t))
+                # Each camera has its own timestamps and frame count. Timestamp jitter
+                # biases median(dt); the encoded playback rate is authoritative here.
+                rate = cam_fps
+                try:
+                    with av.open(str(mp4)) as container:
+                        encoded_rate = container.streams.video[0].average_rate
+                        if encoded_rate:
+                            rate = float(encoded_rate)
+                except Exception:
+                    pass  # the integrity check reports undecodable video
+                times = camera_times.get(key, cam_t - offset)
+                cameras[role] = VideoRef(path=str(mp4), fps=rate, n_frames=len(times))
 
         force = ForceStream(
             channel="wrist",
@@ -216,6 +233,16 @@ class ReassembleAdapter:
             "known_issues": list(KNOWN_ISSUES.get(episode_id, [])),
             "clock_offset_s": offset,
             "h5_path": str(path),
+            "camera_timing": {
+                VIDEO_ROLES[key]: {
+                    "samples": len(t),
+                    "first_s": float(t[0]),
+                    "last_s": float(t[-1]),
+                    "max_interval_s": float(np.max(np.diff(t))) if len(t) > 1 else None,
+                }
+                for key, t in camera_times.items()
+                if len(t)
+            },
         }
         return Episode(
             source=self.name,

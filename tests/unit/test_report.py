@@ -49,8 +49,19 @@ def test_read_checks_roundtrip(tmp_path: Path) -> None:
 
 
 def test_source_verdicts() -> None:
-    assert report.source_verdicts(_results()) == {"spot_check": False}
+    assert report.source_verdicts(_results()) == {"spot_check": False, "sync_median": False}
     assert report.source_verdicts({"e": {"integrity": CheckResult(passed=False)}}) == {}
+
+
+def test_sync_median_uses_absolute_lags_including_rejected_episodes() -> None:
+    results = {
+        "early": {"sync": CheckResult(passed=True, value=-0.1, action="shift")},
+        "late": {"sync": CheckResult(passed=False, value=0.4, action="drop_episode")},
+        "unknown": {"sync": CheckResult(passed=True, detail="not checkable")},
+    }
+    assert report.source_verdicts(results)["sync_median"] is False
+    results["late"]["sync"] = CheckResult(passed=True, value=0.05, action="shift")
+    assert report.source_verdicts(results)["sync_median"] is True
 
 
 def test_all_pass_report(tmp_path: Path) -> None:

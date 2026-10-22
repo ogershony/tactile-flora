@@ -1,5 +1,6 @@
 import math
 import sys
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -80,3 +81,70 @@ def test_clip_array_layout_and_blank() -> None:
     assert clip.shape == (8, 96, 96, 3) and clip.dtype == np.uint8 and clip.std() > 0
     blank = I.clip_array(ep, b.video.model_copy(update={"blank": True}), SyntheticFrameReader())
     assert blank.shape == clip.shape and set(np.unique(blank)) == {128}
+
+
+def test_hf_generation_with_fp32_deltanet_and_bf16_weights() -> None:
+    """The actual small Qwen decoder must run with mixed stored parameter dtypes."""
+    torch = pytest.importorskip("torch")
+    transformers = pytest.importorskip("transformers")
+    config = transformers.Qwen3_5TextConfig(
+        vocab_size=128,
+        hidden_size=64,
+        intermediate_size=128,
+        num_hidden_layers=4,
+        num_attention_heads=4,
+        num_key_value_heads=2,
+        head_dim=16,
+        linear_num_key_heads=2,
+        linear_num_value_heads=4,
+        linear_key_head_dim=16,
+        linear_value_head_dim=16,
+        rope_parameters={
+            "rope_type": "default",
+            "rope_theta": 10000.0,
+            "partial_rotary_factor": 0.25,
+            "mrope_section": [1, 1, 0],
+        },
+        eos_token_id=127,
+        pad_token_id=127,
+    )
+    model = transformers.Qwen3_5ForCausalLM(config).to(dtype=torch.bfloat16).eval()
+    for name, param in model.named_parameters():
+        if "linear_attn" in name:
+            param.data = param.data.float()
+
+    class Processor:
+        tokenizer = SimpleNamespace(
+            decode=lambda ids, **kw: ",".join(str(int(i)) for i in ids),
+            eos_token_id=126,
+            pad_token_id=127,
+        )
+
+        def apply_chat_template(self, *args: object, **kwargs: object) -> str:
+            return "prompt"
+
+        def __call__(self, *args: object, **kwargs: object):
+            return transformers.BatchEncoding({"input_ids": torch.ones((1, 16), dtype=torch.long)})
+
+    backend = I.HFBackend(reader=SyntheticFrameReader())
+    backend._model = model
+    backend._processor = Processor()
+
+    def only_chat_end(input_ids, scores):
+        scores[:] = -torch.inf
+        scores[:, 126] = 0
+        return scores
+
+    backend._processor_logits = lambda regex: [only_chat_end]
+    bundle = build_prompt(window("outcome"), None)
+    generated = backend.generate(
+        to_messages(bundle),
+        bundle.video,
+        episode=make_pad_episode(0),
+        regex=None,
+        max_new_tokens=2,
+        top_logprobs=0,
+    )
+    # The tokenizer EOS differs from model EOS=127; it must stop after one token.
+    assert generated.text == "126"
+    assert all(p.dtype == torch.float32 for n, p in model.named_parameters() if "linear_attn" in n)

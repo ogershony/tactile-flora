@@ -312,7 +312,7 @@ class QwenTokenizerAdapter:
         if answer is not None:
             msgs.append({"role": "assistant", "content": [{"type": "text", "text": answer}]})
         text: str = self.processor.apply_chat_template(
-            msgs, tokenize=False, add_generation_prompt=answer is None
+            msgs, tokenize=False, add_generation_prompt=answer is None, enable_thinking=False
         )
         return text
 

@@ -143,6 +143,11 @@ def check_sensor_health(episode: Episode, ctx: VerifyContext) -> CheckResult:
     zero and do not feed F, so for a wrist arm "flat" means fx, fy and fz are ALL flat (one
     force axis may legitimately stay at zero); other failures in fx, fy, fz drop the arm, and
     torque-only failures are reported in ``detail`` but pass.
+    Adapters that resample native streams may supply ``meta.native_saturation`` with
+    ``arm/channel`` fractions measured before resampling. These avoid counting duplicated
+    maxima as independent observations. A configured ADC rail is still checked separately.
+    An isolated maximum is not evidence of clipping; the unknown-rail heuristic requires
+    at least two independent maxima. Known ADC rail violations still use all samples.
     A failed arm gives drop_channel with the arms named in ``detail`` as ``arm=L,arm=R``
     (comma-separated, first); if every arm is dropped the result is drop_episode.
     """
@@ -171,7 +176,23 @@ def check_sensor_health(episode: Episode, ctx: VerifyContext) -> CheckResult:
         ):
             why.append("flat")
         if x.size and float(np.std(x)) > 0:
-            top = float(np.mean(x == x.max()))
+            top = float(
+                episode.meta.get("native_saturation", {}).get(
+                    f"{arm}/{name}", np.mean(x == x.max())
+                )
+            )
+            if not math.isfinite(top) or not 0 <= top <= 1:
+                raise ValueError(f"invalid native saturation fraction for {arm}/{name}: {top}")
+            key = f"{arm}/{name}"
+            native_counts = episode.meta.get("native_max_counts", {})
+            if key in native_counts:
+                peak_count = int(native_counts[key])
+            elif key in episode.meta.get("native_saturation", {}):
+                peak_count = 2  # older adapter stats did not record independent peak counts
+            else:
+                peak_count = int(np.count_nonzero(x == x.max()))
+            if peak_count < 2:
+                top = 0.0
             if pad and rail is not None:
                 top = max(top, float(np.mean(x >= rail)))
             if top > th.saturation_frac:
