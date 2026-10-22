@@ -94,3 +94,12 @@ core-code/input hashes and job dependencies. The manifest-generation commit is `
 later documentation and orchestration commits do not change its learning inputs. Runtime
 packages and devices are in [the environment](hrdexdb-expanded-v2/training-environment.json).
 Batch scripts are preserved alongside these files; raw videos and adapters remain local.
+
+The force run has completed its first optimizer update with finite loss **2.594008**.
+Automatic report job **6332** depends on successful test evaluation. It verifies adapter
+finiteness and update counts, checks the planned evaluation cells and matching episode/truth
+identities, and writes `data/acceptance/hrdexdb-expanded-v2/final-result.md` plus the portable
+`final-result.json`. The report includes failure recall as well as accuracy/AUROC and parse
+failures, so class imbalance is visible. [Pipeline jobs](hrdexdb-expanded-v2/pipeline-jobs.json)
+record the report-script hash without changing the frozen training plan. Two report tests
+verify successful export and refusal when evaluation conditions disagree on truth targets.

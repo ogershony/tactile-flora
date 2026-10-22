@@ -18,6 +18,8 @@ on two MI210s, with development evaluation 6330 and new-test evaluation 6331 que
 success dependencies. Each run plans four epochs / 88 updates. No expanded trained-model
 score is available yet.
 See [the expanded experiment](experiments/hrdexdb-expanded-v2.md).
+The first expanded force optimizer update is finite (loss 2.594008). Report job 6332 is
+queued after test evaluation to validate artifacts and write the final comparison.
 
 Active HRDexDB working data: **25 train / 13 validation** episodes under
 `data/acceptance/hrdexdb-clean-v1/`, after reviewing all 48 local pilot clips and excluding
