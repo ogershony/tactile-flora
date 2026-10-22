@@ -6,12 +6,15 @@ matches released real-force accuracy at 61.5% (8/13). Shuffled force scores 69.2
 There is no demonstrated training or force benefit on this post hoc development subset.
 See [the fixed training experiment](experiments/hrdexdb-pilot/clean-training.md).
 
-Expansion to all 618 Inspire DFTP clips is downloading with a pinned source revision and
-frozen object assignments (363 train / 139 development / 116 new test before exclusions).
+Expansion to all 618 Inspire DFTP clips is downloaded and mechanically audited with a pinned
+source revision and frozen object assignments. Seventeen exclusions leave **350 train /
+136 development / 115 new test** clips; all retained videos decode completely.
 Recorded video timestamps omitted from the pilot download reveal both start offsets and
 capture/encoded clock drift. A new explicit source-config option maps sensor time to video
-time; legacy runs retain their previous clock behavior. Alignment auditing and expanded
-training are in progress; no expanded score is available yet.
+time; legacy runs retain their previous clock behavior. The aligned released real-force
+diagnostic scores 69.2% (9/13), including refitted normalization, versus 61.5% previously.
+Expanded training preflights pass; no expanded trained-model score is available yet.
+See [the expanded experiment](experiments/hrdexdb-expanded-v2.md).
 
 Active HRDexDB working data: **25 train / 13 validation** episodes under
 `data/acceptance/hrdexdb-clean-v1/`, after reviewing all 48 local pilot clips and excluding

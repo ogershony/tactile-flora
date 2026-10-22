@@ -53,7 +53,8 @@ def main() -> None:
             else f"fixed final checkpoints; {args.benchmark}; see frozen dataset split provenance"
         ),
         "conditions": conditions,
-        "val_manifest_hash": manifest.manifest_hash(cfg.benchmarks[args.benchmark].manifest),
+        "val_manifest_hash": manifest.manifest_hash(args.base / "manifest/val.parquet"),
+        "evaluation_manifest_hash": manifest.manifest_hash(cfg.benchmarks[args.benchmark].manifest),
         "train_manifest_hash": manifest.manifest_hash(args.base / "manifest/hrdexdb-sft.parquet"),
         "training_plan_sha256": hashlib.sha256(
             (args.base / "training-plan.json").read_bytes()
@@ -117,7 +118,7 @@ def main() -> None:
             result = json.loads((path / "metrics.json").read_text())
             saved_config = json.loads((path / "config.json").read_text())
             if (
-                result["manifest_hash"] != plan["val_manifest_hash"]
+                result["manifest_hash"] != plan["evaluation_manifest_hash"]
                 or result["checkpoint"] != checkpoint
                 or result["force_mode"] != mode
                 or result["seed"] != plan["seed"]

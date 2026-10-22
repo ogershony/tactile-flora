@@ -60,7 +60,7 @@ Artifacts live under `data/acceptance/hrdexdb-expanded-v2/`: `download-plan.json
 receipts, `alignment-audit.json`, manifests/holdout, train-only normalization and configs.
 The separate `hrdexdb-aligned-pilot-v2` root checks the corrected timing on the original
 validation IDs; clock validation retains 24 training and 13 validation clips there.
-The expanded audit and training results are pending.
+The expanded audit is complete; training results are pending.
 
 The download completed: 618 episodes, 4,326 per-episode files and 20.22 GB including the
 catalog. [Frozen source and object assignments](hrdexdb-expanded-v2/split.json) are portable.
@@ -70,3 +70,13 @@ normalization on 24 aligned training clips after `blue_alarm/0` failed frame-cou
 it does not isolate the clock change alone. No-force remains stronger at 84.6% (11/13).
 [Diagnostic predictions, audit and configuration](hrdexdb-pilot/aligned-result.json) preserve
 the comparison. Expanded training is needed to assess whether the corrected inputs help SFT.
+
+The [completed mechanical audit](hrdexdb-expanded-v2/alignment-audit.json) retains **350
+train / 136 development / 115 test** clips across the original 52 / 16 / 16 object groups.
+Training has 240 successes / 110 failures; development 74 / 62; test 69 / 46. Seventeen
+clips are excluded: the ten original visual exclusions plus seven additional invalid clock
+records (one original exclusion also has an invalid clock). All 601 retained videos decode
+fully, totaling 519,472 frames. No additional labels were flipped or independently certified.
+Both training preflights pass with exactly 350 samples and no frozen holdout leakage.
+Each four-epoch run plans 88 optimizer updates, including its short final batch each epoch.
+Both source configs and train-only normalization are frozen before training.
