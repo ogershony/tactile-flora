@@ -1,0 +1,575 @@
+{
+  "feature_version": "video-motion-v1-48x256x192",
+  "versions": {
+    "scikit-learn": "1.9.1",
+    "joblib": "1.6.0",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "av": "15.1.0",
+    "pillow": "13.0.0"
+  },
+  "selection": "validation accuracy tuning; tie-break train object CV then validation AUROC; threshold 0.5",
+  "selected": {
+    "model": "logistic-10",
+    "subset": "spatial",
+    "cv_accuracy": 0.75,
+    "cv_auroc": 0.6875,
+    "val_accuracy": 0.8125,
+    "val_auroc": 0.90625
+  },
+  "train_episodes": 32,
+  "val_episodes": 16,
+  "train_split_sha256": "2784b24cb860cafbb320b801816411b2317b60375c2e8b19731b1b1a10a78dd9",
+  "val_split_sha256": "094866b3c3c8d564e2ff05b6a023fa5e5f1ff626d9ec083a04d8afc740ce115d",
+  "val_accuracy": 0.8125,
+  "val_auroc": 0.90625,
+  "predictions": [
+    {
+      "episode_id": "inspire_dftp/cactus2/1",
+      "success_probability": 0.03746991985039741,
+      "prediction": false,
+      "label": false
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/0",
+      "success_probability": 0.9771271655317316,
+      "prediction": true,
+      "label": true
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/0",
+      "success_probability": 0.7936685746402521,
+      "prediction": true,
+      "label": false
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/1",
+      "success_probability": 0.9874001383303396,
+      "prediction": true,
+      "label": true
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/0",
+      "success_probability": 0.005824797685791423,
+      "prediction": false,
+      "label": false
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/1",
+      "success_probability": 0.997642687535271,
+      "prediction": true,
+      "label": true
+    },
+    {
+      "episode_id": "inspire_dftp/knife_sharpener/2",
+      "success_probability": 0.02808415340417472,
+      "prediction": false,
+      "label": false
+    },
+    {
+      "episode_id": "inspire_dftp/knife_sharpener/0",
+      "success_probability": 0.9993330177798802,
+      "prediction": true,
+      "label": true
+    },
+    {
+      "episode_id": "inspire_dftp/lotion/1",
+      "success_probability": 0.07356014972325482,
+      "prediction": false,
+      "label": false
+    },
+    {
+      "episode_id": "inspire_dftp/lotion/3",
+      "success_probability": 0.5242707828559768,
+      "prediction": true,
+      "label": true
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/1",
+      "success_probability": 0.9431576769553875,
+      "prediction": true,
+      "label": false
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/0",
+      "success_probability": 0.9670504640870895,
+      "prediction": true,
+      "label": true
+    },
+    {
+      "episode_id": "inspire_dftp/plant_pot/1",
+      "success_probability": 0.8453547323161544,
+      "prediction": true,
+      "label": false
+    },
+    {
+      "episode_id": "inspire_dftp/plant_pot/0",
+      "success_probability": 0.7678798337721312,
+      "prediction": true,
+      "label": true
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/5",
+      "success_probability": 0.039696223526306924,
+      "prediction": false,
+      "label": false
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/0",
+      "success_probability": 0.9957577436716766,
+      "prediction": true,
+      "label": true
+    }
+  ],
+  "candidates": [
+    {
+      "model": "logistic-10",
+      "subset": "spatial",
+      "cv_accuracy": 0.75,
+      "cv_auroc": 0.6875,
+      "val_accuracy": 0.8125,
+      "val_auroc": 0.90625
+    },
+    {
+      "model": "logistic-1",
+      "subset": "spatial",
+      "cv_accuracy": 0.75,
+      "cv_auroc": 0.6796875,
+      "val_accuracy": 0.8125,
+      "val_auroc": 0.90625
+    },
+    {
+      "model": "logistic-0.1",
+      "subset": "spatial",
+      "cv_accuracy": 0.75,
+      "cv_auroc": 0.6953125,
+      "val_accuracy": 0.75,
+      "val_auroc": 0.90625
+    },
+    {
+      "model": "logistic-0.01",
+      "subset": "spatial",
+      "cv_accuracy": 0.75,
+      "cv_auroc": 0.67578125,
+      "val_accuracy": 0.75,
+      "val_auroc": 0.90625
+    },
+    {
+      "model": "rbf-10",
+      "subset": "spatial",
+      "cv_accuracy": 0.75,
+      "cv_auroc": 0.76171875,
+      "val_accuracy": 0.75,
+      "val_auroc": 0.765625
+    },
+    {
+      "model": "rbf-1",
+      "subset": "spatial",
+      "cv_accuracy": 0.71875,
+      "cv_auroc": 0.73046875,
+      "val_accuracy": 0.75,
+      "val_auroc": 0.734375
+    },
+    {
+      "model": "forest-4",
+      "subset": "spatial",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.71875,
+      "val_accuracy": 0.75,
+      "val_auroc": 0.75
+    },
+    {
+      "model": "forest-None",
+      "subset": "spatial",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.71875,
+      "val_accuracy": 0.75,
+      "val_auroc": 0.75
+    },
+    {
+      "model": "rbf-1",
+      "subset": "all",
+      "cv_accuracy": 0.78125,
+      "cv_auroc": 0.7734375,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.734375
+    },
+    {
+      "model": "forest-None",
+      "subset": "summary",
+      "cv_accuracy": 0.78125,
+      "cv_auroc": 0.82421875,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.671875
+    },
+    {
+      "model": "forest-2",
+      "subset": "summary",
+      "cv_accuracy": 0.78125,
+      "cv_auroc": 0.796875,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.640625
+    },
+    {
+      "model": "extra-2",
+      "subset": "spatial",
+      "cv_accuracy": 0.75,
+      "cv_auroc": 0.796875,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.765625
+    },
+    {
+      "model": "forest-4",
+      "subset": "summary",
+      "cv_accuracy": 0.75,
+      "cv_auroc": 0.82421875,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.671875
+    },
+    {
+      "model": "extra-None",
+      "subset": "dynamics",
+      "cv_accuracy": 0.71875,
+      "cv_auroc": 0.77734375,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.78125
+    },
+    {
+      "model": "rbf-10",
+      "subset": "all",
+      "cv_accuracy": 0.71875,
+      "cv_auroc": 0.84375,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.75
+    },
+    {
+      "model": "extra-None",
+      "subset": "spatial",
+      "cv_accuracy": 0.6875,
+      "cv_auroc": 0.796875,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.75
+    },
+    {
+      "model": "forest-4",
+      "subset": "all",
+      "cv_accuracy": 0.65625,
+      "cv_auroc": 0.72265625,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.828125
+    },
+    {
+      "model": "forest-None",
+      "subset": "all",
+      "cv_accuracy": 0.65625,
+      "cv_auroc": 0.72265625,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.828125
+    },
+    {
+      "model": "extra-4",
+      "subset": "dynamics",
+      "cv_accuracy": 0.65625,
+      "cv_auroc": 0.7734375,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.765625
+    },
+    {
+      "model": "forest-2",
+      "subset": "spatial",
+      "cv_accuracy": 0.65625,
+      "cv_auroc": 0.71875,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.6875
+    },
+    {
+      "model": "extra-2",
+      "subset": "dynamics",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.703125,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.78125
+    },
+    {
+      "model": "extra-2",
+      "subset": "all",
+      "cv_accuracy": 0.59375,
+      "cv_auroc": 0.7578125,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.75
+    },
+    {
+      "model": "forest-4",
+      "subset": "dynamics",
+      "cv_accuracy": 0.59375,
+      "cv_auroc": 0.775390625,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.734375
+    },
+    {
+      "model": "forest-None",
+      "subset": "dynamics",
+      "cv_accuracy": 0.59375,
+      "cv_auroc": 0.775390625,
+      "val_accuracy": 0.6875,
+      "val_auroc": 0.734375
+    },
+    {
+      "model": "extra-None",
+      "subset": "summary",
+      "cv_accuracy": 0.84375,
+      "cv_auroc": 0.8359375,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.703125
+    },
+    {
+      "model": "extra-4",
+      "subset": "summary",
+      "cv_accuracy": 0.8125,
+      "cv_auroc": 0.82421875,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.65625
+    },
+    {
+      "model": "logistic-0.01",
+      "subset": "dynamics",
+      "cv_accuracy": 0.78125,
+      "cv_auroc": 0.79296875,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.921875
+    },
+    {
+      "model": "logistic-1",
+      "subset": "dynamics",
+      "cv_accuracy": 0.78125,
+      "cv_auroc": 0.84375,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.890625
+    },
+    {
+      "model": "logistic-0.1",
+      "subset": "dynamics",
+      "cv_accuracy": 0.78125,
+      "cv_auroc": 0.8203125,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.890625
+    },
+    {
+      "model": "logistic-10",
+      "subset": "dynamics",
+      "cv_accuracy": 0.78125,
+      "cv_auroc": 0.83203125,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.84375
+    },
+    {
+      "model": "extra-2",
+      "subset": "summary",
+      "cv_accuracy": 0.78125,
+      "cv_auroc": 0.82421875,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.671875
+    },
+    {
+      "model": "logistic-10",
+      "subset": "all",
+      "cv_accuracy": 0.75,
+      "cv_auroc": 0.79296875,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.84375
+    },
+    {
+      "model": "rbf-1",
+      "subset": "summary",
+      "cv_accuracy": 0.75,
+      "cv_auroc": 0.80859375,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.59375
+    },
+    {
+      "model": "logistic-1",
+      "subset": "all",
+      "cv_accuracy": 0.71875,
+      "cv_auroc": 0.80078125,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.875
+    },
+    {
+      "model": "logistic-0.1",
+      "subset": "all",
+      "cv_accuracy": 0.71875,
+      "cv_auroc": 0.796875,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.875
+    },
+    {
+      "model": "rbf-10",
+      "subset": "dynamics",
+      "cv_accuracy": 0.71875,
+      "cv_auroc": 0.79296875,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.78125
+    },
+    {
+      "model": "extra-4",
+      "subset": "spatial",
+      "cv_accuracy": 0.71875,
+      "cv_auroc": 0.796875,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.75
+    },
+    {
+      "model": "rbf-1",
+      "subset": "dynamics",
+      "cv_accuracy": 0.71875,
+      "cv_auroc": 0.77734375,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.734375
+    },
+    {
+      "model": "logistic-0.01",
+      "subset": "all",
+      "cv_accuracy": 0.65625,
+      "cv_auroc": 0.7890625,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.875
+    },
+    {
+      "model": "forest-2",
+      "subset": "all",
+      "cv_accuracy": 0.65625,
+      "cv_auroc": 0.69921875,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.828125
+    },
+    {
+      "model": "forest-2",
+      "subset": "dynamics",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.7890625,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.75
+    },
+    {
+      "model": "extra-4",
+      "subset": "all",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.8203125,
+      "val_accuracy": 0.625,
+      "val_auroc": 0.71875
+    },
+    {
+      "model": "rbf-10",
+      "subset": "summary",
+      "cv_accuracy": 0.8125,
+      "cv_auroc": 0.90625,
+      "val_accuracy": 0.5625,
+      "val_auroc": 0.5625
+    },
+    {
+      "model": "extra-None",
+      "subset": "all",
+      "cv_accuracy": 0.625,
+      "cv_auroc": 0.81640625,
+      "val_accuracy": 0.5625,
+      "val_auroc": 0.6875
+    },
+    {
+      "model": "logistic-0.01",
+      "subset": "summary",
+      "cv_accuracy": 0.8125,
+      "cv_auroc": 0.82421875,
+      "val_accuracy": 0.5,
+      "val_auroc": 0.609375
+    },
+    {
+      "model": "rbf-0.01",
+      "subset": "summary",
+      "cv_accuracy": 0.5,
+      "cv_auroc": 0.5,
+      "val_accuracy": 0.5,
+      "val_auroc": 0.4375
+    },
+    {
+      "model": "rbf-0.01",
+      "subset": "dynamics",
+      "cv_accuracy": 0.5,
+      "cv_auroc": 0.5,
+      "val_accuracy": 0.5,
+      "val_auroc": 0.296875
+    },
+    {
+      "model": "rbf-0.01",
+      "subset": "all",
+      "cv_accuracy": 0.5,
+      "cv_auroc": 0.5,
+      "val_accuracy": 0.5,
+      "val_auroc": 0.28125
+    },
+    {
+      "model": "rbf-0.01",
+      "subset": "spatial",
+      "cv_accuracy": 0.5,
+      "cv_auroc": 0.5,
+      "val_accuracy": 0.5,
+      "val_auroc": 0.265625
+    },
+    {
+      "model": "rbf-0.1",
+      "subset": "dynamics",
+      "cv_accuracy": 0.34375,
+      "cv_auroc": 0.25,
+      "val_accuracy": 0.5,
+      "val_auroc": 0.296875
+    },
+    {
+      "model": "rbf-0.1",
+      "subset": "all",
+      "cv_accuracy": 0.34375,
+      "cv_auroc": 0.20703125,
+      "val_accuracy": 0.5,
+      "val_auroc": 0.28125
+    },
+    {
+      "model": "rbf-0.1",
+      "subset": "spatial",
+      "cv_accuracy": 0.28125,
+      "cv_auroc": 0.1796875,
+      "val_accuracy": 0.5,
+      "val_auroc": 0.265625
+    },
+    {
+      "model": "rbf-0.1",
+      "subset": "summary",
+      "cv_accuracy": 0.21875,
+      "cv_auroc": 0.171875,
+      "val_accuracy": 0.5,
+      "val_auroc": 0.4375
+    },
+    {
+      "model": "logistic-0.1",
+      "subset": "summary",
+      "cv_accuracy": 0.8125,
+      "cv_auroc": 0.859375,
+      "val_accuracy": 0.4375,
+      "val_auroc": 0.53125
+    },
+    {
+      "model": "logistic-1",
+      "subset": "summary",
+      "cv_accuracy": 0.78125,
+      "cv_auroc": 0.8828125,
+      "val_accuracy": 0.4375,
+      "val_auroc": 0.515625
+    },
+    {
+      "model": "logistic-10",
+      "subset": "summary",
+      "cv_accuracy": 0.78125,
+      "cv_auroc": 0.87890625,
+      "val_accuracy": 0.4375,
+      "val_auroc": 0.484375
+    }
+  ],
+  "model_sha256": "0edf95128a1fbff741d2c73e0d58991843501b905a0c73a723aed006a83d87ca"
+}

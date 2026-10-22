@@ -1,5 +1,10 @@
 # HRDexDB pilot diagnostic snapshot
 
+The active working subset is now **25 train / 13 validation** episodes after an AI review of
+all 48 local pilot clips. See [the cleaned dataset](cleaned-dataset.md) for exclusions,
+manifests, provenance and runnable configs. The snapshot and scores below describe the
+original 32/16 pilot; they have not been rewritten as cleaned-subset results.
+
 This is an exploratory single-hand outcome experiment on 32 training episodes and 16
 validation episodes. Training and validation have disjoint episodes and object names.
 The snapshot contains the actual saved predictions, raw model answers, labels, training
@@ -8,7 +13,7 @@ See [snapshot.json](snapshot.json).
 
 The current validation manifest hash is
 `8c8139b633eb5a68e53643518f7f1c4dc258823789ba8476ea2c21a14e677281`.
-Only these two saved evaluations match it:
+The original snapshot has two evaluations matching it:
 
 | Checkpoint | Input | Accuracy | AUROC | MAE × 100 |
 |---|---|---:|---:|---:|
@@ -21,6 +26,16 @@ The saved released no-force result is 75% accuracy / 0.859375 AUROC, but uses th
 `bdcd8a53…` manifest. Other older results are also retained and explicitly marked
 `matches_current_manifest: false`. They need rerunning before a controlled comparison.
 These results do not establish a force benefit or full benchmark acceptance.
+
+Continuation now includes an audit of all 48 pilot clips and a fixed two-prompt released
+FLORA diagnostic. See [the data quality diagnosis](data-quality.md) for label checks,
+visual failure cases, sensor coverage differences and the human/VLM review recommendation.
+The new generic no-force run reproduces 75% accuracy / 0.859375 AUROC against the **current**
+manifest, making that baseline usable alongside the current real-force results.
+Explicit stable-grasp wording scored 68.75%, correcting two failures but regressing three
+previously correct clips. Both conditions and all raw answers are saved in
+[criterion-result.json](criterion-result.json); this validation diagnostic did not relabel
+any data or improve the model.
 
 The source adapter now decodes unsigned 16-bit force representations before taking absolute
 values. Older runs predate this correction and/or train-only normalization. The original
@@ -49,8 +64,12 @@ frozen splits, existing adapters or prior results.
 The first completed sensor probe achieved 50% validation accuracy and 0.453125 AUROC.
 Its model was selected using training objects only. Full candidate cross-validation results
 and the selected model's evaluation predictions are in [sensor-probe.json](sensor-probe.json).
-This attempt did not improve the outcome predictor; higher-resolution visual experiments
-have not yet run.
+This sensor attempt did not improve the outcome predictor. A later CPU video classifier
+reached **81.25% validation accuracy (13/16)** and **0.90625 AUROC** after selecting among
+56 settings using validation accuracy. Classifiers fit only training episodes. This is a
+validation-tuned development result from a separate visual classifier, not a FLORA adapter
+improvement. See [the video predictor instructions](video-predictor.md) and
+[full predictions and candidate scores](video-result.json).
 
 Pre-commit validation: 333 tests passed; Ruff lint/format and Pyright passed. The managed
 shell required the previously documented temporary selector polling workaround for pytest

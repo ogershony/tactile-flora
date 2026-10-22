@@ -1,0 +1,388 @@
+{
+  "scope": "16 validation episodes; AI first-pass review; original labels and metrics unchanged",
+  "provenance": "Codex inspected 1 Hz timestamped image sequences spanning every validation clip, plus 4 Hz cropped sequences for cactus2/1, frog_cup/0, plant_pot/1, metal_scoop_small/1. Every frame was decoded to create the 1 Hz sheets; visual judgments use sampled frames, not continuous video playback. Source labels and earlier predictions were already visible in conversation: this review is not blind or independent human ground truth.",
+  "timing": "Event intervals bracket sampled observations and are approximate, not exact event boundaries.",
+  "split_sha256": "094866b3c3c8d564e2ff05b6a023fa5e5f1ff626d9ec083a04d8afc740ce115d",
+  "counts": {
+    "stable_lift": 8,
+    "failed_or_unstable": 5,
+    "cannot_determine": 3
+  },
+  "records": [
+    {
+      "review_id": "val-00",
+      "packet_review_id": "clip-12",
+      "episode_id": "inspire_dftp/cactus2/1",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": false,
+      "verdict": "failed_or_unstable",
+      "confidence": "high",
+      "lift_start_interval_s": [
+        12,
+        13
+      ],
+      "terminal_event_interval_s": [
+        18.267,
+        18.5
+      ],
+      "occlusion": "low",
+      "human_intervention": "none visible",
+      "reason": "Lift is visible around 13\u201315 s; after lowering, the vase tips at 18.267 s and falls sideways by 18.5 s. Failure is at release/placement, not absence of lifting.",
+      "evidence_sheet": "val-00.jpg",
+      "decoded_frames": 747,
+      "video_sha256": "496c3c74fff8067c7bd482880f76cfb5f68522fb20122ed72cc395ec5d6bfd00"
+    },
+    {
+      "review_id": "val-01",
+      "packet_review_id": "clip-08",
+      "episode_id": "inspire_dftp/cactus2/0",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": true,
+      "verdict": "stable_lift",
+      "confidence": "high",
+      "lift_start_interval_s": [
+        9,
+        10
+      ],
+      "terminal_event_interval_s": [
+        15,
+        17
+      ],
+      "occlusion": "low",
+      "human_intervention": "none visible",
+      "reason": "Vase clears the table around 10 s, remains in the grasp while lowered, and is left upright after release around 17 s.",
+      "evidence_sheet": "val-01.jpg",
+      "decoded_frames": 667,
+      "video_sha256": "e4f43e1d95d9e5385150b443e9b0b85ca1877aef17797c6193ef3a96d8d0bb9d"
+    },
+    {
+      "review_id": "val-02",
+      "packet_review_id": "clip-45",
+      "episode_id": "inspire_dftp/cactus3/0",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": false,
+      "verdict": "failed_or_unstable",
+      "confidence": "high",
+      "lift_start_interval_s": null,
+      "terminal_event_interval_s": [
+        22,
+        24
+      ],
+      "occlusion": "low",
+      "human_intervention": "human resets object around 29\u201331 s",
+      "reason": "Extended grasp attempt; cactus tips/rolls around 23\u201324 s as the fingers leave. No sustained clear stable lift is established in the sampled sequence.",
+      "evidence_sheet": "val-02.jpg",
+      "decoded_frames": 948,
+      "video_sha256": "9912d742a524b5552c557de7cf164886b7fb384940772eb3ffbd830a655e64d4"
+    },
+    {
+      "review_id": "val-03",
+      "packet_review_id": "clip-09",
+      "episode_id": "inspire_dftp/cactus3/1",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": true,
+      "verdict": "stable_lift",
+      "confidence": "high",
+      "lift_start_interval_s": [
+        20,
+        21
+      ],
+      "terminal_event_interval_s": [
+        25,
+        30
+      ],
+      "occlusion": "low",
+      "human_intervention": "none visible",
+      "reason": "Cactus clearly elevated at 21\u201325 s, lowered while held, and remains upright when the hand withdraws around 30 s.",
+      "evidence_sheet": "val-03.jpg",
+      "decoded_frames": 1053,
+      "video_sha256": "0f66ac867925b6f34d2e2669d0a37ad3f6d32bb0d7f66e64d96c192bef8b4623"
+    },
+    {
+      "review_id": "val-04",
+      "packet_review_id": "clip-20",
+      "episode_id": "inspire_dftp/frog_cup/0",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": false,
+      "verdict": "cannot_determine",
+      "confidence": "uncertain",
+      "lift_start_interval_s": [
+        15,
+        17
+      ],
+      "terminal_event_interval_s": [
+        18.267,
+        19.267
+      ],
+      "occlusion": "moderate",
+      "human_intervention": "human adjusts object around 25\u201326 s",
+      "reason": "Cup is clearly lifted at 17\u201318 s. Dense 4 Hz frames show cup and hand descending together at 18.267\u201319.267 s. Cannot establish accidental slip versus deliberate tilted lowering from this view; source failure is not independently confirmed.",
+      "evidence_sheet": "val-04.jpg",
+      "decoded_frames": 802,
+      "video_sha256": "1de598cd968075abcf0fe4290ab3aa5f456eb59ab95f061323c58d73184b2882"
+    },
+    {
+      "review_id": "val-05",
+      "packet_review_id": "clip-39",
+      "episode_id": "inspire_dftp/frog_cup/1",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": true,
+      "verdict": "stable_lift",
+      "confidence": "high",
+      "lift_start_interval_s": [
+        12,
+        13
+      ],
+      "terminal_event_interval_s": [
+        15,
+        19
+      ],
+      "occlusion": "moderate",
+      "human_intervention": "none visible",
+      "reason": "Cup clears the table at 13\u201315 s, is lowered upright around 16\u201318 s, and stays upright after the hand withdraws at 19 s.",
+      "evidence_sheet": "val-05.jpg",
+      "decoded_frames": 710,
+      "video_sha256": "784b3329fd373053e87ac23aee3dbb0f2087730006d88e99879e2b160191b1da"
+    },
+    {
+      "review_id": "val-06",
+      "packet_review_id": "clip-23",
+      "episode_id": "inspire_dftp/knife_sharpener/2",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": false,
+      "verdict": "failed_or_unstable",
+      "confidence": "high",
+      "lift_start_interval_s": null,
+      "terminal_event_interval_s": [
+        25,
+        30
+      ],
+      "occlusion": "low",
+      "human_intervention": "human enters around 33\u201334 s after the failure",
+      "reason": "Object remains largely table-supported during attempts; it tilts at 25\u201328 s and falls onto its side by 29\u201330 s. No sustained stable lift is established.",
+      "evidence_sheet": "val-06.jpg",
+      "decoded_frames": 1032,
+      "video_sha256": "4a0f9a72cf62fc5e4039f1871bb84a13ae782d6292077d7bc25719b6f952eca0"
+    },
+    {
+      "review_id": "val-07",
+      "packet_review_id": "clip-38",
+      "episode_id": "inspire_dftp/knife_sharpener/0",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": true,
+      "verdict": "stable_lift",
+      "confidence": "high",
+      "lift_start_interval_s": [
+        9,
+        11
+      ],
+      "terminal_event_interval_s": [
+        14,
+        22
+      ],
+      "occlusion": "moderate",
+      "human_intervention": "human enters around 25\u201326 s after the attempt",
+      "reason": "Sharpener visibly clear of the table around 11\u201314 s. It is lowered and left upright after release around 21\u201322 s; later human motion does not create the observed lift.",
+      "evidence_sheet": "val-07.jpg",
+      "decoded_frames": 810,
+      "video_sha256": "050a83a1fda415febe6b573f153717ab1b9c14b74b09df0cccce980904f62a28"
+    },
+    {
+      "review_id": "val-08",
+      "packet_review_id": "clip-27",
+      "episode_id": "inspire_dftp/lotion/1",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": false,
+      "verdict": "failed_or_unstable",
+      "confidence": "high",
+      "lift_start_interval_s": [
+        13,
+        14
+      ],
+      "terminal_event_interval_s": [
+        19,
+        20
+      ],
+      "occlusion": "moderate",
+      "human_intervention": "none visible",
+      "reason": "Bottle is lifted around 14\u201316 s, then lowered; it falls onto its side as the hand opens around 19\u201320 s. Source failure is consistent with loss of control at release.",
+      "evidence_sheet": "val-08.jpg",
+      "decoded_frames": 742,
+      "video_sha256": "b585a870c03a58c3083cad5d606ad346b55f2ba711764beda9095a9438d5bb2c"
+    },
+    {
+      "review_id": "val-09",
+      "packet_review_id": "clip-04",
+      "episode_id": "inspire_dftp/lotion/3",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": true,
+      "verdict": "stable_lift",
+      "confidence": "moderate",
+      "lift_start_interval_s": [
+        12,
+        13
+      ],
+      "terminal_event_interval_s": [
+        14,
+        19
+      ],
+      "occlusion": "moderate",
+      "human_intervention": "none visible",
+      "reason": "Bottle rises above the table around 13 s, is lowered while held, and remains upright after the hand leaves around 19 s. Hand obscures much of the bottle but visible lower contour supports a lift.",
+      "evidence_sheet": "val-09.jpg",
+      "decoded_frames": 692,
+      "video_sha256": "00106b83e7b7d1cf4fdf269c71803298b7d623d926b8a1c548932e733b59dc8f"
+    },
+    {
+      "review_id": "val-10",
+      "packet_review_id": "clip-28",
+      "episode_id": "inspire_dftp/metal_scoop_small/1",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": false,
+      "verdict": "cannot_determine",
+      "confidence": "uncertain",
+      "lift_start_interval_s": null,
+      "terminal_event_interval_s": [
+        29.5,
+        30.267
+      ],
+      "occlusion": "high",
+      "human_intervention": "human enters around 34 s after the attempt",
+      "reason": "Scoop is heavily hidden during the long 8\u201329 s attempt. Dense final frames show it tipping around 29.767\u201330 s, then resting on the table when the empty hand rises at 30.267 s. No stable lift is demonstrated, but occlusion prevents an authoritative whole-trial verdict.",
+      "evidence_sheet": "val-10.jpg",
+      "decoded_frames": 1060,
+      "video_sha256": "d32f231b8598a700c65bbf73c6cc8c4b1f78fb3d32a8909c1ffeed148674cf7e"
+    },
+    {
+      "review_id": "val-11",
+      "packet_review_id": "clip-26",
+      "episode_id": "inspire_dftp/metal_scoop_small/0",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": true,
+      "verdict": "stable_lift",
+      "confidence": "high",
+      "lift_start_interval_s": [
+        13,
+        14
+      ],
+      "terminal_event_interval_s": [
+        16,
+        19
+      ],
+      "occlusion": "moderate",
+      "human_intervention": "human visible at right edge after the attempt",
+      "reason": "Scoop visibly held clear of the table around 14\u201316 s, lowered around 17\u201318 s, and resting on the table after release at 19 s.",
+      "evidence_sheet": "val-11.jpg",
+      "decoded_frames": 718,
+      "video_sha256": "1c82b3ef0b6c07a4812c5b597c299af2444938b57bcd1ef5bb933e6821f76097"
+    },
+    {
+      "review_id": "val-12",
+      "packet_review_id": "clip-41",
+      "episode_id": "inspire_dftp/plant_pot/1",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": false,
+      "verdict": "cannot_determine",
+      "confidence": "uncertain",
+      "lift_start_interval_s": [
+        15,
+        16
+      ],
+      "terminal_event_interval_s": [
+        18,
+        20
+      ],
+      "occlusion": "moderate",
+      "human_intervention": "none visible",
+      "reason": "Pot is clearly elevated at 16\u201318 s. Dense 4 Hz frames show gradual lowering with the hand through 18\u201320 s, without a decisive visible free fall. Cannot confirm a slip rather than deliberate placement; a hidden contact failure or source criterion may explain the label.",
+      "evidence_sheet": "val-12.jpg",
+      "decoded_frames": 939,
+      "video_sha256": "808b26ada9d9bc5a81fa032cd4824030ceb44b37d56bdcb883d6385dccf98de2"
+    },
+    {
+      "review_id": "val-13",
+      "packet_review_id": "clip-40",
+      "episode_id": "inspire_dftp/plant_pot/0",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": true,
+      "verdict": "stable_lift",
+      "confidence": "high",
+      "lift_start_interval_s": [
+        12,
+        13
+      ],
+      "terminal_event_interval_s": [
+        17,
+        22
+      ],
+      "occlusion": "low",
+      "human_intervention": "none visible",
+      "reason": "Pot visibly raised around 13\u201317 s, lowered to the table around 18 s, then released while upright around 22 s.",
+      "evidence_sheet": "val-13.jpg",
+      "decoded_frames": 853,
+      "video_sha256": "5603208c056487492a7e909f3f11b7ad86f0c9640957565530f8a6aa70533529"
+    },
+    {
+      "review_id": "val-14",
+      "packet_review_id": "clip-13",
+      "episode_id": "inspire_dftp/potato_masher/5",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": false,
+      "verdict": "failed_or_unstable",
+      "confidence": "high",
+      "lift_start_interval_s": [
+        11,
+        12
+      ],
+      "terminal_event_interval_s": [
+        18,
+        19
+      ],
+      "occlusion": "low",
+      "human_intervention": "none visible",
+      "reason": "Masher is clearly lifted at 12\u201317 s, with changing orientation; after lowering it tips/falls onto its side between 18 and 19 s as the hand opens.",
+      "evidence_sheet": "val-14.jpg",
+      "decoded_frames": 718,
+      "video_sha256": "b6b32a70444a57bcdd25707c88c4ca485e7bb957ee095b752d28926cb025a022"
+    },
+    {
+      "review_id": "val-15",
+      "packet_review_id": "clip-29",
+      "episode_id": "inspire_dftp/potato_masher/0",
+      "reviewer": "Codex multimodal visual review",
+      "review_type": "AI first pass; not human adjudication",
+      "source_label": true,
+      "verdict": "stable_lift",
+      "confidence": "high",
+      "lift_start_interval_s": [
+        15,
+        16
+      ],
+      "terminal_event_interval_s": [
+        19,
+        24
+      ],
+      "occlusion": "low",
+      "human_intervention": "none visible",
+      "reason": "Masher held clear of the table around 16\u201318 s, lowered upright around 19\u201322 s, and remains upright after release around 24 s.",
+      "evidence_sheet": "val-15.jpg",
+      "decoded_frames": 836,
+      "video_sha256": "db15bfa8f43cfff211f977aab2898a271c4a9c4720356503be41ae4e2ad5eec8"
+    }
+  ]
+}

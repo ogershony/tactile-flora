@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
+import os
 from pathlib import Path
 
 from tactile_flora.config import ForceConfig, SourceConfig, TrainConfig, load_config
@@ -19,25 +22,48 @@ from tactile_flora.verify.windowing import (
     resample_shifted,
 )
 
-BASE = Path("data/acceptance/hrdexdb-pilot")
-DATA_ROOT = BASE
+BASE = Path("data/acceptance/hrdexdb-clean-v1")
+
+
+def planned_report_version(base: Path, cfg: TrainConfig) -> str | None:
+    """Keep an active Slurm experiment pinned when unrelated commits advance HEAD."""
+    path = base / "training-plan.json"
+    if not path.exists():
+        return None
+    plan = json.loads(path.read_text())
+    job = os.environ.get("SLURM_JOB_ID")
+    if job is None or str(plan.get("slurm_training_job")) != job:
+        return None
+    if cfg.model_dump() not in plan["configs"].values():
+        raise ValueError("configuration differs from the active training plan")
+    if manifest.manifest_hash(cfg.manifest) != plan["manifest_sha256"]:
+        raise ValueError("manifest differs from the active training plan")
+    hashes = plan.get("core_code_sha256")
+    if not hashes:
+        raise ValueError("active training plan has no pinned core code hashes")
+    for name, expected in hashes.items():
+        if hashlib.sha256(Path(name).read_bytes()).hexdigest() != expected:
+            raise ValueError(f"core code changed during the experiment: {name}")
+    return plan["git_hash"]
 
 
 def main() -> None:
     """Run the explicit HRDexDB training pilot with the frozen object split."""
     parser = argparse.ArgumentParser()
+    parser.add_argument("--base", type=Path, default=BASE)
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--config", type=Path, default=BASE / "config/train-hrdexdb.yaml")
+    parser.add_argument("--config", type=Path)
     parser.add_argument("--run-name", default="hrdexdb-outcome-sft")
     args = parser.parse_args()
-    cfg = load_config(args.config, TrainConfig)
+    cfg = load_config(args.config or args.base / "config/train-hrdexdb.yaml", TrainConfig)
     force_cfg = load_config(
         "data/acceptance/released-inference/force.real-tokenizer.yaml", ForceConfig
     )
-    source_cfg = load_config(BASE / "config/sources/hrdexdb.yaml", SourceConfig)
+    source_cfg = load_config(args.base / "config/sources/hrdexdb.yaml", SourceConfig)
     adapter = make_adapter("hrdexdb", source_cfg)
-    ids = sorted(adapter.discover(Path(source_cfg.root)))
-    vdir = DATA_ROOT / "verified/hrdexdb"
+    adapter.discover(Path(source_cfg.root))
+    ids = sorted({r.episode_id for r in manifest.read_manifest(cfg.manifest)})
+    vdir = args.base / "verified/hrdexdb"
     consts = normalize.load(vdir / "norm.json")
     checks = report.read_checks(vdir) if (vdir / "checks.parquet").exists() else {}
     inputs = build_source_inputs(adapter, force_cfg, consts, vdir, ids, checks)
@@ -82,11 +108,12 @@ def main() -> None:
     run_dir = train(
         cfg,
         force_cfg,
-        DATA_ROOT,
+        args.base,
         dry_run=args.dry_run,
         run_name=args.run_name,
         windows_source=windows_source,
         eval_only_sources=set(),  # the manifest has a fixed train split, object-disjoint from val
+        report_version=planned_report_version(args.base, cfg),
     )
     print(f"training complete: {run_dir}")
 

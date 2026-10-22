@@ -1,0 +1,179 @@
+{
+  "scope": "all 48 locally downloaded HRDexDB pilot episodes, not the full release",
+  "review_sha256": "b9f99ae03372c8468638683345047b5442a51f676eebaad8743f18e518298c17",
+  "original_counts": {
+    "train": 32,
+    "val": 16
+  },
+  "kept_counts": {
+    "train": 25,
+    "val": 13
+  },
+  "class_counts": {
+    "train": {
+      "success": 16,
+      "failure": 9
+    },
+    "val": {
+      "success": 8,
+      "failure": 5
+    }
+  },
+  "excluded": [
+    {
+      "episode_id": "inspire_dftp/frame_oak/0",
+      "split": "train",
+      "source_label": false,
+      "verdict": "cannot_determine",
+      "decision": "exclude",
+      "reason": "Frame is clearly lifted around 11\u201313 s and returned upright around 15\u201317 s, rotated relative to its initial pose. The sampled camera does not establish why this is labeled failure; exclude unresolved label/criterion ambiguity.",
+      "confidence": "uncertain",
+      "video_sha256": "1f65dba53b007b6bcce0440feaceb95cafc366a008b709977e9418362c525dfa",
+      "evidence_sheet": "train-06.jpg",
+      "decoded_frames": 637
+    },
+    {
+      "episode_id": "inspire_dftp/grey_pot/4",
+      "split": "train",
+      "source_label": false,
+      "verdict": "no_observable_attempt",
+      "decision": "exclude",
+      "reason": "No visible approach/contact/lift across the 20 s clip. The task attempt or its outcome is not captured; exclude as an uninformative/capture-mismatch negative rather than inventing an outcome.",
+      "confidence": "high",
+      "video_sha256": "2aa7eeb13ad1184de6680be6e1cfc3d4fa3d57564f767679e3eca98dd2c34f5f",
+      "evidence_sheet": "train-10.jpg",
+      "decoded_frames": 599
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_light_green_bowl/1",
+      "split": "train",
+      "source_label": false,
+      "verdict": "cannot_determine",
+      "decision": "exclude",
+      "reason": "Bowl visibly lifted at 21\u201324 s and returned to the table upright around 25\u201326 s. Source failure cannot be distinguished from deliberate placement in this camera; exclude unresolved outcome.",
+      "confidence": "uncertain",
+      "video_sha256": "2e14fa6b703b554dbc4b58e4ab9d13ad7e4ef9fe19211c6bba3f8c69761fc589",
+      "evidence_sheet": "train-16.jpg",
+      "decoded_frames": 901
+    },
+    {
+      "episode_id": "inspire_dftp/pringles/3",
+      "split": "train",
+      "source_label": false,
+      "verdict": "no_observable_attempt",
+      "decision": "exclude",
+      "reason": "The hand remains above the object and no visible contact/lift occurs during the 17 s clip. Exclude as an uninformative or incompletely captured attempt.",
+      "confidence": "high",
+      "video_sha256": "703f276d1d1a9920f0f01d7a1d2bcc0ab1b5880504de3d8335b1483bd8d7ea1b",
+      "evidence_sheet": "train-22.jpg",
+      "decoded_frames": 505
+    },
+    {
+      "episode_id": "inspire_dftp/rectangular_frying_pan/3",
+      "split": "train",
+      "source_label": false,
+      "verdict": "cannot_determine",
+      "decision": "exclude",
+      "reason": "Long attempt rotates the pan from flat to almost vertical around 29\u201335 s, with the handle tip close to or on the table. It returns flat at 36 s. Full clearance and accidental slip versus deliberate rotation cannot be established; exclude ambiguous outcome.",
+      "confidence": "uncertain",
+      "video_sha256": "a362f335bbe12b4eadcaf183cfe04e07befaac8bfb4c94d4d82257cc0b44a6c1",
+      "evidence_sheet": "train-24.jpg",
+      "decoded_frames": 1224
+    },
+    {
+      "episode_id": "inspire_dftp/spam_can/1",
+      "split": "train",
+      "source_label": false,
+      "verdict": "cannot_determine",
+      "decision": "exclude",
+      "reason": "Can visibly lifted at 17\u201319 s and returned upright around 20\u201322 s. No decisive loss of control distinguishes the source failure from the successful paired clip; exclude unresolved criterion/label ambiguity.",
+      "confidence": "uncertain",
+      "video_sha256": "ca89c42b0a186efa4bba037d1296f446acdc8074b1cea242a35b3d506f1ce2ac",
+      "evidence_sheet": "train-26.jpg",
+      "decoded_frames": 887
+    },
+    {
+      "episode_id": "inspire_dftp/yellow_wash_tub/3",
+      "split": "train",
+      "source_label": false,
+      "verdict": "no_observable_attempt",
+      "decision": "exclude",
+      "reason": "Human setup is visible at the beginning; robot approaches around 11\u201313 s but no visible grasp/lift is completed before the 17.7 s clip ends. Exclude incomplete/no-outcome capture.",
+      "confidence": "high",
+      "video_sha256": "6ac5ed904c04f6fe1360b36d17a7a70ec8cbba2c9a4f274c899a0fe9e1a92c10",
+      "evidence_sheet": "train-30.jpg",
+      "decoded_frames": 532
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/0",
+      "split": "val",
+      "source_label": false,
+      "verdict": "cannot_determine",
+      "decision": "exclude",
+      "reason": "Cup is clearly lifted at 17\u201318 s. Dense 4 Hz frames show cup and hand descending together at 18.267\u201319.267 s. Cannot establish accidental slip versus deliberate tilted lowering from this view; source failure is not independently confirmed.",
+      "confidence": "uncertain",
+      "video_sha256": "1de598cd968075abcf0fe4290ab3aa5f456eb59ab95f061323c58d73184b2882",
+      "evidence_sheet": "val-04.jpg",
+      "decoded_frames": 802
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/1",
+      "split": "val",
+      "source_label": false,
+      "verdict": "cannot_determine",
+      "decision": "exclude",
+      "reason": "Scoop is heavily hidden during the long 8\u201329 s attempt. Dense final frames show it tipping around 29.767\u201330 s, then resting on the table when the empty hand rises at 30.267 s. No stable lift is demonstrated, but occlusion prevents an authoritative whole-trial verdict.",
+      "confidence": "uncertain",
+      "video_sha256": "d32f231b8598a700c65bbf73c6cc8c4b1f78fb3d32a8909c1ffeed148674cf7e",
+      "evidence_sheet": "val-10.jpg",
+      "decoded_frames": 1060
+    },
+    {
+      "episode_id": "inspire_dftp/plant_pot/1",
+      "split": "val",
+      "source_label": false,
+      "verdict": "cannot_determine",
+      "decision": "exclude",
+      "reason": "Pot is clearly elevated at 16\u201318 s. Dense 4 Hz frames show gradual lowering with the hand through 18\u201320 s, without a decisive visible free fall. Cannot confirm a slip rather than deliberate placement; a hidden contact failure or source criterion may explain the label.",
+      "confidence": "uncertain",
+      "video_sha256": "808b26ada9d9bc5a81fa032cd4824030ceb44b37d56bdcb883d6385dccf98de2",
+      "evidence_sheet": "val-12.jpg",
+      "decoded_frames": 939
+    }
+  ],
+  "normalization_fit_ids": [
+    "inspire_dftp/baby_beaker/6",
+    "inspire_dftp/baby_beaker/0",
+    "inspire_dftp/blue_alarm/1",
+    "inspire_dftp/blue_alarm/0",
+    "inspire_dftp/cactus/2",
+    "inspire_dftp/cactus/0",
+    "inspire_dftp/frame_oak/1",
+    "inspire_dftp/green_attached_container/3",
+    "inspire_dftp/green_attached_container/0",
+    "inspire_dftp/grey_pot/0",
+    "inspire_dftp/lemon_squeezer/2",
+    "inspire_dftp/lemon_squeezer/0",
+    "inspire_dftp/metal_scoop_big/1",
+    "inspire_dftp/metal_scoop_big/0",
+    "inspire_dftp/pastel_light_green_bowl/0",
+    "inspire_dftp/pepper_tuna/0",
+    "inspire_dftp/pepper_tuna/1",
+    "inspire_dftp/pingpong/1",
+    "inspire_dftp/pingpong/0",
+    "inspire_dftp/pringles/2",
+    "inspire_dftp/rectangular_frying_pan/4",
+    "inspire_dftp/spam_can/0",
+    "inspire_dftp/work_lamp/4",
+    "inspire_dftp/work_lamp/0",
+    "inspire_dftp/yellow_wash_tub/0"
+  ],
+  "norm_version": "bc481146cfadb980ec5eac6de3692c947c31028135149876691ab7e3aa99e235",
+  "manifest_hashes": {
+    "hrdexdb-sft": "e91d7b896489ad15e1a05ad3686db44a5ef90a3110e1f3ddf8ca87efddc31a42",
+    "train": "303513ccb8bb8af757852cfb71010bdcfb28037123086c217505e8e5e48cf717",
+    "val": "0511f44661bfbfba7519be4e8afc21bafe9c6152beb43f3d37190e014f5465af"
+  },
+  "force_sync_status": "unverified; visual cleaning does not repair sensor/video timing",
+  "evaluation_status": "post hoc curated development subset; not an untouched benchmark"
+}

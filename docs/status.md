@@ -1,11 +1,36 @@
 # Status report (2026-10-21)
 
+Active HRDexDB working data: **25 train / 13 validation** episodes under
+`data/acceptance/hrdexdb-clean-v1/`, after reviewing all 48 local pilot clips and excluding
+seven unresolved outcomes plus three no-attempt/incomplete captures. No label flips or split
+moves were made. The SFT launcher defaults to this cleaned root; original data and holdout
+assignments remain intact. See [cleaned dataset details](experiments/hrdexdb-pilot/cleaned-dataset.md).
+
+Resumed HRDexDB diagnosis checked all 48 pilot episodes: manifest, raw and catalog labels
+agree; no exact duplicate videos or train/validation object overlap was found. Force/video
+coverage differs by 0.24–3.14 seconds, so clock alignment remains unverified. A fresh released
+no-force baseline on the current manifest reaches 75% accuracy / 0.859375 AUROC.
+Explicit stable-grasp task wording reaches 68.75% / 0.796875, with two corrected and three
+regressed classifications. Both conditions have zero parse failures; no labels were changed.
+See [the quality diagnosis](experiments/hrdexdb-pilot/data-quality.md) for the review packet,
+failure cases and the recommendation to establish human gold labels before VLM expansion.
+An AI first-pass review is now complete for all 16 validation episodes: eight stable-lift
+and five failure labels are visually supported; three remain uncertain. Evidence and event
+intervals are saved separately in the pilot's `ai-review.json` / `ai-review.csv`; original
+labels and human-review status are unchanged.
+
 Later exploratory HRDexDB SFT and evaluation results are recorded in
 [`experiments/hrdexdb-pilot/`](experiments/hrdexdb-pilot/README.md), including a portable
 prediction/config snapshot for diagnosis. The signed-force pilot has 56.25% validation
 accuracy against 62.5% for released FLORA with real force on the same current manifest.
 The historical acceptance report below predates those experiments; its statements about
 missing scores and production SFT do not describe this later, limited pilot.
+
+A subsequent hackathon CPU video classifier reached **81.25% validation accuracy (13/16)**
+and **0.90625 AUROC** on the frozen pilot split. This is a validation-tuned development
+result, selected among 56 settings; all classifiers fit only the training episodes.
+The saved predictor, usage and full candidate scores are documented in
+[`experiments/hrdexdb-pilot/video-predictor.md`](experiments/hrdexdb-pilot/video-predictor.md).
 
 The original implementation was checked with synthetic fixtures on CPU. Continuation work has
 passed released-model HF inference and tiny two-GPU FSDP training on two MI210s. Bounded real
