@@ -17,10 +17,19 @@ verified 2026-10-21 from the HF API and file headers (docs/research/datasets.md 
 - allegro_v5: ``raw/hand/tactile.npy`` int32 (T, 4), one scalar per fingertip; time base
   ``raw/hand/time.npy``. INCLUDED.
 - inspire_dftp: ``raw/hand/force.npy`` int64 (T, 6), one scalar per DOF/finger. INCLUDED.
-- inspire_f1: ``raw/hand/right_tactile.npy`` is a pickled per-frame object array whose internal
-  layout is NOT verified; load() raises NotImplementedError. robotiq_2f85: no tactile or force
-  file at all; load() raises NotImplementedError. human: no robot; load() raises. All three are
-  still returned by discover() (the verifier, not the adapter, decides what to keep).
+- inspire_f1: ``raw/hand/right_tactile.npy`` is an object array of T dicts (verified
+  2026-10-22 on real trials): per pad in ``F1_PADS`` (thumb, index, middle, ring, little,
+  palm_left, palm_middle, palm_right) the keys ``<pad>_normal_force``,
+  ``<pad>_tangential_force`` and ``<pad>_tangential_direction`` (floats, raw units; normal
+  peaks 100-3,000 on contact, resting 0-3). Time base ``right_tactile_time.npy`` (object
+  array of epoch seconds, 50 Hz). Hand position is ``right_joint_states.npy`` (object (T, 6),
+  about 1,742 open, smaller when closed) with ``right_joint_states_time.npy``. The adapter
+  uses the eight normal-force pads as channels; tangential force is not exposed yet. Object
+  arrays are unpickled with a restricted unpickler that admits only numpy's array
+  reconstruction globals, so a tampered file cannot run code. INCLUDED.
+  robotiq_2f85: no tactile or force file at all; load() raises NotImplementedError. human: no
+  robot; load() raises. Both are still returned by discover() (the verifier, not the adapter,
+  decides what to keep).
 - Units and per-finger semantics are undocumented ("sensor specifications vary across
   platforms"); uint16-range samples are decoded as signed int16 before abs() is taken. Values
   remain in raw sensor units and are NOT comparable across hands.
@@ -48,7 +57,12 @@ verified 2026-10-21 from the HF API and file headers (docs/research/datasets.md 
   ``hrdexdb_use_video_timestamps`` to map sensor time to encoded video time using the recorded
   ``raw/timestamps/{timestamp,frame_id}.npy``. The upstream viewer uses one-based frame IDs;
   both start offset and capture/encoded clock-rate differences are accounted for. Missing or
-  incomplete timelines raise rather than silently reverting to the legacy assumption.
+  incomplete timelines raise rather than silently reverting to the legacy assumption. Frame
+  ids past the end of the encoded video (all inspire_f1 trials, by 9-37 frames; 3 of 618
+  inspire_dftp trials, by 1-2) are dropped and the sensor stream is cut at the last encoded
+  frame; ``meta["clock_alignment"]["frame_ids_beyond_video"]`` records how many. Rows logged
+  out of order (a frame id below an earlier one, 24% of inspire_f1 trials, 3 inspire_dftp
+  trials) are dropped and counted in ``out_of_order_frame_ids``; the frame is interpolated.
 - Native label: outcome 5 if ``grasp_result.json`` grasp_success is true, else 1 (binary;
   criterion in the paper: lifted and held 10 s). No label when success is null/absent (human).
 - Session / split key: hand type. Every episode goes to split "benchmark".
@@ -58,6 +72,7 @@ verified 2026-10-21 from the HF API and file headers (docs/research/datasets.md 
 from __future__ import annotations
 
 import json
+import pickle
 from pathlib import Path
 from typing import Any
 
@@ -77,13 +92,61 @@ from tactile_flora.sources.base import register_source, strip_outcome_words
 LICENSE = "CC-BY-NC-4.0"
 DEFAULT_FPS = 30.0
 # hand -> (tactile file, time-file stem)
-_TACTILE_FILES = {"allegro_v5": "tactile", "inspire_dftp": "force"}
+_TACTILE_FILES = {"allegro_v5": "tactile", "inspire_dftp": "force", "inspire_f1": "right_tactile"}
+# hand -> hand position file stem (default "position")
+_POSITION_FILES = {"inspire_f1": "right_joint_states"}
+# Inspire hands report larger joint values when open; the closure proxy is flipped for them.
+_LARGER_IS_OPEN = {"inspire_dftp": "inspire_angle_1000_open", "inspire_f1": "inspire_f1_larger_is_open"}
 _UNSUPPORTED = {
-    "inspire_f1": "raw/hand/right_tactile.npy is a pickled per-frame object array with an "
-    "unverified internal layout",
     "robotiq_2f85": "it has no tactile or force file",
     "human": "there is no robot, hence no tactile or force stream",
 }
+F1_PADS = ("thumb", "index", "middle", "ring", "little", "palm_left", "palm_middle", "palm_right")
+_PICKLE_ALLOWED = {
+    ("numpy.core.multiarray", "_reconstruct"),
+    ("numpy._core.multiarray", "_reconstruct"),
+    ("numpy.core.multiarray", "scalar"),
+    ("numpy._core.multiarray", "scalar"),
+    ("numpy", "ndarray"),
+    ("numpy", "dtype"),
+}
+
+
+class _RestrictedUnpickler(pickle.Unpickler):
+    """Unpickler that admits only the globals numpy needs to rebuild an object array."""
+
+    def find_class(self, module: str, name: str) -> Any:
+        if (module, name) in _PICKLE_ALLOWED:
+            return super().find_class(module, name)
+        raise pickle.UnpicklingError(f"refusing to unpickle {module}.{name} from an HRDexDB file")
+
+
+def load_npy(path: Path) -> np.ndarray:
+    """Load a ``.npy`` file; object arrays go through the restricted unpickler."""
+    with open(path, "rb") as fh:
+        version = np.lib.format.read_magic(fh)
+        reader = (
+            np.lib.format.read_array_header_1_0
+            if version == (1, 0)
+            else np.lib.format.read_array_header_2_0
+        )
+        _shape, _fortran, dtype = reader(fh)
+        if dtype.hasobject:
+            return np.asarray(_RestrictedUnpickler(fh).load(), dtype=object)
+    return np.load(path, allow_pickle=False)
+
+
+def f1_normal_force(frames: np.ndarray) -> np.ndarray:
+    """Return the (T, 8) per-pad normal force of an inspire_f1 ``right_tactile`` object array."""
+    out = np.zeros((len(frames), len(F1_PADS)), dtype=np.float64)
+    for i, frame in enumerate(frames):
+        if not isinstance(frame, dict):
+            raise ValueError(f"inspire_f1 tactile frame {i} is {type(frame).__name__}, not dict")
+        try:
+            out[i] = [float(frame[f"{pad}_normal_force"]) for pad in F1_PADS]
+        except KeyError as exc:
+            raise ValueError(f"inspire_f1 tactile frame {i} lacks {exc.args[0]}") from None
+    return out
 
 
 def _read_time(trial: Path, stem: str, n: int, fps: float) -> np.ndarray:
@@ -96,7 +159,7 @@ def _read_time(trial: Path, stem: str, n: int, fps: float) -> np.ndarray:
     ]
     for path in candidates:
         if path.is_file():
-            t = np.asarray(np.load(path), dtype=np.float64).reshape(-1)
+            t = np.asarray(load_npy(path), dtype=np.float64).reshape(-1)
             if len(t) == n:
                 return t
     return np.arange(n, dtype=np.float64) / fps
@@ -153,13 +216,27 @@ def video_clock(trial: Path, sensor_time: np.ndarray, fps: float, n_frames: int)
         or len(timestamps) != len(frames)
         or not np.isfinite(timestamps).all()
         or not np.isfinite(frames).all()
-        or not (np.diff(timestamps) > 0).all()
-        or not (np.diff(frames) > 0).all()
         or not np.equal(frames, np.floor(frames)).all()
         or frames[0] != 1
-        or frames[-1] != n_frames
         or fps <= 0
     ):
+        raise ValueError(f"invalid or incomplete recorded video timeline: {trial}")
+    # Some rows are logged late: a frame id smaller than an earlier one with a timestamp that
+    # is its logging time, not its capture time (24% of inspire_f1 trials, 1-8 rows each; 3 of
+    # 618 inspire_dftp trials, 1 row). Those rows are dropped and the frame is treated as a
+    # missing timestamp (interpolated).
+    in_order = frames > np.concatenate([[0], np.maximum.accumulate(frames)[:-1]])
+    out_of_order = int(np.count_nonzero(~in_order))
+    timestamps, frames = timestamps[in_order], frames[in_order]
+    # The encoded stream may end before the last recorded frame id (every inspire_f1 trial is
+    # 9-37 frames short; a few inspire_dftp trials by 1-2). Frames that were never encoded
+    # carry no video, so their timestamps are dropped and sensor samples after the last encoded
+    # frame are masked out. A video LONGER than its recorded ids stays an error: trailing frames
+    # would have no timestamps.
+    beyond = int(np.count_nonzero(frames > n_frames))
+    if beyond:
+        timestamps, frames = timestamps[frames <= n_frames], frames[frames <= n_frames]
+    if len(frames) < 2 or frames[-1] != n_frames or not (np.diff(timestamps) > 0).all():
         raise ValueError(f"invalid or incomplete recorded video timeline: {trial}")
     mask = (sensor_time >= timestamps[0]) & (sensor_time <= timestamps[-1])
     if np.count_nonzero(mask) < 2:
@@ -178,6 +255,8 @@ def video_clock(trial: Path, sensor_time: np.ndarray, fps: float, n_frames: int)
             "encoded_span_s": float((frames[-1] - 1) / fps),
             "timestamp_rows": len(timestamps),
             "missing_frame_timestamps": int(n_frames - len(frames)),
+            "frame_ids_beyond_video": beyond,
+            "out_of_order_frame_ids": out_of_order,
             "max_capture_gap_s": float(np.diff(timestamps).max()),
             "samples_outside_video": int(len(sensor_time) - mask.sum()),
         },
@@ -253,7 +332,11 @@ class HrdexdbAdapter:
         trial = self._trial(episode_id)
         fps = self._fps.get(episode_id, DEFAULT_FPS)
         stem = _TACTILE_FILES[hand]
-        signed = _signed_force(np.load(trial / "raw" / "hand" / f"{stem}.npy"))
+        tactile = load_npy(trial / "raw" / "hand" / f"{stem}.npy")
+        if hand == "inspire_f1":
+            signed = f1_normal_force(tactile)  # already float; no uint16 bit patterns
+        else:
+            signed = _signed_force(tactile)
         signed = signed.reshape(len(signed), -1)
         t_raw = _read_time(trial, stem, len(signed), fps)
         tared = self.cfg.hrdexdb_force_representation == "tared"
@@ -265,9 +348,10 @@ class HrdexdbAdapter:
             raw = np.abs(signed)
             top = np.argsort(-raw.mean(axis=0), kind="stable")[:2]
 
-        pos = np.asarray(np.load(trial / "raw" / "hand" / "position.npy"), dtype=np.float64)
+        pos_stem = _POSITION_FILES.get(hand, "position")
+        pos = np.asarray(load_npy(trial / "raw" / "hand" / f"{pos_stem}.npy"), dtype=np.float64)
         pos = pos.reshape(len(pos), -1)
-        t_pos = _read_time(trial, "position", len(pos), fps)
+        t_pos = _read_time(trial, pos_stem, len(pos), fps)
 
         offset = float(min(t_raw[0], t_pos[0]))
         t = t_raw - offset
@@ -278,9 +362,11 @@ class HrdexdbAdapter:
         span = float(closure.max() - closure.min())
         closure = (closure - closure.min()) / span if span > 0 else np.zeros_like(closure)
         gripper_convention = "larger_joint_value_is_closed"
-        if tared and hand == "inspire_dftp":
-            closure = 1.0 - closure  # Inspire angles: 1000 open, 0 closed
-            gripper_convention = "inspire_angle_1000_open"
+        # inspire_dftp keeps the inverted legacy proxy so earlier runs stay reproducible;
+        # inspire_f1 has no legacy runs, so it is always sign-corrected.
+        if hand in _LARGER_IS_OPEN and (tared or hand == "inspire_f1"):
+            closure = 1.0 - closure  # Inspire joints: larger value is open
+            gripper_convention = _LARGER_IS_OPEN[hand]
         g = closure[nearest_index(t_pos - offset, t)]
 
         vids = sorted((trial / "vid").glob("*.mp4"))
@@ -320,9 +406,15 @@ class HrdexdbAdapter:
                 "camera_serial": vids[0].stem,
                 "tactile_file": f"raw/hand/{stem}.npy",
                 "tactile_channels": [int(top[0]), int(top[1])],
+                "tactile_channel_names": (
+                    [F1_PADS[int(top[0])], F1_PADS[int(top[1])]] if hand == "inspire_f1" else None
+                ),
                 "force_units": (
-                    "raw sensor units (undocumented), signed-int16 decoded, per-trial resting "
-                    "offset subtracted and floored at zero"
+                    "inspire_f1 per-pad normal force, raw sensor units (undocumented)"
+                    + (", per-trial resting offset subtracted and floored at zero" if tared else "")
+                    if hand == "inspire_f1"
+                    else "raw sensor units (undocumented), signed-int16 decoded, per-trial "
+                    "resting offset subtracted and floored at zero"
                     if tared
                     else "raw sensor units (undocumented), signed-int16 decoded then abs"
                 ),

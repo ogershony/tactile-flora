@@ -249,7 +249,7 @@ in `docs/deviations.md`.
 | RH20T port fidelity | Partly resolved: no fingertip tactile in any port (wrist only), licenses per scene; one real cfg3 episode loads. Still open: whether `robot_ft` is tared; sampled episode fails sync and normalization gates |
 | REASSEMBLE anomaly format | Resolved: there is none; per-segment `success` plus known-issues table. Dense spans come from failed segments |
 | SoftVTBench contact fields and DSR tolerance | Contact resolved (`obs/finger_force`). Tolerance still open: unset in config (`dsr_tolerance_pct: null`) |
-| HRDexDB tactile layout and hands | Resolved for allegro_v5 and inspire_dftp (included); inspire_f1, robotiq, human raise NotImplementedError |
+| HRDexDB tactile layout and hands | Resolved for allegro_v5, inspire_dftp and (2026-10-22) inspire_f1: per-pad normal/tangential force dicts, decoded with a restricted unpickler; robotiq, human raise NotImplementedError |
 | Sensor identity (ASIN B0CZ6L5NMM) | Open. `sensor_confirmed: false`; `r_ref_ohm` 4700 and saturation counts are placeholders |
 | Baxter gripper force command range and per-episode variation | Open; blocks the recorder's `meta.json` fields |
 | AIRoA wrench key and per-primitive labels | Open (gated dataset; heuristics in the adapter) |

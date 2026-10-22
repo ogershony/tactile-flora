@@ -113,6 +113,36 @@ def test_adapter_aligns_force_and_gripper_on_the_same_video_clock(tmp_path: Path
     assert aligned.meta["clock_offset_s"] == pytest.approx(capture[0])
 
 
+def test_recorded_clock_drops_frame_ids_past_the_encoded_video(tmp_path: Path) -> None:
+    directory = tmp_path / "raw/timestamps"
+    directory.mkdir(parents=True)
+    # The recorder logged seven frames but only five were encoded (every inspire_f1 trial).
+    np.save(directory / "timestamp.npy", [102.0, 103.0, 104.0, 105.0, 106.0, 107.0, 108.0])
+    np.save(directory / "frame_id.npy", [1, 2, 3, 4, 5, 6, 7])
+    sensor = np.array([101.0, 102.0, 104.0, 106.0, 106.5, 107.0, 108.0])
+    mask, mapped, info = video_clock(tmp_path, sensor, fps=1, n_frames=5)
+    np.testing.assert_array_equal(mask, [False, True, True, True, False, False, False])
+    np.testing.assert_allclose(mapped, [0, 2, 4])
+    assert info["frame_ids_beyond_video"] == 2
+    assert info["samples_outside_video"] == 4
+    assert info["capture_span_s"] == 4
+
+
+def test_recorded_clock_drops_rows_logged_out_of_order(tmp_path: Path) -> None:
+    directory = tmp_path / "raw/timestamps"
+    directory.mkdir(parents=True)
+    # Frame 3 was logged after frame 6 with its logging time, as in 24% of inspire_f1 trials.
+    np.save(directory / "timestamp.npy", [102.0, 103.0, 104.0, 105.0, 106.0, 106.1, 107.0])
+    np.save(directory / "frame_id.npy", [1, 2, 4, 5, 6, 3, 7])
+    sensor = np.array([102.0, 103.5, 106.1, 107.0])
+    mask, mapped, info = video_clock(tmp_path, sensor, fps=1, n_frames=7)
+    assert mask.all()
+    np.testing.assert_allclose(mapped, [0, 2, 5.1, 6])
+    assert info["out_of_order_frame_ids"] == 1
+    assert info["missing_frame_timestamps"] == 1
+    assert info["frame_ids_beyond_video"] == 0
+
+
 @pytest.mark.parametrize(
     "timestamps,frames",
     [
@@ -122,6 +152,7 @@ def test_adapter_aligns_force_and_gripper_on_the_same_video_clock(tmp_path: Path
         ([102, float("nan")], [1, 5]),
         ([102, 103], [1, 1]),
         ([102], [1, 5]),
+        ([102, 103, 104], [1, 4, 7]),  # ids run past the video but frame 5 was never logged
     ],
 )
 def test_recorded_clock_refuses_invalid_timelines(tmp_path, timestamps, frames) -> None:
@@ -143,13 +174,13 @@ def test_splits_and_labels() -> None:
 
 
 def test_unsupported_hands_raise(tmp_path: Path) -> None:
-    for hand in ("inspire_f1", "robotiq_2f85", "human"):
+    for hand in ("robotiq_2f85", "human"):
         trial = tmp_path / hand / "obj" / "s1"
         trial.mkdir(parents=True)
         (trial / "grasp_result.json").write_text("{}")
     a = HrdexdbAdapter(_cfg())
     ids = a.discover(tmp_path)
-    assert len(ids) == 3
+    assert len(ids) == 2
     for eid in ids:
         with pytest.raises(NotImplementedError, match="not loadable"):
             a.load(eid)
@@ -233,3 +264,93 @@ def test_legacy_fixture_is_unchanged_by_the_representation_default() -> None:
     ep = HrdexdbAdapter(_cfg()).load(EID)
     assert ep.meta["force_representation"] == "legacy"
     assert ep.meta["force_offsets"] is None
+
+
+def _f1_trial(root: Path, n: int = 12) -> str:
+    """Write an inspire_f1 trial in the real on-disk layout: object arrays of per-pad dicts."""
+    from tactile_flora.sources.hrdexdb import F1_PADS
+    from tests.fixtures._video import write_mp4
+
+    trial = root / "inspire_f1" / "mug" / "3"
+    (trial / "raw" / "hand").mkdir(parents=True)
+    (trial / "grasp_result.json").write_text(json.dumps({"grasp_success": True}))
+    frames = np.empty(n, dtype=object)
+    for i in range(n):
+        frame = {}
+        for pad in F1_PADS:
+            frame[f"{pad}_normal_force"] = 0.0
+            frame[f"{pad}_tangential_force"] = 0.0
+            frame[f"{pad}_tangential_direction"] = -1.0
+        frame["ring_normal_force"] = 2.0  # resting offset on an untouched pad
+        if i >= 6:
+            frame["index_normal_force"] = 300.0
+            frame["thumb_normal_force"] = 120.0
+            frame["index_tangential_force"] = 40.0
+        frames[i] = frame
+    np.save(trial / "raw" / "hand" / "right_tactile.npy", frames, allow_pickle=True)
+    t = np.empty(n, dtype=object)
+    t[:] = list(1.7e9 + np.arange(n) / 50.0)
+    np.save(trial / "raw" / "hand" / "right_tactile_time.npy", t, allow_pickle=True)
+    joints = np.empty((n, 6), dtype=object)
+    joints[:] = 1742.0
+    joints[6:] = 1450.0  # smaller joint value = closed
+    np.save(trial / "raw" / "hand" / "right_joint_states.npy", joints, allow_pickle=True)
+    np.save(trial / "raw" / "hand" / "right_joint_states_time.npy", t, allow_pickle=True)
+    write_mp4(trial / "vid" / "22641005.mp4", n, 30)
+    return "inspire_f1/mug/3"
+
+
+def test_inspire_f1_object_arrays_load_as_pad_normal_force(tmp_path: Path) -> None:
+    eid = _f1_trial(tmp_path)
+    cfg = _cfg().model_copy(
+        update={
+            "root": str(tmp_path),
+            "hrdexdb_force_representation": "tared",
+            "hrdexdb_tare_s": 0.1,
+        }
+    )
+    ep = HrdexdbAdapter(cfg).load(eid)
+    assert ep.session == "inspire_f1"
+    assert ep.meta["tactile_channel_names"] == ["index", "thumb"]
+    assert ep.meta["tactile_channels"] == [1, 0]
+    assert ep.meta["gripper_convention"] == "inspire_f1_larger_is_open"
+    np.testing.assert_allclose(ep.meta["force_offsets"], [0, 0, 0, 2, 0, 0, 0, 0])
+    arm = ep.force.arms["R"]
+    assert arm.kind == "pad"
+    np.testing.assert_allclose(arm.f_a, [0] * 6 + [300] * 6)
+    np.testing.assert_allclose(arm.f_b, [0] * 6 + [120] * 6)
+    # Recorded 50 Hz clock (epoch seconds, so float64 resolution is about 2e-7 s).
+    np.testing.assert_allclose(np.diff(ep.force.t), 1 / 50.0, rtol=1e-4)
+    assert ep.gripper is not None
+    g = ep.gripper.arms["R"]
+    assert g[0] == 0.0 and g[-1] == 1.0
+    labels = HrdexdbAdapter(cfg).native_labels(eid)
+    assert labels[0].outcome == 5
+    # The legacy representation also loads inspire_f1 and still sign-corrects its closure.
+    legacy = HrdexdbAdapter(_cfg().model_copy(update={"root": str(tmp_path)})).load(eid)
+    assert legacy.gripper is not None and legacy.gripper.arms["R"][-1] == 1.0
+
+
+def test_inspire_f1_refuses_pickles_that_reference_other_globals(tmp_path: Path) -> None:
+    import pickle
+
+    from tactile_flora.sources.hrdexdb import f1_normal_force, load_npy
+
+    eid = _f1_trial(tmp_path)
+    path = tmp_path / eid / "raw" / "hand" / "right_tactile.npy"
+    # Keep the npy header, replace the payload with a pickle that would call a builtin.
+    with open(path, "rb") as fh:
+        version = np.lib.format.read_magic(fh)
+        np.lib.format.read_array_header_1_0(fh) if version == (1, 0) else (
+            np.lib.format.read_array_header_2_0(fh)
+        )
+        header = fh.tell()
+    body = pickle.dumps(pickle.loads(pickle.dumps(len)), protocol=3)
+    path.write_bytes(path.read_bytes()[:header] + body)
+    with pytest.raises(pickle.UnpicklingError, match="refusing to unpickle builtins.len"):
+        load_npy(path)
+    with pytest.raises(ValueError, match="not dict"):
+        f1_normal_force(np.array([1.0], dtype=object))
+    with pytest.raises(ValueError, match="lacks thumb_normal_force"):
+        f1_normal_force(np.array([{}], dtype=object))
+
