@@ -44,6 +44,9 @@ def planned_report_version(base: Path, cfg: TrainConfig) -> str | None:
     for name, expected in hashes.items():
         if hashlib.sha256(Path(name).read_bytes()).hexdigest() != expected:
             raise ValueError(f"core code changed during the experiment: {name}")
+    for name, expected in plan.get("input_sha256", {}).items():
+        if hashlib.sha256(Path(name).read_bytes()).hexdigest() != expected:
+            raise ValueError(f"learning input changed during the experiment: {name}")
     return plan["git_hash"]
 
 

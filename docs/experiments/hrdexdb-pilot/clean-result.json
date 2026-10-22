@@ -1,0 +1,2126 @@
+{
+  "scope": "Post hoc curated development pilot, 25 train / 13 val; not untouched test data",
+  "training": {
+    "scope": "25 cleaned training clips, four epochs each; final-epoch adapters; no validation-based selection",
+    "plan": {
+      "scope": "25 cleaned training episodes, 13 curated development validation episodes",
+      "base_model": "/home/ogershony/tactile-flora/data/acceptance/released-inference/hub/models--nvidia--Flora-Rewarder/snapshots/7de68d22c4a9decec5ddb7f86ddcaee8f82d3367",
+      "configs": {
+        "force": {
+          "manifest": "data/acceptance/hrdexdb-clean-v1/manifest/hrdexdb-sft.parquet",
+          "base_model": "/home/ogershony/tactile-flora/data/acceptance/released-inference/hub/models--nvidia--Flora-Rewarder/snapshots/7de68d22c4a9decec5ddb7f86ddcaee8f82d3367",
+          "force_mode": "real",
+          "seed": 17,
+          "epochs": 4,
+          "learning_rate": 2e-05,
+          "warmup_frac": 0.1,
+          "grad_clip": 1.0,
+          "effective_batch": 16,
+          "lora": {
+            "rank": 32,
+            "alpha": 64,
+            "target_modules": [
+              "q_proj",
+              "k_proj",
+              "v_proj",
+              "o_proj",
+              "gate_proj",
+              "up_proj",
+              "down_proj"
+            ]
+          },
+          "output_dir": "data/acceptance/hrdexdb-clean-v1/runs"
+        },
+        "control": {
+          "manifest": "data/acceptance/hrdexdb-clean-v1/manifest/hrdexdb-sft.parquet",
+          "base_model": "/home/ogershony/tactile-flora/data/acceptance/released-inference/hub/models--nvidia--Flora-Rewarder/snapshots/7de68d22c4a9decec5ddb7f86ddcaee8f82d3367",
+          "force_mode": "omitted",
+          "seed": 17,
+          "epochs": 4,
+          "learning_rate": 2e-05,
+          "warmup_frac": 0.1,
+          "grad_clip": 1.0,
+          "effective_batch": 16,
+          "lora": {
+            "rank": 32,
+            "alpha": 64,
+            "target_modules": [
+              "q_proj",
+              "k_proj",
+              "v_proj",
+              "o_proj",
+              "gate_proj",
+              "up_proj",
+              "down_proj"
+            ]
+          },
+          "output_dir": "data/acceptance/hrdexdb-clean-v1/runs"
+        }
+      },
+      "config_sha256": {
+        "train-hrdexdb.yaml": "c65b6f57c798e3c924bf5efd141dd6f7da13bf4755245bb329c5b91b88c4c9fa",
+        "train-control.yaml": "a23a0591b2b1bc323e4faa2c83b3b73f17f7e355e35def292eb247f87991653c"
+      },
+      "manifest_sha256": "e91d7b896489ad15e1a05ad3686db44a5ef90a3110e1f3ddf8ca87efddc31a42",
+      "validation_manifest_sha256": "0511f44661bfbfba7519be4e8afc21bafe9c6152beb43f3d37190e014f5465af",
+      "selection": "Train each adapter from the released base; fixed 4 epochs; evaluate final checkpoints without validation-based selection",
+      "git_hash": "3e21915ca05af7ce12955b872ce2a1f3de712b0c",
+      "dirty_workspace": true,
+      "code_sha256": {
+        "scripts/cluster/run_hrdexdb_sft.py": "47dbf49f7c5c4378c77437aef396b08ed3cd25ab0fd81713b777ddb4f70d0256",
+        "tactile_flora/train/sft.py": "32f540f7d4d0ff1530f64498f943d7c6ec09658794cb125d4676ca78627ebff1",
+        "tactile_flora/train/dataset.py": "849de456b919c1f02a47c0e0e51bf2429a6b2df20f9c76fa5807df473bfb6862"
+      },
+      "slurm_training_job": 6321,
+      "slurm_account": "scc",
+      "hardware": "matthew: 2 MI210; monster: 3 MI210 configured but DOWN+DRAIN+NOT_RESPONDING",
+      "core_code_sha256": {
+        "tactile_flora/__init__.py": "3224e1485b8c492e54b9eabb79ea848a84481b1c6141b704d8a1e7527bddd7be",
+        "tactile_flora/baxter/__init__.py": "0074a61a6ec1cbc82950975c7d666b35d5a450f214a82d74f71d678a664cb1e0",
+        "tactile_flora/baxter/calibrate.py": "f5a23413330bfc5a62dc8ad7e92ed41a1a2df9c643df655bbe271019af3518d7",
+        "tactile_flora/baxter/calibration.py": "5d90b5e3030b2f4b52b18a63128063a492ca31d7b4e5f7f410d6887ed9dba83a",
+        "tactile_flora/baxter/label.py": "d505ea538740a411317677b71f835283ab27946ee76d881d48a09ba4cea8e75c",
+        "tactile_flora/baxter/ros/__init__.py": "b75c61bb2b2210f46b905e28832e2f38edd33302365e92bf8a66b94f97dae2c3",
+        "tactile_flora/baxter/ros/fsr_node.py": "7bde612175fbd9c052b24b5d4724ad3bf5e4b850ec25f1e1a55161ad07f5c68a",
+        "tactile_flora/baxter/ros/recorder.py": "884249022c0293d59b119945cf7bba058766e5161aa7bab22e1f47154e7d052a",
+        "tactile_flora/baxter/ros/transport.py": "ff665518f091a82ed12abc8d79f5219dcb8264f7d4c8929357d2c2c998a2c1a3",
+        "tactile_flora/baxter/serial_protocol.py": "10328f16bb70698c2347cb7113b4b5643322f9ba0fb48561b1f1ec0d1d34d202",
+        "tactile_flora/baxter/to_lerobot.py": "51f586128a58637802d48efb76fb4dad7bcab8589088dabccb654f3b567fcc01",
+        "tactile_flora/cli.py": "ec2d71920ff4bf4ea57bfd226c2be546ea896db85a103e39957af89f0f8ee6a9",
+        "tactile_flora/config.py": "be57f44bcefba01c086fd32759d9f902c9319d4c42d6129261a7606400e81754",
+        "tactile_flora/eval/__init__.py": "8c3525469cfe41dab63a7c03fb7e1f11756319aef8a1d4415f22230e1014cdca",
+        "tactile_flora/eval/ablations.py": "d9d9d8c6068e24c48acb8386d15c56b7a5dc03ac8e24e2851fe7fa03c86bc91f",
+        "tactile_flora/eval/cache.py": "6757ad70e8b9ff09000fb88b1af07c4de7ad5fb964c72dd420cae2ca5a45c188",
+        "tactile_flora/eval/harness.py": "ed0d2df038fd7e4115af263e9c335f281899d1b8b85f659541a7f61d00962eeb",
+        "tactile_flora/eval/inference.py": "64e57f5332b8cdf65c2f0655191a8b91dbdba9f8ba7f01149dffcde79affb32b",
+        "tactile_flora/eval/metrics.py": "4fb33dfd9e34f2aca689d4f53d04ae0fb1c087f71aae44db5ab0d736e4632e49",
+        "tactile_flora/eval/roboreward.py": "6cddd3a24da3646d1a491a141d1e7be4c2d307ed1397a24d76a541c39d79a099",
+        "tactile_flora/force/__init__.py": "af7e0e42ff1ce70de4324f70bebc41b634020628af32ef2c361c96c33f3f6c05",
+        "tactile_flora/force/normalize.py": "a1e8e319123fe135c029447de48fc3aaabee5ad1f021005d250437ec1c3b3e1e",
+        "tactile_flora/force/render.py": "749eac296fbc020f54dc94c59440811bcc8853181b200c310941e10e3442be3b",
+        "tactile_flora/force/resample.py": "91d76ea29896d16ff5ca08db7b672ebbdb38f1fdaebe1151681d2f2e621eaf7a",
+        "tactile_flora/labels/__init__.py": "3c49c8935fcfbb566bb97a58b4d19d12f703b30b285a13878bfd96712644f685",
+        "tactile_flora/labels/events.py": "3a1e2fd06573bad2e867ad3e392b4c9478d251b7bf0941ea60c6d812c4fd18d7",
+        "tactile_flora/labels/mapping.py": "7c854d269b337032dff207ccab190ca8b801e434f57b1858f8def5e363e410a5",
+        "tactile_flora/labels/merge.py": "de021d1f33ae163dbbf5bcb33100113e0b47b85a69b0c3a987328770a2490ea4",
+        "tactile_flora/labels/pseudo.py": "0723396a4283714f4a24f56efe406c27dce12a8d336266e7163fb12418e0ac2b",
+        "tactile_flora/labels/windows.py": "62aef8e7425750141165d1586ab47a8dbbbd06b2168acab6047de024123234ca",
+        "tactile_flora/prompts/__init__.py": "1f376fdcf2dd0ea4cd246e93844c18e65e12f0440a1a37879b8ee13f22103040",
+        "tactile_flora/prompts/flora.py": "bf575a29ac3b33cd8eddd2afe03dbbe5829e70dc550073cf255dfd2a4266164a",
+        "tactile_flora/prompts/parse.py": "1ec053bf6fb63e002220b476eb2fa3bcd0792125eb3b1469a847b4938001c5bb",
+        "tactile_flora/prompts/templates.py": "bc5e96b21ceeefc7db4ce662f6dbb072c6c0944e4e83c6c827a9c487837bc559",
+        "tactile_flora/schema.py": "1ff8f9e45bd67324952803e0baeaa589cf06b938ce307b5c94ff8ba318f98042",
+        "tactile_flora/sources/__init__.py": "014077521e8e8f4d7d694dd97327941a7eb4b52ce8b0212ae451667f54249c58",
+        "tactile_flora/sources/_common.py": "9ea95b253a3155e1ded07579fd9e12ff26ec76ca5174886d686ceeeabbd7044a",
+        "tactile_flora/sources/_eval_common.py": "c8369c9bbef0356beb07ec97cd558e5966a9fb4a521bfedec082e98353af61e8",
+        "tactile_flora/sources/_lerobot.py": "2d8a5cc532373e6291734ffebbf51388363f6ef466930c79ae67155aa8763cc6",
+        "tactile_flora/sources/airoa.py": "e40f9a2a069a64fee0c3a2ed2eb34db5828fd5d4e1319fefcfc49318866ef8c7",
+        "tactile_flora/sources/base.py": "8a799627b815d8ea0c77374b5f15bffca31a717a18fe9c4629eecfd8cd4fe3ee",
+        "tactile_flora/sources/baxter.py": "e7b0c742c1a60a18e96077a9f400580da227b9e86fcccb58ab989a1c727dfdeb",
+        "tactile_flora/sources/hrdexdb.py": "a8de92a43fec1fda5ce451af59203e284c9a12aab3389c0fddcd027d7860af51",
+        "tactile_flora/sources/phantom.py": "7fcbe25cea58b5d2a29b7c48604e153ff89e00334d1070ba55fc34fdc79fe7c2",
+        "tactile_flora/sources/reassemble.py": "7084dd34f8c8ab33b6219bf2dd246b30c6e0891916695e3b43071a7a2cd709f0",
+        "tactile_flora/sources/rh20t.py": "ff5841e005b9b8eac35e8bd0d1d2ce777ca08bf16fa6be006daa3817859c2838",
+        "tactile_flora/sources/sharpadex.py": "f79275fe3689cc1b6df39fcf6dda90c52a97c31600db6f6aa67011f233d83e45",
+        "tactile_flora/sources/softvtbench.py": "1e7e199154ead3b6964cdf27d4a81c6bf0e07d1ea1520d084c3432c1b4a0512a",
+        "tactile_flora/train/__init__.py": "15503e3f9f3a2711597337c17339f3f3dc0b52826cf1dbab579cf755c2bf0cf7",
+        "tactile_flora/train/dataset.py": "849de456b919c1f02a47c0e0e51bf2429a6b2df20f9c76fa5807df473bfb6862",
+        "tactile_flora/train/sft.py": "32f540f7d4d0ff1530f64498f943d7c6ec09658794cb125d4676ca78627ebff1",
+        "tactile_flora/verify/__init__.py": "fa6057c491a5199bfafa74da33fa89b54146e02bc3c2e5e98dc1502679d1d3c1",
+        "tactile_flora/verify/checks.py": "91b5915dfe4ab70d74020cf077858e72f5ee5a21032af91e2ce75fe6a2f7646d",
+        "tactile_flora/verify/hashing.py": "85cd262b6278cb279ec04d6bd2c5302c6b2c685b13608827b9c478d8f68e742a",
+        "tactile_flora/verify/manifest.py": "3f9b9be45f49296207388577d14e88eac4db7a005e5e7304f6337abfc65db39e",
+        "tactile_flora/verify/report.py": "c4bbba662cfc0475487f6d5022b1d4849e57432bb6536e269d960352d31405d1",
+        "tactile_flora/verify/windowing.py": "f098ea63b0ceefa1bb31eadaaf4aaef297ce6ac54320ae201d59e15c733ec82d",
+        "tactile_flora/video/__init__.py": "ed60c868b556c969deaa21c21ce2895d5e4d9a2681ab76912042fb3bf11b05bb",
+        "tactile_flora/video/mosaic.py": "ffb78b68b046240eb35f9f123af9c445f32de5c37a2eedcfad2ede9fed03d50b",
+        "tactile_flora/video/readers.py": "7eb692ce5cc1c7cc3825d6f0c2d1bf409bbe63800519cb5dad00ab6141102409",
+        "tactile_flora/video/zarr_compat.py": "88b9e6e8c17d34c4c87d747625e6d11a8c41f841e9d97462d8be0fad14e58f34"
+      },
+      "launcher_note": "Launcher now verifies pinned manifest/config/core-code hashes for the active Slurm job, allowing HEAD to advance without changing experiment inputs."
+    },
+    "environment": {
+      "host": "matthew.nodes.scc.sdsc.edu",
+      "torch": "2.12.1+rocm7.1",
+      "hip": "7.1.52802",
+      "packages": {
+        "transformers": "5.8.1",
+        "peft": "0.21.2",
+        "accelerate": "1.15.0",
+        "numpy": "2.4.6",
+        "av": "15.1.0"
+      },
+      "gpus": [
+        {
+          "index": 0,
+          "name": "AMD Radeon Graphics",
+          "arch": "gfx90a:sramecc+:xnack-",
+          "total_gib": 63.984375
+        },
+        {
+          "index": 1,
+          "name": "AMD Radeon Graphics",
+          "arch": "gfx90a:sramecc+:xnack-",
+          "total_gib": 63.984375
+        }
+      ]
+    },
+    "artifacts": [
+      {
+        "run": "clean-v1-force",
+        "epochs": 4,
+        "optimizer_steps": 7,
+        "first_loss": 2.606366,
+        "last_loss": 1.495084,
+        "all_tensors_finite": true,
+        "tensor_count": 512,
+        "parameter_count": 159383552,
+        "lora_B_tensors": 256,
+        "nonzero_lora_B_tensors": 256,
+        "adapter_bytes": 637610624,
+        "adapter_sha256": "7646468816c09c75d5f9e486e7799bf4968229d64c9d575ee8cfac109fc7bae0",
+        "manifest_sha256": "e91d7b896489ad15e1a05ad3686db44a5ef90a3110e1f3ddf8ca87efddc31a42",
+        "note": "Current accumulation crosses short epoch-batch boundaries: 7 actual updates; learning-rate scheduler planned 8. Control uses the same implementation."
+      },
+      {
+        "run": "clean-v1-control",
+        "epochs": 4,
+        "optimizer_steps": 7,
+        "first_loss": 2.604739,
+        "last_loss": 1.744217,
+        "all_tensors_finite": true,
+        "tensor_count": 512,
+        "parameter_count": 159383552,
+        "lora_B_tensors": 256,
+        "nonzero_lora_B_tensors": 256,
+        "adapter_bytes": 637610624,
+        "adapter_sha256": "800df0087ac4892b6ff86a5494e742ed5e25de20248da09088735668915babee",
+        "manifest_sha256": "e91d7b896489ad15e1a05ad3686db44a5ef90a3110e1f3ddf8ca87efddc31a42",
+        "note": "Current accumulation crosses short epoch-batch boundaries: 7 actual updates; learning-rate scheduler planned 8. Both runs use this implementation."
+      }
+    ],
+    "scheduler_job": 6321,
+    "push_verified_commit": "b48111c33c69c894c468770ca0471f07a32c01b6"
+  },
+  "evaluation": {
+    "plan": {
+      "scope": "post hoc curated development validation; 13 clips; not a new test result",
+      "conditions": [
+        [
+          "released",
+          [
+            "omitted",
+            "real"
+          ]
+        ],
+        [
+          "data/acceptance/hrdexdb-clean-v1/runs/clean-v1-control/adapter",
+          [
+            "omitted"
+          ]
+        ],
+        [
+          "data/acceptance/hrdexdb-clean-v1/runs/clean-v1-force/adapter",
+          [
+            "real",
+            "shuffled"
+          ]
+        ]
+      ],
+      "val_manifest_hash": "0511f44661bfbfba7519be4e8afc21bafe9c6152beb43f3d37190e014f5465af",
+      "train_manifest_hash": "e91d7b896489ad15e1a05ad3686db44a5ef90a3110e1f3ddf8ca87efddc31a42",
+      "training_plan_sha256": "190c65eaba0e08c2f6b43d921ca6a94dd7e26af798f98d892fadee7e920d1fb9",
+      "selection": "final epoch for both adapters; fixed five evaluation conditions; no tuning",
+      "seed": 0
+    },
+    "results": [
+      {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "released",
+        "config_hash": "513d3729be15dd37",
+        "force_mode": "omitted",
+        "git_hash": "b48111c33c69c894c468770ca0471f07a32c01b6",
+        "manifest_hash": "0511f44661bfbfba7519be4e8afc21bafe9c6152beb43f3d37190e014f5465af",
+        "metrics": {
+          "accuracy": 0.8461538461538461,
+          "auroc": 0.925,
+          "mae": 92.3076923076923
+        },
+        "n_episodes": 13,
+        "n_windows": 13,
+        "no_logprobs": 0,
+        "parse_failed": 0,
+        "per_object": {
+          "cactus2": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 100.0
+          },
+          "cactus3": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 200.0
+          },
+          "frog_cup": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "knife_sharpener": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 0.0
+          },
+          "lotion": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "metal_scoop_small": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "plant_pot": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "potato_masher": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          }
+        },
+        "seed": 0,
+        "warnings": [],
+        "windows_cache_hash": null
+      },
+      {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "released",
+        "config_hash": "5b9dbfe734cbba05",
+        "force_mode": "real",
+        "git_hash": "b48111c33c69c894c468770ca0471f07a32c01b6",
+        "manifest_hash": "0511f44661bfbfba7519be4e8afc21bafe9c6152beb43f3d37190e014f5465af",
+        "metrics": {
+          "accuracy": 0.6153846153846154,
+          "auroc": 0.65,
+          "mae": 130.76923076923077
+        },
+        "n_episodes": 13,
+        "n_windows": 13,
+        "no_logprobs": 0,
+        "parse_failed": 0,
+        "per_object": {
+          "cactus2": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "cactus3": {
+            "accuracy": 0.5,
+            "auroc": 0.0,
+            "mae": 200.0
+          },
+          "frog_cup": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "knife_sharpener": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "lotion": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "metal_scoop_small": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "plant_pot": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "potato_masher": {
+            "accuracy": 0.5,
+            "auroc": 0.0,
+            "mae": 200.0
+          }
+        },
+        "seed": 0,
+        "warnings": [],
+        "windows_cache_hash": null
+      },
+      {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "data/acceptance/hrdexdb-clean-v1/runs/clean-v1-control/adapter",
+        "config_hash": "63d3c77542b177eb",
+        "force_mode": "omitted",
+        "git_hash": "b48111c33c69c894c468770ca0471f07a32c01b6",
+        "manifest_hash": "0511f44661bfbfba7519be4e8afc21bafe9c6152beb43f3d37190e014f5465af",
+        "metrics": {
+          "accuracy": 0.8461538461538461,
+          "auroc": 0.8,
+          "mae": 92.3076923076923
+        },
+        "n_episodes": 13,
+        "n_windows": 13,
+        "no_logprobs": 0,
+        "parse_failed": 0,
+        "per_object": {
+          "cactus2": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 100.0
+          },
+          "cactus3": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 200.0
+          },
+          "frog_cup": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "knife_sharpener": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 0.0
+          },
+          "lotion": {
+            "accuracy": 0.5,
+            "auroc": 0.0,
+            "mae": 200.0
+          },
+          "metal_scoop_small": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "plant_pot": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "potato_masher": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 100.0
+          }
+        },
+        "seed": 0,
+        "warnings": [],
+        "windows_cache_hash": null
+      },
+      {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "data/acceptance/hrdexdb-clean-v1/runs/clean-v1-force/adapter",
+        "config_hash": "7bd31976e66c2ba4",
+        "force_mode": "real",
+        "git_hash": "b48111c33c69c894c468770ca0471f07a32c01b6",
+        "manifest_hash": "0511f44661bfbfba7519be4e8afc21bafe9c6152beb43f3d37190e014f5465af",
+        "metrics": {
+          "accuracy": 0.6153846153846154,
+          "auroc": 0.65,
+          "mae": 138.46153846153845
+        },
+        "n_episodes": 13,
+        "n_windows": 13,
+        "no_logprobs": 0,
+        "parse_failed": 0,
+        "per_object": {
+          "cactus2": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "cactus3": {
+            "accuracy": 0.5,
+            "auroc": 0.0,
+            "mae": 200.0
+          },
+          "frog_cup": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "knife_sharpener": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 200.0
+          },
+          "lotion": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "metal_scoop_small": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "plant_pot": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "potato_masher": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 200.0
+          }
+        },
+        "seed": 0,
+        "warnings": [],
+        "windows_cache_hash": null
+      },
+      {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "data/acceptance/hrdexdb-clean-v1/runs/clean-v1-force/adapter",
+        "config_hash": "930d80bdcc23a567",
+        "force_mode": "shuffled",
+        "git_hash": "b48111c33c69c894c468770ca0471f07a32c01b6",
+        "manifest_hash": "0511f44661bfbfba7519be4e8afc21bafe9c6152beb43f3d37190e014f5465af",
+        "metrics": {
+          "accuracy": 0.6923076923076923,
+          "auroc": 0.725,
+          "mae": 138.46153846153845
+        },
+        "n_episodes": 13,
+        "n_windows": 13,
+        "no_logprobs": 0,
+        "parse_failed": 0,
+        "per_object": {
+          "cactus2": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "cactus3": {
+            "accuracy": 0.5,
+            "auroc": 0.0,
+            "mae": 200.0
+          },
+          "frog_cup": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "knife_sharpener": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "lotion": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 200.0
+          },
+          "metal_scoop_small": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "plant_pot": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "potato_masher": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 200.0
+          }
+        },
+        "seed": 0,
+        "warnings": [],
+        "windows_cache_hash": null
+      }
+    ]
+  },
+  "cells": [
+    {
+      "metrics": {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "released",
+        "config_hash": "513d3729be15dd37",
+        "force_mode": "omitted",
+        "git_hash": "b48111c33c69c894c468770ca0471f07a32c01b6",
+        "manifest_hash": "0511f44661bfbfba7519be4e8afc21bafe9c6152beb43f3d37190e014f5465af",
+        "metrics": {
+          "accuracy": 0.8461538461538461,
+          "auroc": 0.925,
+          "mae": 92.3076923076923
+        },
+        "n_episodes": 13,
+        "n_windows": 13,
+        "no_logprobs": 0,
+        "parse_failed": 0,
+        "per_object": {
+          "cactus2": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 100.0
+          },
+          "cactus3": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 200.0
+          },
+          "frog_cup": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "knife_sharpener": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 0.0
+          },
+          "lotion": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "metal_scoop_small": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "plant_pot": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "potato_masher": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          }
+        },
+        "seed": 0,
+        "warnings": [],
+        "windows_cache_hash": null
+      },
+      "config": {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "released",
+        "eval": {
+          "benchmarks": {
+            "hrdexdb_clean_outcome": {
+              "manifest": "data/acceptance/hrdexdb-clean-v1/manifest/val.parquet",
+              "metrics": [
+                "mae",
+                "accuracy",
+                "auroc"
+              ],
+              "prompts": [
+                "outcome"
+              ],
+              "score_only": false
+            }
+          },
+          "output_dir": "data/acceptance/hrdexdb-clean-v1/eval"
+        },
+        "force": {
+          "events": {
+            "contact_loss_s": 0.3,
+            "crush_f": 2.0,
+            "grasp_f": 0.5,
+            "grasp_g": 0.6,
+            "grasp_window_s": 0.5,
+            "off_axis_delta": 0.6,
+            "regrasp_window_s": 3.0,
+            "slip_df": -2.0,
+            "slip_g_tol": 0.02,
+            "slip_min_s": 0.1
+          },
+          "render": {
+            "clip_max": 3.0,
+            "decimals": 2,
+            "header": "Force (normalized: 0 free space, 1 median grasp, max 3):",
+            "max_tokens": 3000,
+            "tokenizer_json": "/home/ogershony/tactile-flora/data/acceptance/released-inference/hub/models--nvidia--Flora-Rewarder/snapshots/7de68d22c4a9decec5ddb7f86ddcaee8f82d3367/tokenizer.json"
+          },
+          "resample": {
+            "contact_sigma": 3.0,
+            "frame_period_s": 0.25,
+            "group_period_s": 0.5,
+            "half_window_s": 0.125,
+            "raw_rate_hz": 100.0
+          }
+        },
+        "force_mode": "omitted",
+        "seed": 0
+      },
+      "predictions": [
+        {
+          "window_id": "3737b18e8c455459f7536ae263f73213a549807e",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus2/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus2",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then placed it back down. The cactus was successfully grasped and lifted.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then placed it back down. The cactus was successfully grasped and lifted.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9997941479,
+          "parse_failed": false,
+          "latency_s": 10.283780931,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "dfdac52f93b069fb8a7f9b631b6a2990cf851c5b",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus2/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus2",
+          "raw_text": "Rationale: The robot grasped and lifted the cactus, but it was dropped or fell onto its side and was not held upright at the end.\n\nScore: 3",
+          "parsed": "{\"score\":3,\"rationale\":\"The robot grasped and lifted the cactus, but it was dropped or fell onto its side and was not held upright at the end.\",\"parse_failed\":false}",
+          "score": 3.0,
+          "expected_score": 3.4397478744,
+          "parse_failed": false,
+          "latency_s": 5.560776876,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "e39ac81616f6c1c0670832438c0df3029acf3393",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus3/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus3",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9977461241,
+          "parse_failed": false,
+          "latency_s": 4.811317221,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "baca4c84adee6d2ee555bfae03b65b71d4126f6d",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus3/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus3",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then placed it back down. The cactus was successfully grasped and lifted.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then placed it back down. The cactus was successfully grasped and lifted.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9997909436,
+          "parse_failed": false,
+          "latency_s": 6.168089688,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "5f19f6cc9ece87523b9a5f3375cd15de50f29ed1",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/frog_cup/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "frog_cup",
+          "raw_text": "Rationale: The robot grasped the frog cup, lifted it off the table, and moved it. The cup was later placed back on the table, but the grasp and lift were completed.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot grasped the frog cup, lifted it off the table, and moved it. The cup was later placed back on the table, but the grasp and lift were completed.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9994093009,
+          "parse_failed": false,
+          "latency_s": 6.696047723,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "d6fdf397e3094ac8f1d42abda10e332c36c80623",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/knife_sharpener/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "knife_sharpener",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the knife sharpener off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the knife sharpener off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9688777851,
+          "parse_failed": false,
+          "latency_s": 4.976553393,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "3f03d3967cb1f9ddb7751485bca6aa5111173c2d",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/knife_sharpener/2",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "knife_sharpener",
+          "raw_text": "Rationale: The robot approached and contacted the knife sharpener, but the sharpener ended up knocked over on the table rather than being grasped and lifted.\n\nScore: 1",
+          "parsed": "{\"score\":1,\"rationale\":\"The robot approached and contacted the knife sharpener, but the sharpener ended up knocked over on the table rather than being grasped and lifted.\",\"parse_failed\":false}",
+          "score": 1.0,
+          "expected_score": 1.5469018956,
+          "parse_failed": false,
+          "latency_s": 5.771434018,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "ed7985137047871afee4025ea73526c93d8095f2",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/lotion/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "lotion",
+          "raw_text": "Rationale: The robot grasped the lotion bottle and lifted it off the table, but the bottle was later lying on its side, indicating that it was dropped or placed down.\n\nScore: 4",
+          "parsed": "{\"score\":4,\"rationale\":\"The robot grasped the lotion bottle and lifted it off the table, but the bottle was later lying on its side, indicating that it was dropped or placed down.\",\"parse_failed\":false}",
+          "score": 4.0,
+          "expected_score": 3.9064992673,
+          "parse_failed": false,
+          "latency_s": 6.554626356,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "e8d856c8864c8f002a6c2d1cdcd1ab1939a3b161",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/lotion/3",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "lotion",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the lotion bottle off the table, then placed it back on the table.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the lotion bottle off the table, then placed it back on the table.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9771995224,
+          "parse_failed": false,
+          "latency_s": 5.107047483,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "1affb56c5fd99a69447f6d890a047b67446b78f7",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/metal_scoop_small/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "metal_scoop_small",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the small metal scoop off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the small metal scoop off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9971783029,
+          "parse_failed": false,
+          "latency_s": 4.968548775,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "0a91b9144e38be91f9099e2dc7ea1a6f6fe78e72",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/plant_pot/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "plant_pot",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the plant pot off the table, then placed it back down. The pot was successfully grasped and lifted.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the plant pot off the table, then placed it back down. The pot was successfully grasped and lifted.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9998076915,
+          "parse_failed": false,
+          "latency_s": 6.020255389,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "c92a327a6361caaa76b2e31b2671d025214417ee",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/potato_masher/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "potato_masher",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the potato masher off the table, leaving it held in the gripper above the surface.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the potato masher off the table, leaving it held in the gripper above the surface.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9999550832,
+          "parse_failed": false,
+          "latency_s": 5.63836086,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "03c9384b33da4a61153b600777f461060feb261e",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/potato_masher/5",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "potato_masher",
+          "raw_text": "Rationale: The robot grasped and lifted the potato masher, but it was later dropped or placed back on the table.\n\nScore: 4",
+          "parsed": "{\"score\":4,\"rationale\":\"The robot grasped and lifted the potato masher, but it was later dropped or placed back on the table.\",\"parse_failed\":false}",
+          "score": 4.0,
+          "expected_score": 4.0373298196,
+          "parse_failed": false,
+          "latency_s": 4.952265451,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        }
+      ]
+    },
+    {
+      "metrics": {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "released",
+        "config_hash": "5b9dbfe734cbba05",
+        "force_mode": "real",
+        "git_hash": "b48111c33c69c894c468770ca0471f07a32c01b6",
+        "manifest_hash": "0511f44661bfbfba7519be4e8afc21bafe9c6152beb43f3d37190e014f5465af",
+        "metrics": {
+          "accuracy": 0.6153846153846154,
+          "auroc": 0.65,
+          "mae": 130.76923076923077
+        },
+        "n_episodes": 13,
+        "n_windows": 13,
+        "no_logprobs": 0,
+        "parse_failed": 0,
+        "per_object": {
+          "cactus2": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "cactus3": {
+            "accuracy": 0.5,
+            "auroc": 0.0,
+            "mae": 200.0
+          },
+          "frog_cup": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "knife_sharpener": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "lotion": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "metal_scoop_small": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "plant_pot": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "potato_masher": {
+            "accuracy": 0.5,
+            "auroc": 0.0,
+            "mae": 200.0
+          }
+        },
+        "seed": 0,
+        "warnings": [],
+        "windows_cache_hash": null
+      },
+      "config": {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "released",
+        "eval": {
+          "benchmarks": {
+            "hrdexdb_clean_outcome": {
+              "manifest": "data/acceptance/hrdexdb-clean-v1/manifest/val.parquet",
+              "metrics": [
+                "mae",
+                "accuracy",
+                "auroc"
+              ],
+              "prompts": [
+                "outcome"
+              ],
+              "score_only": false
+            }
+          },
+          "output_dir": "data/acceptance/hrdexdb-clean-v1/eval"
+        },
+        "force": {
+          "events": {
+            "contact_loss_s": 0.3,
+            "crush_f": 2.0,
+            "grasp_f": 0.5,
+            "grasp_g": 0.6,
+            "grasp_window_s": 0.5,
+            "off_axis_delta": 0.6,
+            "regrasp_window_s": 3.0,
+            "slip_df": -2.0,
+            "slip_g_tol": 0.02,
+            "slip_min_s": 0.1
+          },
+          "render": {
+            "clip_max": 3.0,
+            "decimals": 2,
+            "header": "Force (normalized: 0 free space, 1 median grasp, max 3):",
+            "max_tokens": 3000,
+            "tokenizer_json": "/home/ogershony/tactile-flora/data/acceptance/released-inference/hub/models--nvidia--Flora-Rewarder/snapshots/7de68d22c4a9decec5ddb7f86ddcaee8f82d3367/tokenizer.json"
+          },
+          "resample": {
+            "contact_sigma": 3.0,
+            "frame_period_s": 0.25,
+            "group_period_s": 0.5,
+            "half_window_s": 0.125,
+            "raw_rate_hz": 100.0
+          }
+        },
+        "force_mode": "real",
+        "seed": 0
+      },
+      "predictions": [
+        {
+          "window_id": "3737b18e8c455459f7536ae263f73213a549807e",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus2/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus2",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9965224247,
+          "parse_failed": false,
+          "latency_s": 7.355439432,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "dfdac52f93b069fb8a7f9b631b6a2990cf851c5b",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus2/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus2",
+          "raw_text": "Rationale: The robot grasped the cactus, lifted it off the table, and moved it, but the cactus ended up knocked over on the table.\n\nScore: 4",
+          "parsed": "{\"score\":4,\"rationale\":\"The robot grasped the cactus, lifted it off the table, and moved it, but the cactus ended up knocked over on the table.\",\"parse_failed\":false}",
+          "score": 4.0,
+          "expected_score": 4.3332210346,
+          "parse_failed": false,
+          "latency_s": 8.252876059,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "e39ac81616f6c1c0670832438c0df3029acf3393",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus3/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus3",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then released it. The cactus was clearly lifted and held by the gripper.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then released it. The cactus was clearly lifted and held by the gripper.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9993612905,
+          "parse_failed": false,
+          "latency_s": 8.64962681,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "baca4c84adee6d2ee555bfae03b65b71d4126f6d",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus3/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus3",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9989473901,
+          "parse_failed": false,
+          "latency_s": 6.998410155,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "5f19f6cc9ece87523b9a5f3375cd15de50f29ed1",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/frog_cup/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "frog_cup",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the frog cup off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the frog cup off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9987554007,
+          "parse_failed": false,
+          "latency_s": 6.996695217,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "d6fdf397e3094ac8f1d42abda10e332c36c80623",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/knife_sharpener/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "knife_sharpener",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the knife sharpener off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the knife sharpener off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9931144812,
+          "parse_failed": false,
+          "latency_s": 7.101145295,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "3f03d3967cb1f9ddb7751485bca6aa5111173c2d",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/knife_sharpener/2",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "knife_sharpener",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the knife sharpener off the table, but the object was later dropped or left on the table.\n\nScore: 4",
+          "parsed": "{\"score\":4,\"rationale\":\"The robot approached, grasped, and lifted the knife sharpener off the table, but the object was later dropped or left on the table.\",\"parse_failed\":false}",
+          "score": 4.0,
+          "expected_score": 4.143207556,
+          "parse_failed": false,
+          "latency_s": 7.913366323,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "ed7985137047871afee4025ea73526c93d8095f2",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/lotion/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "lotion",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the lotion bottle off the table, but the bottle was later knocked over and ended on its side.\n\nScore: 4",
+          "parsed": "{\"score\":4,\"rationale\":\"The robot approached, grasped, and lifted the lotion bottle off the table, but the bottle was later knocked over and ended on its side.\",\"parse_failed\":false}",
+          "score": 4.0,
+          "expected_score": 4.1187958568,
+          "parse_failed": false,
+          "latency_s": 7.901927089,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "e8d856c8864c8f002a6c2d1cdcd1ab1939a3b161",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/lotion/3",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "lotion",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the lotion bottle off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the lotion bottle off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9946290569,
+          "parse_failed": false,
+          "latency_s": 6.934953452,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "1affb56c5fd99a69447f6d890a047b67446b78f7",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/metal_scoop_small/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "metal_scoop_small",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the small metal scoop off the table, then released it.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the small metal scoop off the table, then released it.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9991077146,
+          "parse_failed": false,
+          "latency_s": 6.828846147,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "0a91b9144e38be91f9099e2dc7ea1a6f6fe78e72",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/plant_pot/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "plant_pot",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the plant pot off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the plant pot off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9993753885,
+          "parse_failed": false,
+          "latency_s": 6.97344974,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "c92a327a6361caaa76b2e31b2671d025214417ee",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/potato_masher/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "potato_masher",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the potato masher off the table, then released it.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the potato masher off the table, then released it.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9995750277,
+          "parse_failed": false,
+          "latency_s": 6.828328375,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "03c9384b33da4a61153b600777f461060feb261e",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/potato_masher/5",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "potato_masher",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the potato masher off the table, then released it. The masher was clearly lifted and held during the episode.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the potato masher off the table, then released it. The masher was clearly lifted and held during the episode.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9996519724,
+          "parse_failed": false,
+          "latency_s": 8.449371758,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        }
+      ]
+    },
+    {
+      "metrics": {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "data/acceptance/hrdexdb-clean-v1/runs/clean-v1-control/adapter",
+        "config_hash": "63d3c77542b177eb",
+        "force_mode": "omitted",
+        "git_hash": "b48111c33c69c894c468770ca0471f07a32c01b6",
+        "manifest_hash": "0511f44661bfbfba7519be4e8afc21bafe9c6152beb43f3d37190e014f5465af",
+        "metrics": {
+          "accuracy": 0.8461538461538461,
+          "auroc": 0.8,
+          "mae": 92.3076923076923
+        },
+        "n_episodes": 13,
+        "n_windows": 13,
+        "no_logprobs": 0,
+        "parse_failed": 0,
+        "per_object": {
+          "cactus2": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 100.0
+          },
+          "cactus3": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 200.0
+          },
+          "frog_cup": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "knife_sharpener": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 0.0
+          },
+          "lotion": {
+            "accuracy": 0.5,
+            "auroc": 0.0,
+            "mae": 200.0
+          },
+          "metal_scoop_small": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "plant_pot": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "potato_masher": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 100.0
+          }
+        },
+        "seed": 0,
+        "warnings": [],
+        "windows_cache_hash": null
+      },
+      "config": {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "data/acceptance/hrdexdb-clean-v1/runs/clean-v1-control/adapter",
+        "eval": {
+          "benchmarks": {
+            "hrdexdb_clean_outcome": {
+              "manifest": "data/acceptance/hrdexdb-clean-v1/manifest/val.parquet",
+              "metrics": [
+                "mae",
+                "accuracy",
+                "auroc"
+              ],
+              "prompts": [
+                "outcome"
+              ],
+              "score_only": false
+            }
+          },
+          "output_dir": "data/acceptance/hrdexdb-clean-v1/eval"
+        },
+        "force": {
+          "events": {
+            "contact_loss_s": 0.3,
+            "crush_f": 2.0,
+            "grasp_f": 0.5,
+            "grasp_g": 0.6,
+            "grasp_window_s": 0.5,
+            "off_axis_delta": 0.6,
+            "regrasp_window_s": 3.0,
+            "slip_df": -2.0,
+            "slip_g_tol": 0.02,
+            "slip_min_s": 0.1
+          },
+          "render": {
+            "clip_max": 3.0,
+            "decimals": 2,
+            "header": "Force (normalized: 0 free space, 1 median grasp, max 3):",
+            "max_tokens": 3000,
+            "tokenizer_json": "/home/ogershony/tactile-flora/data/acceptance/released-inference/hub/models--nvidia--Flora-Rewarder/snapshots/7de68d22c4a9decec5ddb7f86ddcaee8f82d3367/tokenizer.json"
+          },
+          "resample": {
+            "contact_sigma": 3.0,
+            "frame_period_s": 0.25,
+            "group_period_s": 0.5,
+            "half_window_s": 0.125,
+            "raw_rate_hz": 100.0
+          }
+        },
+        "force_mode": "omitted",
+        "seed": 0
+      },
+      "predictions": [
+        {
+          "window_id": "3737b18e8c455459f7536ae263f73213a549807e",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus2/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus2",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, holding it in the gripper in the final frames.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, holding it in the gripper in the final frames.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9998042815,
+          "parse_failed": false,
+          "latency_s": 9.099549039,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "dfdac52f93b069fb8a7f9b631b6a2990cf851c5b",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus2/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus2",
+          "raw_text": "Rationale: The robot grasped and lifted the cactus, but the cactus was dropped or fell onto its side and was not held upright at the end.\n\nScore: 3",
+          "parsed": "{\"score\":3,\"rationale\":\"The robot grasped and lifted the cactus, but the cactus was dropped or fell onto its side and was not held upright at the end.\",\"parse_failed\":false}",
+          "score": 3.0,
+          "expected_score": 3.3847256842,
+          "parse_failed": false,
+          "latency_s": 6.115875486,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "e39ac81616f6c1c0670832438c0df3029acf3393",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus3/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus3",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9986698247,
+          "parse_failed": false,
+          "latency_s": 5.01352658,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "baca4c84adee6d2ee555bfae03b65b71d4126f6d",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus3/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus3",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then placed it back down. The cactus was successfully grasped and lifted.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then placed it back down. The cactus was successfully grasped and lifted.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9998148092,
+          "parse_failed": false,
+          "latency_s": 6.369539459,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "5f19f6cc9ece87523b9a5f3375cd15de50f29ed1",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/frog_cup/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "frog_cup",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the frog cup off the table, then placed it back down. The cup was successfully grasped and lifted.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the frog cup off the table, then placed it back down. The cup was successfully grasped and lifted.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9998908205,
+          "parse_failed": false,
+          "latency_s": 6.382320434,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "d6fdf397e3094ac8f1d42abda10e332c36c80623",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/knife_sharpener/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "knife_sharpener",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the knife sharpener off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the knife sharpener off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9829314879,
+          "parse_failed": false,
+          "latency_s": 5.167742354,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "3f03d3967cb1f9ddb7751485bca6aa5111173c2d",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/knife_sharpener/2",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "knife_sharpener",
+          "raw_text": "Rationale: The robot approached and contacted the knife sharpener, but the sharpener ended up knocked over on the table rather than being grasped and lifted.\n\nScore: 1",
+          "parsed": "{\"score\":1,\"rationale\":\"The robot approached and contacted the knife sharpener, but the sharpener ended up knocked over on the table rather than being grasped and lifted.\",\"parse_failed\":false}",
+          "score": 1.0,
+          "expected_score": 1.4662573329,
+          "parse_failed": false,
+          "latency_s": 5.999602369,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "ed7985137047871afee4025ea73526c93d8095f2",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/lotion/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "lotion",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the lotion bottle off the table, then moved it and placed it down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the lotion bottle off the table, then moved it and placed it down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9994398104,
+          "parse_failed": false,
+          "latency_s": 5.294077005,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "e8d856c8864c8f002a6c2d1cdcd1ab1939a3b161",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/lotion/3",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "lotion",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the lotion bottle off the table, then placed it back on the table.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the lotion bottle off the table, then placed it back on the table.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9906019433,
+          "parse_failed": false,
+          "latency_s": 5.306028652,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "1affb56c5fd99a69447f6d890a047b67446b78f7",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/metal_scoop_small/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "metal_scoop_small",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the small metal scoop off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the small metal scoop off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9976465949,
+          "parse_failed": false,
+          "latency_s": 5.168163694,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "0a91b9144e38be91f9099e2dc7ea1a6f6fe78e72",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/plant_pot/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "plant_pot",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the plant pot off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the plant pot off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9980784488,
+          "parse_failed": false,
+          "latency_s": 5.030590961,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "c92a327a6361caaa76b2e31b2671d025214417ee",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/potato_masher/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "potato_masher",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the potato masher off the table, leaving it held in the gripper above the surface.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the potato masher off the table, leaving it held in the gripper above the surface.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9999609721,
+          "parse_failed": false,
+          "latency_s": 5.952865046,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "03c9384b33da4a61153b600777f461060feb261e",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/potato_masher/5",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "potato_masher",
+          "raw_text": "Rationale: The robot grasped and lifted the potato masher, but it ended up lying on the table rather than remaining held or placed in a clearly successful final state.\n\nScore: 3",
+          "parsed": "{\"score\":3,\"rationale\":\"The robot grasped and lifted the potato masher, but it ended up lying on the table rather than remaining held or placed in a clearly successful final state.\",\"parse_failed\":false}",
+          "score": 3.0,
+          "expected_score": 3.4227837952,
+          "parse_failed": false,
+          "latency_s": 6.420398136,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        }
+      ]
+    },
+    {
+      "metrics": {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "data/acceptance/hrdexdb-clean-v1/runs/clean-v1-force/adapter",
+        "config_hash": "7bd31976e66c2ba4",
+        "force_mode": "real",
+        "git_hash": "b48111c33c69c894c468770ca0471f07a32c01b6",
+        "manifest_hash": "0511f44661bfbfba7519be4e8afc21bafe9c6152beb43f3d37190e014f5465af",
+        "metrics": {
+          "accuracy": 0.6153846153846154,
+          "auroc": 0.65,
+          "mae": 138.46153846153845
+        },
+        "n_episodes": 13,
+        "n_windows": 13,
+        "no_logprobs": 0,
+        "parse_failed": 0,
+        "per_object": {
+          "cactus2": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "cactus3": {
+            "accuracy": 0.5,
+            "auroc": 0.0,
+            "mae": 200.0
+          },
+          "frog_cup": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "knife_sharpener": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 200.0
+          },
+          "lotion": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "metal_scoop_small": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "plant_pot": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "potato_masher": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 200.0
+          }
+        },
+        "seed": 0,
+        "warnings": [],
+        "windows_cache_hash": null
+      },
+      "config": {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "data/acceptance/hrdexdb-clean-v1/runs/clean-v1-force/adapter",
+        "eval": {
+          "benchmarks": {
+            "hrdexdb_clean_outcome": {
+              "manifest": "data/acceptance/hrdexdb-clean-v1/manifest/val.parquet",
+              "metrics": [
+                "mae",
+                "accuracy",
+                "auroc"
+              ],
+              "prompts": [
+                "outcome"
+              ],
+              "score_only": false
+            }
+          },
+          "output_dir": "data/acceptance/hrdexdb-clean-v1/eval"
+        },
+        "force": {
+          "events": {
+            "contact_loss_s": 0.3,
+            "crush_f": 2.0,
+            "grasp_f": 0.5,
+            "grasp_g": 0.6,
+            "grasp_window_s": 0.5,
+            "off_axis_delta": 0.6,
+            "regrasp_window_s": 3.0,
+            "slip_df": -2.0,
+            "slip_g_tol": 0.02,
+            "slip_min_s": 0.1
+          },
+          "render": {
+            "clip_max": 3.0,
+            "decimals": 2,
+            "header": "Force (normalized: 0 free space, 1 median grasp, max 3):",
+            "max_tokens": 3000,
+            "tokenizer_json": "/home/ogershony/tactile-flora/data/acceptance/released-inference/hub/models--nvidia--Flora-Rewarder/snapshots/7de68d22c4a9decec5ddb7f86ddcaee8f82d3367/tokenizer.json"
+          },
+          "resample": {
+            "contact_sigma": 3.0,
+            "frame_period_s": 0.25,
+            "group_period_s": 0.5,
+            "half_window_s": 0.125,
+            "raw_rate_hz": 100.0
+          }
+        },
+        "force_mode": "real",
+        "seed": 0
+      },
+      "predictions": [
+        {
+          "window_id": "3737b18e8c455459f7536ae263f73213a549807e",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus2/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus2",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9957350247,
+          "parse_failed": false,
+          "latency_s": 10.557748091,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "dfdac52f93b069fb8a7f9b631b6a2990cf851c5b",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus2/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus2",
+          "raw_text": "Rationale: The robot grasped the cactus, lifted it off the table, and moved it, but the cactus ended up knocked over on the table.\n\nScore: 4",
+          "parsed": "{\"score\":4,\"rationale\":\"The robot grasped the cactus, lifted it off the table, and moved it, but the cactus ended up knocked over on the table.\",\"parse_failed\":false}",
+          "score": 4.0,
+          "expected_score": 4.4226712311,
+          "parse_failed": false,
+          "latency_s": 8.265913675,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "e39ac81616f6c1c0670832438c0df3029acf3393",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus3/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus3",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then released it. The cactus was clearly lifted and held by the gripper.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then released it. The cactus was clearly lifted and held by the gripper.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9993059887,
+          "parse_failed": false,
+          "latency_s": 8.899879811,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "baca4c84adee6d2ee555bfae03b65b71d4126f6d",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus3/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus3",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9988407324,
+          "parse_failed": false,
+          "latency_s": 7.271405488,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "5f19f6cc9ece87523b9a5f3375cd15de50f29ed1",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/frog_cup/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "frog_cup",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the frog cup off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the frog cup off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9989206582,
+          "parse_failed": false,
+          "latency_s": 7.239196874,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "d6fdf397e3094ac8f1d42abda10e332c36c80623",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/knife_sharpener/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "knife_sharpener",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the knife sharpener off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the knife sharpener off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9945800472,
+          "parse_failed": false,
+          "latency_s": 7.430712635,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "3f03d3967cb1f9ddb7751485bca6aa5111173c2d",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/knife_sharpener/2",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "knife_sharpener",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the knife sharpener off the table, but the object was later dropped or left on the table.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the knife sharpener off the table, but the object was later dropped or left on the table.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.3195873314,
+          "parse_failed": false,
+          "latency_s": 8.167459501,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "ed7985137047871afee4025ea73526c93d8095f2",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/lotion/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "lotion",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the lotion bottle off the table, but the bottle was later knocked over and ended on its side.\n\nScore: 4",
+          "parsed": "{\"score\":4,\"rationale\":\"The robot approached, grasped, and lifted the lotion bottle off the table, but the bottle was later knocked over and ended on its side.\",\"parse_failed\":false}",
+          "score": 4.0,
+          "expected_score": 4.1888836548,
+          "parse_failed": false,
+          "latency_s": 8.26244493,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "e8d856c8864c8f002a6c2d1cdcd1ab1939a3b161",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/lotion/3",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "lotion",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the lotion bottle off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the lotion bottle off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.995380486,
+          "parse_failed": false,
+          "latency_s": 7.167278813,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "1affb56c5fd99a69447f6d890a047b67446b78f7",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/metal_scoop_small/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "metal_scoop_small",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the small metal scoop off the table, then released it.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the small metal scoop off the table, then released it.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9991621728,
+          "parse_failed": false,
+          "latency_s": 7.112537956,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "0a91b9144e38be91f9099e2dc7ea1a6f6fe78e72",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/plant_pot/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "plant_pot",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the plant pot off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the plant pot off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9991507267,
+          "parse_failed": false,
+          "latency_s": 7.239906369,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "c92a327a6361caaa76b2e31b2671d025214417ee",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/potato_masher/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "potato_masher",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the potato masher off the table, then released it.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the potato masher off the table, then released it.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9995245135,
+          "parse_failed": false,
+          "latency_s": 7.194296348,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "03c9384b33da4a61153b600777f461060feb261e",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/potato_masher/5",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "potato_masher",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the potato masher off the table, then released it.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the potato masher off the table, then released it.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9991850504,
+          "parse_failed": false,
+          "latency_s": 7.088466017,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        }
+      ]
+    },
+    {
+      "metrics": {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "data/acceptance/hrdexdb-clean-v1/runs/clean-v1-force/adapter",
+        "config_hash": "930d80bdcc23a567",
+        "force_mode": "shuffled",
+        "git_hash": "b48111c33c69c894c468770ca0471f07a32c01b6",
+        "manifest_hash": "0511f44661bfbfba7519be4e8afc21bafe9c6152beb43f3d37190e014f5465af",
+        "metrics": {
+          "accuracy": 0.6923076923076923,
+          "auroc": 0.725,
+          "mae": 138.46153846153845
+        },
+        "n_episodes": 13,
+        "n_windows": 13,
+        "no_logprobs": 0,
+        "parse_failed": 0,
+        "per_object": {
+          "cactus2": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "cactus3": {
+            "accuracy": 0.5,
+            "auroc": 0.0,
+            "mae": 200.0
+          },
+          "frog_cup": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "knife_sharpener": {
+            "accuracy": 1.0,
+            "auroc": 1.0,
+            "mae": 150.0
+          },
+          "lotion": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 200.0
+          },
+          "metal_scoop_small": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "plant_pot": {
+            "accuracy": 1.0,
+            "auroc": null,
+            "mae": 0.0
+          },
+          "potato_masher": {
+            "accuracy": 0.5,
+            "auroc": 1.0,
+            "mae": 200.0
+          }
+        },
+        "seed": 0,
+        "warnings": [],
+        "windows_cache_hash": null
+      },
+      "config": {
+        "backend": "hf",
+        "benchmark": "hrdexdb_clean_outcome",
+        "checkpoint": "data/acceptance/hrdexdb-clean-v1/runs/clean-v1-force/adapter",
+        "eval": {
+          "benchmarks": {
+            "hrdexdb_clean_outcome": {
+              "manifest": "data/acceptance/hrdexdb-clean-v1/manifest/val.parquet",
+              "metrics": [
+                "mae",
+                "accuracy",
+                "auroc"
+              ],
+              "prompts": [
+                "outcome"
+              ],
+              "score_only": false
+            }
+          },
+          "output_dir": "data/acceptance/hrdexdb-clean-v1/eval"
+        },
+        "force": {
+          "events": {
+            "contact_loss_s": 0.3,
+            "crush_f": 2.0,
+            "grasp_f": 0.5,
+            "grasp_g": 0.6,
+            "grasp_window_s": 0.5,
+            "off_axis_delta": 0.6,
+            "regrasp_window_s": 3.0,
+            "slip_df": -2.0,
+            "slip_g_tol": 0.02,
+            "slip_min_s": 0.1
+          },
+          "render": {
+            "clip_max": 3.0,
+            "decimals": 2,
+            "header": "Force (normalized: 0 free space, 1 median grasp, max 3):",
+            "max_tokens": 3000,
+            "tokenizer_json": "/home/ogershony/tactile-flora/data/acceptance/released-inference/hub/models--nvidia--Flora-Rewarder/snapshots/7de68d22c4a9decec5ddb7f86ddcaee8f82d3367/tokenizer.json"
+          },
+          "resample": {
+            "contact_sigma": 3.0,
+            "frame_period_s": 0.25,
+            "group_period_s": 0.5,
+            "half_window_s": 0.125,
+            "raw_rate_hz": 100.0
+          }
+        },
+        "force_mode": "shuffled",
+        "seed": 0
+      },
+      "predictions": [
+        {
+          "window_id": "3737b18e8c455459f7536ae263f73213a549807e",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus2/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus2",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9949372419,
+          "parse_failed": false,
+          "latency_s": 7.344224187,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "dfdac52f93b069fb8a7f9b631b6a2990cf851c5b",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus2/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus2",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, but the cactus was later dropped or fell onto its side.\n\nScore: 4",
+          "parsed": "{\"score\":4,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, but the cactus was later dropped or fell onto its side.\",\"parse_failed\":false}",
+          "score": 4.0,
+          "expected_score": 4.4179240314,
+          "parse_failed": false,
+          "latency_s": 8.66015507,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "e39ac81616f6c1c0670832438c0df3029acf3393",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus3/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus3",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then released it.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then released it.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9984744553,
+          "parse_failed": false,
+          "latency_s": 7.03769382,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "baca4c84adee6d2ee555bfae03b65b71d4126f6d",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/cactus3/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "cactus3",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.997422659,
+          "parse_failed": false,
+          "latency_s": 7.228134146,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "5f19f6cc9ece87523b9a5f3375cd15de50f29ed1",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/frog_cup/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "frog_cup",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the frog cup off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the frog cup off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9994608785,
+          "parse_failed": false,
+          "latency_s": 7.223503283,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "d6fdf397e3094ac8f1d42abda10e332c36c80623",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/knife_sharpener/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "knife_sharpener",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the knife sharpener off the table, then released it.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the knife sharpener off the table, then released it.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9971199602,
+          "parse_failed": false,
+          "latency_s": 7.083007284,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "3f03d3967cb1f9ddb7751485bca6aa5111173c2d",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/knife_sharpener/2",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "knife_sharpener",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the knife sharpener off the table, but the object was later knocked over or released and ended on its side.\n\nScore: 4",
+          "parsed": "{\"score\":4,\"rationale\":\"The robot approached, grasped, and lifted the knife sharpener off the table, but the object was later knocked over or released and ended on its side.\",\"parse_failed\":false}",
+          "score": 4.0,
+          "expected_score": 3.8353789352,
+          "parse_failed": false,
+          "latency_s": 8.808701839,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "ed7985137047871afee4025ea73526c93d8095f2",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/lotion/1",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "lotion",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the lotion bottle off the table, then released it.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the lotion bottle off the table, then released it.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9982974601,
+          "parse_failed": false,
+          "latency_s": 6.956309356,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        },
+        {
+          "window_id": "e8d856c8864c8f002a6c2d1cdcd1ab1939a3b161",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/lotion/3",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "lotion",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the lotion bottle off the table, then released it.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the lotion bottle off the table, then released it.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9995535155,
+          "parse_failed": false,
+          "latency_s": 7.494899583,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "1affb56c5fd99a69447f6d890a047b67446b78f7",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/metal_scoop_small/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "metal_scoop_small",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the small metal scoop off the table, then released it.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the small metal scoop off the table, then released it.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9991369771,
+          "parse_failed": false,
+          "latency_s": 7.03550309,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "0a91b9144e38be91f9099e2dc7ea1a6f6fe78e72",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/plant_pot/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "plant_pot",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the plant pot off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the plant pot off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9959500911,
+          "parse_failed": false,
+          "latency_s": 7.289028869,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "c92a327a6361caaa76b2e31b2671d025214417ee",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/potato_masher/0",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "potato_masher",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the potato masher off the table, then released it.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the potato masher off the table, then released it.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9995145405,
+          "parse_failed": false,
+          "latency_s": 6.994108695,
+          "truth_target": "Rationale: no rationale\n\nScore: 5"
+        },
+        {
+          "window_id": "03c9384b33da4a61153b600777f461060feb261e",
+          "source": "hrdexdb",
+          "episode_id": "inspire_dftp/potato_masher/5",
+          "prompt_kind": "outcome",
+          "anchor_s": 0.0,
+          "object": "potato_masher",
+          "raw_text": "Rationale: The robot approached, grasped, and lifted the potato masher off the table, then placed it back down.\n\nScore: 5",
+          "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the potato masher off the table, then placed it back down.\",\"parse_failed\":false}",
+          "score": 5.0,
+          "expected_score": 4.9971517304,
+          "parse_failed": false,
+          "latency_s": 7.416340638,
+          "truth_target": "Rationale: no rationale\n\nScore: 1"
+        }
+      ]
+    }
+  ]
+}

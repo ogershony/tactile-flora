@@ -1,9 +1,17 @@
 # Status report (2026-10-21)
 
-Matched four-epoch cleaned-pilot training is running on two MI210s (Slurm job 6321),
-with final-checkpoint evaluation queued as job 6322. The force run has recorded finite
-optimizer losses; neither adapter's final cleaned-validation score is available yet.
+Matched four-epoch cleaned-pilot training and evaluation completed (Slurm jobs 6321/6325).
+The control adapter matches released no-force accuracy at 84.6% (11/13); the force adapter
+matches released real-force accuracy at 61.5% (8/13). Shuffled force scores 69.2% (9/13).
+There is no demonstrated training or force benefit on this post hoc development subset.
 See [the fixed training experiment](experiments/hrdexdb-pilot/clean-training.md).
+
+Expansion to all 618 Inspire DFTP clips is downloading with a pinned source revision and
+frozen object assignments (363 train / 139 development / 116 new test before exclusions).
+Recorded video timestamps omitted from the pilot download reveal both start offsets and
+capture/encoded clock drift. A new explicit source-config option maps sensor time to video
+time; legacy runs retain their previous clock behavior. Alignment auditing and expanded
+training are in progress; no expanded score is available yet.
 
 Active HRDexDB working data: **25 train / 13 validation** episodes under
 `data/acceptance/hrdexdb-clean-v1/`, after reviewing all 48 local pilot clips and excluding

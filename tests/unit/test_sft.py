@@ -112,6 +112,34 @@ def test_partial_global_batch_stays_last_after_shuffle() -> None:
     assert {id(x) for g in groups for x in g} == {id(x) for x in samples}
 
 
+@pytest.mark.parametrize("world_size", [1, 2])
+def test_short_epoch_batch_has_its_own_update(world_size) -> None:
+    torch = pytest.importorskip("torch")
+    model = torch.nn.Sequential(torch.nn.Embedding(VOCAB, 8), torch.nn.Linear(8, VOCAB))
+    ids = torch.ones((1, 8), dtype=torch.long)
+    labels = ids.clone()
+    labels[:, :4] = -100
+    backend: Any = SimpleNamespace(
+        rank=0,
+        world_size=world_size,
+        make_batch=lambda sample: {"input_ids": ids, "labels": labels},
+    )
+    samples: list[Any] = list(range(25))
+    groups = sft.ordered_groups(samples, 16, seed=17)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+    scheduler = sft.make_scheduler(optimizer, 8, 0.1)
+    losses = sft.train_steps(
+        _Wrap(model),
+        sft._batches(groups, backend, 4),
+        optimizer,
+        scheduler,
+        accum=16 // world_size,
+        grad_clip=1.0,
+    )
+    assert len(losses) == 8
+    assert scheduler.last_epoch == 8
+
+
 def test_training_autocast_handles_mixed_stored_dtypes() -> None:
     torch = pytest.importorskip("torch")
     model = torch.nn.Sequential(

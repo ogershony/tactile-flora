@@ -1,0 +1,1475 @@
+{
+  "scope": "Recorded-clock pipeline diagnostic on the same 13 post hoc development clips; not test data",
+  "caveat": "Normalization was refit on 24 aligned training clips after blue_alarm/0 failed frame-count validation; improvement cannot be attributed to clock mapping alone",
+  "model_revision": "7de68d22c4a9decec5ddb7f86ddcaee8f82d3367",
+  "metrics": {
+    "backend": "hf",
+    "benchmark": "hrdexdb_aligned_val",
+    "checkpoint": "released",
+    "config_hash": "6b988ca54697afdd",
+    "force_mode": "real",
+    "git_hash": "b48111c33c69c894c468770ca0471f07a32c01b6",
+    "manifest_hash": "1d5e1ac0823d1d93622bee4da28695711dd0a854f7c93e2eae3b567ac4a1c98a",
+    "metrics": {
+      "accuracy": 0.6923076923076923,
+      "auroc": 0.65,
+      "mae": 123.07692307692308
+    },
+    "n_episodes": 13,
+    "n_windows": 13,
+    "no_logprobs": 0,
+    "parse_failed": 0,
+    "per_object": {
+      "cactus2": {
+        "accuracy": 0.5,
+        "auroc": 1.0,
+        "mae": 150.0
+      },
+      "cactus3": {
+        "accuracy": 0.5,
+        "auroc": 0.0,
+        "mae": 200.0
+      },
+      "frog_cup": {
+        "accuracy": 1.0,
+        "auroc": null,
+        "mae": 0.0
+      },
+      "knife_sharpener": {
+        "accuracy": 1.0,
+        "auroc": 1.0,
+        "mae": 100.0
+      },
+      "lotion": {
+        "accuracy": 0.5,
+        "auroc": 1.0,
+        "mae": 150.0
+      },
+      "metal_scoop_small": {
+        "accuracy": 1.0,
+        "auroc": null,
+        "mae": 0.0
+      },
+      "plant_pot": {
+        "accuracy": 1.0,
+        "auroc": null,
+        "mae": 0.0
+      },
+      "potato_masher": {
+        "accuracy": 0.5,
+        "auroc": 0.0,
+        "mae": 200.0
+      }
+    },
+    "seed": 0,
+    "warnings": [],
+    "windows_cache_hash": null
+  },
+  "config": {
+    "backend": "hf",
+    "benchmark": "hrdexdb_aligned_val",
+    "checkpoint": "released",
+    "eval": {
+      "benchmarks": {
+        "hrdexdb_aligned_val": {
+          "manifest": "data/acceptance/hrdexdb-aligned-pilot-v2/manifest/val.parquet",
+          "metrics": [
+            "mae",
+            "accuracy",
+            "auroc"
+          ],
+          "prompts": [
+            "outcome"
+          ],
+          "score_only": false
+        }
+      },
+      "output_dir": "data/acceptance/hrdexdb-aligned-pilot-v2/eval"
+    },
+    "force": {
+      "events": {
+        "contact_loss_s": 0.3,
+        "crush_f": 2.0,
+        "grasp_f": 0.5,
+        "grasp_g": 0.6,
+        "grasp_window_s": 0.5,
+        "off_axis_delta": 0.6,
+        "regrasp_window_s": 3.0,
+        "slip_df": -2.0,
+        "slip_g_tol": 0.02,
+        "slip_min_s": 0.1
+      },
+      "render": {
+        "clip_max": 3.0,
+        "decimals": 2,
+        "header": "Force (normalized: 0 free space, 1 median grasp, max 3):",
+        "max_tokens": 3000,
+        "tokenizer_json": "/home/ogershony/tactile-flora/data/acceptance/released-inference/hub/models--nvidia--Flora-Rewarder/snapshots/7de68d22c4a9decec5ddb7f86ddcaee8f82d3367/tokenizer.json"
+      },
+      "resample": {
+        "contact_sigma": 3.0,
+        "frame_period_s": 0.25,
+        "group_period_s": 0.5,
+        "half_window_s": 0.125,
+        "raw_rate_hz": 100.0
+      }
+    },
+    "force_mode": "real",
+    "seed": 0
+  },
+  "source_config": "name: hrdexdb\nroot: /home/ogershony/tactile-flora/data/acceptance/hrdexdb-aligned-pilot-v2/raw\nlicense_allowed:\n- CC-BY-NC-4.0\nmax_windows: 0\nmax_episodes: 0\nmax_dense_windows: null\nmax_outcome_windows: null\neval_only: true\nexpected_label_rate: 0.5\nsplit_rules:\n  by: session\n  note: placeholder until milestone 5\nhrdexdb_use_video_timestamps: true\nseed: 0\n",
+  "norm": {
+    "arms": {
+      "R": {
+        "baseline": 194.0,
+        "grasp": 240.0,
+        "scale": 46.0,
+        "sigma": 0.32218973970892123,
+        "tau": 194.96656921912677
+      }
+    },
+    "channel": "pad",
+    "norm_version": "c972905cbea604a6bc4c185940746df8340aade3235b307b2a8e5c11c6631daa",
+    "source": "hrdexdb"
+  },
+  "audit": {
+    "scope": "mechanical quality checks; new source labels have no independent human signoff",
+    "download_plan_sha256": "e44709965eb34e3919eafacf1b9ff7b613c2e894a8dd108f54e4ece53a7661de",
+    "rules": "previous ten exclusions; invalid arrays/clocks/labels/decodes; gaps >0.25s; exact duplicates",
+    "records": [
+      {
+        "episode_id": "inspire_dftp/baby_beaker/6",
+        "object_id": "baby_beaker",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782452940.9428625,
+          "video_start_minus_sensor_start_s": 2.2393288612365723,
+          "capture_span_s": 22.443808794021606,
+          "encoded_span_s": 24.833333333333332,
+          "timestamp_rows": 746,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.06871223449707031,
+          "samples_outside_video": 112
+        },
+        "duration_s": 24.866666666666667,
+        "decoded_frames": 746,
+        "video_sha256": "39d30a36e6093c31c91a16da3084686af5de60050dacaab1f2616f9c7edee52f",
+        "sensor_samples": 1181,
+        "aligned_samples": 1069
+      },
+      {
+        "episode_id": "inspire_dftp/baby_beaker/0",
+        "object_id": "baby_beaker",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782452536.0591211,
+          "video_start_minus_sensor_start_s": 2.227898120880127,
+          "capture_span_s": 27.266448974609375,
+          "encoded_span_s": 30.166666666666668,
+          "timestamp_rows": 906,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.0827329158782959,
+          "samples_outside_video": 111
+        },
+        "duration_s": 30.2,
+        "decoded_frames": 906,
+        "video_sha256": "76fc7185785398581665e0c3cb32019e8505bebc25b280099f1fafc013e9d8e6",
+        "sensor_samples": 1417,
+        "aligned_samples": 1306
+      },
+      {
+        "episode_id": "inspire_dftp/blue_alarm/1",
+        "object_id": "blue_alarm",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782879426.148406,
+          "video_start_minus_sensor_start_s": 2.2846264839172363,
+          "capture_span_s": 18.84335160255432,
+          "encoded_span_s": 20.766666666666666,
+          "timestamp_rows": 624,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.07313990592956543,
+          "samples_outside_video": 114
+        },
+        "duration_s": 20.8,
+        "decoded_frames": 624,
+        "video_sha256": "7e074aba2da1380ed3dc801c8d0c2917fb3f7b52b4bd3fb1eaacd58f810d144a",
+        "sensor_samples": 1008,
+        "aligned_samples": 894
+      },
+      {
+        "episode_id": "inspire_dftp/blue_alarm/0",
+        "object_id": "blue_alarm",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [
+          "mechanical audit failed: invalid or incomplete recorded video timeline: data/acceptance/hrdexdb-aligned-pilot-v2/raw/inspire_dftp/blue_alarm/0"
+        ]
+      },
+      {
+        "episode_id": "inspire_dftp/cactus/2",
+        "object_id": "cactus",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782382329.74834,
+          "video_start_minus_sensor_start_s": 2.292178153991699,
+          "capture_span_s": 24.7140052318573,
+          "encoded_span_s": 27.333333333333332,
+          "timestamp_rows": 821,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.08773279190063477,
+          "samples_outside_video": 114
+        },
+        "duration_s": 27.366666666666667,
+        "decoded_frames": 821,
+        "video_sha256": "09b8dd7ff3b26bf15155feaca16a2ec94ce5c4a4f0d453b6e86332c5b288b6cc",
+        "sensor_samples": 1295,
+        "aligned_samples": 1181
+      },
+      {
+        "episode_id": "inspire_dftp/cactus/0",
+        "object_id": "cactus",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782382234.5634296,
+          "video_start_minus_sensor_start_s": 2.282745361328125,
+          "capture_span_s": 25.382587432861328,
+          "encoded_span_s": 28.066666666666666,
+          "timestamp_rows": 843,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.07037186622619629,
+          "samples_outside_video": 113
+        },
+        "duration_s": 28.1,
+        "decoded_frames": 843,
+        "video_sha256": "d7d257c3d93558a3918ecf44cf2eab7776705cb90346987502cceac3e042d0da",
+        "sensor_samples": 1329,
+        "aligned_samples": 1216
+      },
+      {
+        "episode_id": "inspire_dftp/frame_oak/0",
+        "object_id": "frame_oak",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [
+          "previous visual review excluded this outcome/capture"
+        ],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782465072.889315,
+          "video_start_minus_sensor_start_s": 2.2478229999542236,
+          "capture_span_s": 19.20535922050476,
+          "encoded_span_s": 21.2,
+          "timestamp_rows": 636,
+          "missing_frame_timestamps": 1,
+          "max_capture_gap_s": 0.09061980247497559,
+          "samples_outside_video": 112
+        },
+        "duration_s": 21.233333333333334,
+        "decoded_frames": 637,
+        "video_sha256": "1f65dba53b007b6bcce0440feaceb95cafc366a008b709977e9418362c525dfa",
+        "sensor_samples": 1021,
+        "aligned_samples": 909
+      },
+      {
+        "episode_id": "inspire_dftp/frame_oak/1",
+        "object_id": "frame_oak",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782465102.6366017,
+          "video_start_minus_sensor_start_s": 2.2400057315826416,
+          "capture_span_s": 24.74221134185791,
+          "encoded_span_s": 27.366666666666667,
+          "timestamp_rows": 822,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.08034443855285645,
+          "samples_outside_video": 111
+        },
+        "duration_s": 27.4,
+        "decoded_frames": 822,
+        "video_sha256": "40481cbf6f269cf8b18305adb73adcad12b601d51891fa569d352a4cb70e6d00",
+        "sensor_samples": 1294,
+        "aligned_samples": 1183
+      },
+      {
+        "episode_id": "inspire_dftp/green_attached_container/3",
+        "object_id": "green_attached_container",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782457851.9371715,
+          "video_start_minus_sensor_start_s": 2.289095401763916,
+          "capture_span_s": 28.387885332107544,
+          "encoded_span_s": 31.4,
+          "timestamp_rows": 943,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.08218646049499512,
+          "samples_outside_video": 114
+        },
+        "duration_s": 31.433333333333334,
+        "decoded_frames": 943,
+        "video_sha256": "b9d3f97feabd1a4d7891be216c56504b4b7056149a2dd2c411e14a29aba9b21f",
+        "sensor_samples": 1477,
+        "aligned_samples": 1363
+      },
+      {
+        "episode_id": "inspire_dftp/green_attached_container/0",
+        "object_id": "green_attached_container",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782457670.28303,
+          "video_start_minus_sensor_start_s": 2.2817318439483643,
+          "capture_span_s": 19.98360848426819,
+          "encoded_span_s": 22.066666666666666,
+          "timestamp_rows": 663,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.07922005653381348,
+          "samples_outside_video": 113
+        },
+        "duration_s": 22.1,
+        "decoded_frames": 663,
+        "video_sha256": "1096de35f03682cdc5dbe4830743a525720c5fff5c7b971b18e5475419aa0bce",
+        "sensor_samples": 1061,
+        "aligned_samples": 948
+      },
+      {
+        "episode_id": "inspire_dftp/grey_pot/4",
+        "object_id": "grey_pot",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [
+          "previous visual review excluded this outcome/capture"
+        ],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782382955.147515,
+          "video_start_minus_sensor_start_s": 2.2603681087493896,
+          "capture_span_s": 18.027844429016113,
+          "encoded_span_s": 19.933333333333334,
+          "timestamp_rows": 599,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.0601191520690918,
+          "samples_outside_video": 113
+        },
+        "duration_s": 19.966666666666665,
+        "decoded_frames": 599,
+        "video_sha256": "2aa7eeb13ad1184de6680be6e1cfc3d4fa3d57564f767679e3eca98dd2c34f5f",
+        "sensor_samples": 975,
+        "aligned_samples": 862
+      },
+      {
+        "episode_id": "inspire_dftp/grey_pot/0",
+        "object_id": "grey_pot",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782382780.3168817,
+          "video_start_minus_sensor_start_s": 2.288079023361206,
+          "capture_span_s": 20.18502426147461,
+          "encoded_span_s": 22.3,
+          "timestamp_rows": 670,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.06510448455810547,
+          "samples_outside_video": 114
+        },
+        "duration_s": 22.333333333333332,
+        "decoded_frames": 670,
+        "video_sha256": "b5fa7cd478cd47c3ca445371276bbb78c8dcddcb2e62b891fc0f9448c03ebbda",
+        "sensor_samples": 1075,
+        "aligned_samples": 961
+      },
+      {
+        "episode_id": "inspire_dftp/lemon_squeezer/2",
+        "object_id": "lemon_squeezer",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782463963.1577792,
+          "video_start_minus_sensor_start_s": 2.3099558353424072,
+          "capture_span_s": 20.467732906341553,
+          "encoded_span_s": 22.633333333333333,
+          "timestamp_rows": 680,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.05745053291320801,
+          "samples_outside_video": 115
+        },
+        "duration_s": 22.666666666666668,
+        "decoded_frames": 680,
+        "video_sha256": "cbad7d5a2af5848bacc077a099aa21071a29f53a6e9544270404c60fbd5ed4c9",
+        "sensor_samples": 1088,
+        "aligned_samples": 973
+      },
+      {
+        "episode_id": "inspire_dftp/lemon_squeezer/0",
+        "object_id": "lemon_squeezer",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782463849.8949478,
+          "video_start_minus_sensor_start_s": 2.219546318054199,
+          "capture_span_s": 22.58191442489624,
+          "encoded_span_s": 25.0,
+          "timestamp_rows": 750,
+          "missing_frame_timestamps": 1,
+          "max_capture_gap_s": 0.10141777992248535,
+          "samples_outside_video": 110
+        },
+        "duration_s": 25.033333333333335,
+        "decoded_frames": 751,
+        "video_sha256": "7c69542f6b5059dc50604828762e59a3f480a5a6f2e8a08e3c1884f868729a9b",
+        "sensor_samples": 1184,
+        "aligned_samples": 1074
+      },
+      {
+        "episode_id": "inspire_dftp/metal_scoop_big/1",
+        "object_id": "metal_scoop_big",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782721495.442815,
+          "video_start_minus_sensor_start_s": 2.3053596019744873,
+          "capture_span_s": 27.69490098953247,
+          "encoded_span_s": 30.633333333333333,
+          "timestamp_rows": 919,
+          "missing_frame_timestamps": 1,
+          "max_capture_gap_s": 0.09868216514587402,
+          "samples_outside_video": 114
+        },
+        "duration_s": 30.666666666666668,
+        "decoded_frames": 920,
+        "video_sha256": "82c19c42ab0cc3ce3372542fccedb43c43fff7eb01078deea8583acccf017e69",
+        "sensor_samples": 1439,
+        "aligned_samples": 1325
+      },
+      {
+        "episode_id": "inspire_dftp/metal_scoop_big/0",
+        "object_id": "metal_scoop_big",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782721455.6519089,
+          "video_start_minus_sensor_start_s": 2.2529776096343994,
+          "capture_span_s": 25.572296619415283,
+          "encoded_span_s": 28.3,
+          "timestamp_rows": 850,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.0753331184387207,
+          "samples_outside_video": 113
+        },
+        "duration_s": 28.333333333333332,
+        "decoded_frames": 850,
+        "video_sha256": "be7cf45f8aa28f87d070846a066555c4fac611b702ef0cd5c8c5b48860ed76c9",
+        "sensor_samples": 1337,
+        "aligned_samples": 1224
+      },
+      {
+        "episode_id": "inspire_dftp/pastel_light_green_bowl/1",
+        "object_id": "pastel_light_green_bowl",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [
+          "previous visual review excluded this outcome/capture"
+        ],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782385715.5646696,
+          "video_start_minus_sensor_start_s": 2.267683744430542,
+          "capture_span_s": 27.134150743484497,
+          "encoded_span_s": 30.0,
+          "timestamp_rows": 901,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.08786797523498535,
+          "samples_outside_video": 113
+        },
+        "duration_s": 30.033333333333335,
+        "decoded_frames": 901,
+        "video_sha256": "2e14fa6b703b554dbc4b58e4ab9d13ad7e4ef9fe19211c6bba3f8c69761fc589",
+        "sensor_samples": 1410,
+        "aligned_samples": 1297
+      },
+      {
+        "episode_id": "inspire_dftp/pastel_light_green_bowl/0",
+        "object_id": "pastel_light_green_bowl",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782385644.817879,
+          "video_start_minus_sensor_start_s": 2.228045701980591,
+          "capture_span_s": 28.67430019378662,
+          "encoded_span_s": 31.733333333333334,
+          "timestamp_rows": 952,
+          "missing_frame_timestamps": 1,
+          "max_capture_gap_s": 0.09681510925292969,
+          "samples_outside_video": 110
+        },
+        "duration_s": 31.766666666666666,
+        "decoded_frames": 953,
+        "video_sha256": "52f0efdf600f5d8df4a5c77124211d1c9d3707fc112815e8656953f00c81b87e",
+        "sensor_samples": 1485,
+        "aligned_samples": 1375
+      },
+      {
+        "episode_id": "inspire_dftp/pepper_tuna/0",
+        "object_id": "pepper_tuna",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782388080.5819976,
+          "video_start_minus_sensor_start_s": 2.3032724857330322,
+          "capture_span_s": 24.38449001312256,
+          "encoded_span_s": 26.966666666666665,
+          "timestamp_rows": 809,
+          "missing_frame_timestamps": 1,
+          "max_capture_gap_s": 0.10794448852539062,
+          "samples_outside_video": 115
+        },
+        "duration_s": 27.0,
+        "decoded_frames": 810,
+        "video_sha256": "d1f08a2a3f95d852bf4f36170499220038d1050ea7b77de1cc4a7c392c398b2e",
+        "sensor_samples": 1277,
+        "aligned_samples": 1162
+      },
+      {
+        "episode_id": "inspire_dftp/pepper_tuna/1",
+        "object_id": "pepper_tuna",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782388173.8370755,
+          "video_start_minus_sensor_start_s": 2.258603096008301,
+          "capture_span_s": 26.372612953186035,
+          "encoded_span_s": 29.166666666666668,
+          "timestamp_rows": 875,
+          "missing_frame_timestamps": 1,
+          "max_capture_gap_s": 0.1107320785522461,
+          "samples_outside_video": 112
+        },
+        "duration_s": 29.2,
+        "decoded_frames": 876,
+        "video_sha256": "8b376447255ed80882dc279d6782e72b6e2bdc958af3b46616814be94161743c",
+        "sensor_samples": 1373,
+        "aligned_samples": 1261
+      },
+      {
+        "episode_id": "inspire_dftp/pingpong/1",
+        "object_id": "pingpong",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782381369.8635037,
+          "video_start_minus_sensor_start_s": 2.285663366317749,
+          "capture_span_s": 16.10359525680542,
+          "encoded_span_s": 17.766666666666666,
+          "timestamp_rows": 534,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.06996941566467285,
+          "samples_outside_video": 114
+        },
+        "duration_s": 17.8,
+        "decoded_frames": 534,
+        "video_sha256": "758ced42471b3351133be2bdfd7c8acad5234ac2a0fbf99b84802acc61dadad1",
+        "sensor_samples": 871,
+        "aligned_samples": 757
+      },
+      {
+        "episode_id": "inspire_dftp/pingpong/0",
+        "object_id": "pingpong",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782381321.1502357,
+          "video_start_minus_sensor_start_s": 2.291809558868408,
+          "capture_span_s": 25.13469123840332,
+          "encoded_span_s": 27.8,
+          "timestamp_rows": 835,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.08437991142272949,
+          "samples_outside_video": 114
+        },
+        "duration_s": 27.833333333333332,
+        "decoded_frames": 835,
+        "video_sha256": "71b360c19bdd615b7f8ebec7f5192707b2220242e382a977745c1056c5307e99",
+        "sensor_samples": 1314,
+        "aligned_samples": 1200
+      },
+      {
+        "episode_id": "inspire_dftp/pringles/3",
+        "object_id": "pringles",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [
+          "previous visual review excluded this outcome/capture"
+        ],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782279410.8796432,
+          "video_start_minus_sensor_start_s": 2.297586679458618,
+          "capture_span_s": 15.245898485183716,
+          "encoded_span_s": 16.8,
+          "timestamp_rows": 505,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.05794835090637207,
+          "samples_outside_video": 114
+        },
+        "duration_s": 16.833333333333332,
+        "decoded_frames": 505,
+        "video_sha256": "703f276d1d1a9920f0f01d7a1d2bcc0ab1b5880504de3d8335b1483bd8d7ea1b",
+        "sensor_samples": 803,
+        "aligned_samples": 689
+      },
+      {
+        "episode_id": "inspire_dftp/pringles/2",
+        "object_id": "pringles",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782279328.4178705,
+          "video_start_minus_sensor_start_s": 2.240272283554077,
+          "capture_span_s": 31.265789031982422,
+          "encoded_span_s": 34.63333333333333,
+          "timestamp_rows": 1038,
+          "missing_frame_timestamps": 2,
+          "max_capture_gap_s": 0.10581707954406738,
+          "samples_outside_video": 112
+        },
+        "duration_s": 34.666666666666664,
+        "decoded_frames": 1040,
+        "video_sha256": "28b5c7f4e413f5bdb5a1a13848dc32f524c31db223642725bc99b454fe503bd1",
+        "sensor_samples": 1561,
+        "aligned_samples": 1449
+      },
+      {
+        "episode_id": "inspire_dftp/rectangular_frying_pan/3",
+        "object_id": "rectangular_frying_pan",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [
+          "previous visual review excluded this outcome/capture"
+        ],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782709182.6738405,
+          "video_start_minus_sensor_start_s": 2.3266239166259766,
+          "capture_span_s": 36.794355154037476,
+          "encoded_span_s": 40.766666666666666,
+          "timestamp_rows": 1222,
+          "missing_frame_timestamps": 2,
+          "max_capture_gap_s": 0.12180852890014648,
+          "samples_outside_video": 116
+        },
+        "duration_s": 40.8,
+        "decoded_frames": 1224,
+        "video_sha256": "a362f335bbe12b4eadcaf183cfe04e07befaac8bfb4c94d4d82257cc0b44a6c1",
+        "sensor_samples": 1890,
+        "aligned_samples": 1774
+      },
+      {
+        "episode_id": "inspire_dftp/rectangular_frying_pan/4",
+        "object_id": "rectangular_frying_pan",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782709260.3472831,
+          "video_start_minus_sensor_start_s": 2.263071060180664,
+          "capture_span_s": 23.412044048309326,
+          "encoded_span_s": 25.866666666666667,
+          "timestamp_rows": 777,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.07434511184692383,
+          "samples_outside_video": 112
+        },
+        "duration_s": 25.9,
+        "decoded_frames": 777,
+        "video_sha256": "13eca5e8896c81e4aca5580dfef18b7d08f7d1132ee0278f5de78b8fa1c212bb",
+        "sensor_samples": 1231,
+        "aligned_samples": 1119
+      },
+      {
+        "episode_id": "inspire_dftp/spam_can/1",
+        "object_id": "spam_can",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [
+          "previous visual review excluded this outcome/capture"
+        ],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782289157.8660834,
+          "video_start_minus_sensor_start_s": 2.2316668033599854,
+          "capture_span_s": 26.686280488967896,
+          "encoded_span_s": 29.533333333333335,
+          "timestamp_rows": 885,
+          "missing_frame_timestamps": 2,
+          "max_capture_gap_s": 0.09950470924377441,
+          "samples_outside_video": 111
+        },
+        "duration_s": 29.566666666666666,
+        "decoded_frames": 887,
+        "video_sha256": "ca89c42b0a186efa4bba037d1296f446acdc8074b1cea242a35b3d506f1ce2ac",
+        "sensor_samples": 1343,
+        "aligned_samples": 1232
+      },
+      {
+        "episode_id": "inspire_dftp/spam_can/0",
+        "object_id": "spam_can",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782289089.9183562,
+          "video_start_minus_sensor_start_s": 2.271728277206421,
+          "capture_span_s": 21.931452989578247,
+          "encoded_span_s": 24.233333333333334,
+          "timestamp_rows": 727,
+          "missing_frame_timestamps": 1,
+          "max_capture_gap_s": 0.09945297241210938,
+          "samples_outside_video": 114
+        },
+        "duration_s": 24.266666666666666,
+        "decoded_frames": 728,
+        "video_sha256": "5ac21e2201c4e69e5c529476cfdf0cd7ab8aa37d3bdc4c38e796817d0bb50cf3",
+        "sensor_samples": 1119,
+        "aligned_samples": 1005
+      },
+      {
+        "episode_id": "inspire_dftp/work_lamp/4",
+        "object_id": "work_lamp",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782706030.215644,
+          "video_start_minus_sensor_start_s": 2.301187753677368,
+          "capture_span_s": 25.948922395706177,
+          "encoded_span_s": 28.7,
+          "timestamp_rows": 862,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.06169772148132324,
+          "samples_outside_video": 115
+        },
+        "duration_s": 28.733333333333334,
+        "decoded_frames": 862,
+        "video_sha256": "f32fb31317f15cd9f769ff542d23c43598d986a8e33046b70ecac69c516803ca",
+        "sensor_samples": 1359,
+        "aligned_samples": 1244
+      },
+      {
+        "episode_id": "inspire_dftp/work_lamp/0",
+        "object_id": "work_lamp",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782705737.0438724,
+          "video_start_minus_sensor_start_s": 2.3019821643829346,
+          "capture_span_s": 28.907222747802734,
+          "encoded_span_s": 31.966666666666665,
+          "timestamp_rows": 960,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.08340620994567871,
+          "samples_outside_video": 114
+        },
+        "duration_s": 32.0,
+        "decoded_frames": 960,
+        "video_sha256": "41ad90b82f8b29bc5b28866d3f5fec6192ec9eb63c91d50c24ebf8ab6f69f56e",
+        "sensor_samples": 1501,
+        "aligned_samples": 1387
+      },
+      {
+        "episode_id": "inspire_dftp/yellow_wash_tub/3",
+        "object_id": "yellow_wash_tub",
+        "success": false,
+        "split": "train",
+        "excluded_reasons": [
+          "previous visual review excluded this outcome/capture"
+        ],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782876964.5961702,
+          "video_start_minus_sensor_start_s": 2.2361738681793213,
+          "capture_span_s": 16.041619539260864,
+          "encoded_span_s": 17.7,
+          "timestamp_rows": 532,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.0691378116607666,
+          "samples_outside_video": 111
+        },
+        "duration_s": 17.733333333333334,
+        "decoded_frames": 532,
+        "video_sha256": "6ac5ed904c04f6fe1360b36d17a7a70ec8cbba2c9a4f274c899a0fe9e1a92c10",
+        "sensor_samples": 866,
+        "aligned_samples": 755
+      },
+      {
+        "episode_id": "inspire_dftp/yellow_wash_tub/0",
+        "object_id": "yellow_wash_tub",
+        "success": true,
+        "split": "train",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782876832.4155498,
+          "video_start_minus_sensor_start_s": 2.335453510284424,
+          "capture_span_s": 23.242455005645752,
+          "encoded_span_s": 25.7,
+          "timestamp_rows": 772,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.08358311653137207,
+          "samples_outside_video": 116
+        },
+        "duration_s": 25.733333333333334,
+        "decoded_frames": 772,
+        "video_sha256": "1d20b740f0a2f2a509d3c0e336761c5afe10cb98aed711dfdd442fceed0b6c6d",
+        "sensor_samples": 1222,
+        "aligned_samples": 1106
+      },
+      {
+        "episode_id": "inspire_dftp/cactus2/1",
+        "object_id": "cactus2",
+        "success": false,
+        "split": "val",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782379497.011864,
+          "video_start_minus_sensor_start_s": 2.2368416786193848,
+          "capture_span_s": 22.469768524169922,
+          "encoded_span_s": 24.866666666666667,
+          "timestamp_rows": 747,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.07943558692932129,
+          "samples_outside_video": 112
+        },
+        "duration_s": 24.9,
+        "decoded_frames": 747,
+        "video_sha256": "496c3c74fff8067c7bd482880f76cfb5f68522fb20122ed72cc395ec5d6bfd00",
+        "sensor_samples": 1182,
+        "aligned_samples": 1070
+      },
+      {
+        "episode_id": "inspire_dftp/cactus2/0",
+        "object_id": "cactus2",
+        "success": true,
+        "split": "val",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782379440.4047306,
+          "video_start_minus_sensor_start_s": 2.3230018615722656,
+          "capture_span_s": 20.10931158065796,
+          "encoded_span_s": 22.2,
+          "timestamp_rows": 666,
+          "missing_frame_timestamps": 1,
+          "max_capture_gap_s": 0.10565042495727539,
+          "samples_outside_video": 115
+        },
+        "duration_s": 22.233333333333334,
+        "decoded_frames": 667,
+        "video_sha256": "e4f43e1d95d9e5385150b443e9b0b85ca1877aef17797c6193ef3a96d8d0bb9d",
+        "sensor_samples": 1067,
+        "aligned_samples": 952
+      },
+      {
+        "episode_id": "inspire_dftp/cactus3/0",
+        "object_id": "cactus3",
+        "success": false,
+        "split": "val",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782289566.436238,
+          "video_start_minus_sensor_start_s": 2.2409045696258545,
+          "capture_span_s": 28.51507258415222,
+          "encoded_span_s": 31.566666666666666,
+          "timestamp_rows": 947,
+          "missing_frame_timestamps": 1,
+          "max_capture_gap_s": 0.11225414276123047,
+          "samples_outside_video": 111
+        },
+        "duration_s": 31.6,
+        "decoded_frames": 948,
+        "video_sha256": "9912d742a524b5552c557de7cf164886b7fb384940772eb3ffbd830a655e64d4",
+        "sensor_samples": 1433,
+        "aligned_samples": 1322
+      },
+      {
+        "episode_id": "inspire_dftp/cactus3/1",
+        "object_id": "cactus3",
+        "success": true,
+        "split": "val",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782289605.4551475,
+          "video_start_minus_sensor_start_s": 2.279271125793457,
+          "capture_span_s": 31.699846267700195,
+          "encoded_span_s": 35.06666666666667,
+          "timestamp_rows": 1051,
+          "missing_frame_timestamps": 2,
+          "max_capture_gap_s": 0.10798144340515137,
+          "samples_outside_video": 113
+        },
+        "duration_s": 35.1,
+        "decoded_frames": 1053,
+        "video_sha256": "0f66ac867925b6f34d2e2669d0a37ad3f6d32bb0d7f66e64d96c192bef8b4623",
+        "sensor_samples": 1584,
+        "aligned_samples": 1471
+      },
+      {
+        "episode_id": "inspire_dftp/frog_cup/0",
+        "object_id": "frog_cup",
+        "success": false,
+        "split": "val",
+        "excluded_reasons": [
+          "previous visual review excluded this outcome/capture"
+        ],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782461316.9434628,
+          "video_start_minus_sensor_start_s": 2.307912826538086,
+          "capture_span_s": 24.13941788673401,
+          "encoded_span_s": 26.7,
+          "timestamp_rows": 801,
+          "missing_frame_timestamps": 1,
+          "max_capture_gap_s": 0.11217808723449707,
+          "samples_outside_video": 114
+        },
+        "duration_s": 26.733333333333334,
+        "decoded_frames": 802,
+        "video_sha256": "1de598cd968075abcf0fe4290ab3aa5f456eb59ab95f061323c58d73184b2882",
+        "sensor_samples": 1268,
+        "aligned_samples": 1154
+      },
+      {
+        "episode_id": "inspire_dftp/frog_cup/1",
+        "object_id": "frog_cup",
+        "success": true,
+        "split": "val",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782461358.3543863,
+          "video_start_minus_sensor_start_s": 2.3153843879699707,
+          "capture_span_s": 21.351141452789307,
+          "encoded_span_s": 23.633333333333333,
+          "timestamp_rows": 710,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.07181930541992188,
+          "samples_outside_video": 115
+        },
+        "duration_s": 23.666666666666668,
+        "decoded_frames": 710,
+        "video_sha256": "784b3329fd373053e87ac23aee3dbb0f2087730006d88e99879e2b160191b1da",
+        "sensor_samples": 1128,
+        "aligned_samples": 1013
+      },
+      {
+        "episode_id": "inspire_dftp/knife_sharpener/2",
+        "object_id": "knife_sharpener",
+        "success": false,
+        "split": "val",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782460595.6821532,
+          "video_start_minus_sensor_start_s": 2.2720742225646973,
+          "capture_span_s": 31.043148279190063,
+          "encoded_span_s": 34.36666666666667,
+          "timestamp_rows": 1030,
+          "missing_frame_timestamps": 2,
+          "max_capture_gap_s": 0.08691763877868652,
+          "samples_outside_video": 112
+        },
+        "duration_s": 34.4,
+        "decoded_frames": 1032,
+        "video_sha256": "4a0f9a72cf62fc5e4039f1871bb84a13ae782d6292077d7bc25719b6f952eca0",
+        "sensor_samples": 1606,
+        "aligned_samples": 1494
+      },
+      {
+        "episode_id": "inspire_dftp/knife_sharpener/0",
+        "object_id": "knife_sharpener",
+        "success": true,
+        "split": "val",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782460481.0033193,
+          "video_start_minus_sensor_start_s": 2.2318766117095947,
+          "capture_span_s": 24.357880353927612,
+          "encoded_span_s": 26.966666666666665,
+          "timestamp_rows": 810,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.06822705268859863,
+          "samples_outside_video": 111
+        },
+        "duration_s": 27.0,
+        "decoded_frames": 810,
+        "video_sha256": "050a83a1fda415febe6b573f153717ab1b9c14b74b09df0cccce980904f62a28",
+        "sensor_samples": 1278,
+        "aligned_samples": 1167
+      },
+      {
+        "episode_id": "inspire_dftp/lotion/1",
+        "object_id": "lotion",
+        "success": false,
+        "split": "val",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782707143.365675,
+          "video_start_minus_sensor_start_s": 2.3067219257354736,
+          "capture_span_s": 22.329729557037354,
+          "encoded_span_s": 24.7,
+          "timestamp_rows": 742,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.07430386543273926,
+          "samples_outside_video": 115
+        },
+        "duration_s": 24.733333333333334,
+        "decoded_frames": 742,
+        "video_sha256": "b585a870c03a58c3083cad5d606ad346b55f2ba711764beda9095a9438d5bb2c",
+        "sensor_samples": 1177,
+        "aligned_samples": 1062
+      },
+      {
+        "episode_id": "inspire_dftp/lotion/3",
+        "object_id": "lotion",
+        "success": true,
+        "split": "val",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782707210.3530111,
+          "video_start_minus_sensor_start_s": 2.3035764694213867,
+          "capture_span_s": 20.831345319747925,
+          "encoded_span_s": 23.033333333333335,
+          "timestamp_rows": 692,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.06486749649047852,
+          "samples_outside_video": 114
+        },
+        "duration_s": 23.066666666666666,
+        "decoded_frames": 692,
+        "video_sha256": "00106b83e7b7d1cf4fdf269c71803298b7d623d926b8a1c548932e733b59dc8f",
+        "sensor_samples": 1106,
+        "aligned_samples": 992
+      },
+      {
+        "episode_id": "inspire_dftp/metal_scoop_small/1",
+        "object_id": "metal_scoop_small",
+        "success": false,
+        "split": "val",
+        "excluded_reasons": [
+          "previous visual review excluded this outcome/capture"
+        ],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782717112.2867384,
+          "video_start_minus_sensor_start_s": 2.2829034328460693,
+          "capture_span_s": 31.886045694351196,
+          "encoded_span_s": 35.3,
+          "timestamp_rows": 1058,
+          "missing_frame_timestamps": 2,
+          "max_capture_gap_s": 0.10876774787902832,
+          "samples_outside_video": 114
+        },
+        "duration_s": 35.333333333333336,
+        "decoded_frames": 1060,
+        "video_sha256": "d32f231b8598a700c65bbf73c6cc8c4b1f78fb3d32a8909c1ffeed148674cf7e",
+        "sensor_samples": 1647,
+        "aligned_samples": 1533
+      },
+      {
+        "episode_id": "inspire_dftp/metal_scoop_small/0",
+        "object_id": "metal_scoop_small",
+        "success": true,
+        "split": "val",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782717063.5911517,
+          "video_start_minus_sensor_start_s": 2.321105718612671,
+          "capture_span_s": 21.60489511489868,
+          "encoded_span_s": 23.9,
+          "timestamp_rows": 717,
+          "missing_frame_timestamps": 1,
+          "max_capture_gap_s": 0.09357261657714844,
+          "samples_outside_video": 116
+        },
+        "duration_s": 23.933333333333334,
+        "decoded_frames": 718,
+        "video_sha256": "1c82b3ef0b6c07a4812c5b597c299af2444938b57bcd1ef5bb933e6821f76097",
+        "sensor_samples": 1141,
+        "aligned_samples": 1025
+      },
+      {
+        "episode_id": "inspire_dftp/plant_pot/1",
+        "object_id": "plant_pot",
+        "success": false,
+        "split": "val",
+        "excluded_reasons": [
+          "previous visual review excluded this outcome/capture",
+          "mechanical audit failed: invalid or incomplete recorded video timeline: data/acceptance/hrdexdb-aligned-pilot-v2/raw/inspire_dftp/plant_pot/1"
+        ]
+      },
+      {
+        "episode_id": "inspire_dftp/plant_pot/0",
+        "object_id": "plant_pot",
+        "success": true,
+        "split": "val",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782284427.9465823,
+          "video_start_minus_sensor_start_s": 2.2244014739990234,
+          "capture_span_s": 25.656790733337402,
+          "encoded_span_s": 28.4,
+          "timestamp_rows": 852,
+          "missing_frame_timestamps": 1,
+          "max_capture_gap_s": 0.10941529273986816,
+          "samples_outside_video": 111
+        },
+        "duration_s": 28.433333333333334,
+        "decoded_frames": 853,
+        "video_sha256": "5603208c056487492a7e909f3f11b7ad86f0c9640957565530f8a6aa70533529",
+        "sensor_samples": 1294,
+        "aligned_samples": 1183
+      },
+      {
+        "episode_id": "inspire_dftp/potato_masher/5",
+        "object_id": "potato_masher",
+        "success": false,
+        "split": "val",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782450559.1036649,
+          "video_start_minus_sensor_start_s": 2.299672842025757,
+          "capture_span_s": 21.597090482711792,
+          "encoded_span_s": 23.9,
+          "timestamp_rows": 718,
+          "missing_frame_timestamps": 0,
+          "max_capture_gap_s": 0.06505918502807617,
+          "samples_outside_video": 114
+        },
+        "duration_s": 23.933333333333334,
+        "decoded_frames": 718,
+        "video_sha256": "b6b32a70444a57bcdd25707c88c4ca485e7bb957ee095b752d28926cb025a022",
+        "sensor_samples": 1142,
+        "aligned_samples": 1028
+      },
+      {
+        "episode_id": "inspire_dftp/potato_masher/0",
+        "object_id": "potato_masher",
+        "success": true,
+        "split": "val",
+        "excluded_reasons": [],
+        "clock_alignment": {
+          "method": "recorded_video_timestamps",
+          "video_start_epoch_s": 1782450258.8812091,
+          "video_start_minus_sensor_start_s": 2.2489538192749023,
+          "capture_span_s": 25.170337915420532,
+          "encoded_span_s": 27.833333333333332,
+          "timestamp_rows": 835,
+          "missing_frame_timestamps": 1,
+          "max_capture_gap_s": 0.10949826240539551,
+          "samples_outside_video": 112
+        },
+        "duration_s": 27.866666666666667,
+        "decoded_frames": 836,
+        "video_sha256": "db15bfa8f43cfff211f977aab2898a271c4a9c4720356503be41ae4e2ad5eec8",
+        "sensor_samples": 1312,
+        "aligned_samples": 1200
+      }
+    ],
+    "kept_counts": {
+      "train": 24,
+      "val": 13
+    },
+    "excluded_count": 11,
+    "normalization_fit_ids": [
+      "inspire_dftp/baby_beaker/6",
+      "inspire_dftp/baby_beaker/0",
+      "inspire_dftp/blue_alarm/1",
+      "inspire_dftp/cactus/2",
+      "inspire_dftp/cactus/0",
+      "inspire_dftp/frame_oak/1",
+      "inspire_dftp/green_attached_container/3",
+      "inspire_dftp/green_attached_container/0",
+      "inspire_dftp/grey_pot/0",
+      "inspire_dftp/lemon_squeezer/2",
+      "inspire_dftp/lemon_squeezer/0",
+      "inspire_dftp/metal_scoop_big/1",
+      "inspire_dftp/metal_scoop_big/0",
+      "inspire_dftp/pastel_light_green_bowl/0",
+      "inspire_dftp/pepper_tuna/0",
+      "inspire_dftp/pepper_tuna/1",
+      "inspire_dftp/pingpong/1",
+      "inspire_dftp/pingpong/0",
+      "inspire_dftp/pringles/2",
+      "inspire_dftp/rectangular_frying_pan/4",
+      "inspire_dftp/spam_can/0",
+      "inspire_dftp/work_lamp/4",
+      "inspire_dftp/work_lamp/0",
+      "inspire_dftp/yellow_wash_tub/0"
+    ],
+    "manifest_hashes": {
+      "train": "de8c0f299d2c6f72aa6e783172b74801f8a287b3d450b06f0efb48aa0628d23b",
+      "val": "1d5e1ac0823d1d93622bee4da28695711dd0a854f7c93e2eae3b567ac4a1c98a",
+      "test": "a11936765b0df59cbed4e0ac4f1ee9583d5f07bc501fad8c7167bbe291a35461",
+      "hrdexdb-sft": "5b061a1be39ced1bd4db4c41f20039b85111e096aaa063097c4686b1c759a5bb"
+    }
+  },
+  "predictions": [
+    {
+      "window_id": "3737b18e8c455459f7536ae263f73213a549807e",
+      "source": "hrdexdb",
+      "episode_id": "inspire_dftp/cactus2/0",
+      "prompt_kind": "outcome",
+      "anchor_s": 0.0,
+      "object": "cactus2",
+      "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\n\nScore: 5",
+      "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\",\"parse_failed\":false}",
+      "score": 5.0,
+      "expected_score": 4.9973870109,
+      "parse_failed": false,
+      "latency_s": 10.92366905,
+      "truth_target": "Rationale: no rationale\n\nScore: 5"
+    },
+    {
+      "window_id": "dfdac52f93b069fb8a7f9b631b6a2990cf851c5b",
+      "source": "hrdexdb",
+      "episode_id": "inspire_dftp/cactus2/1",
+      "prompt_kind": "outcome",
+      "anchor_s": 0.0,
+      "object": "cactus2",
+      "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, but the cactus was later dropped or fell onto its side.\n\nScore: 4",
+      "parsed": "{\"score\":4,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, but the cactus was later dropped or fell onto its side.\",\"parse_failed\":false}",
+      "score": 4.0,
+      "expected_score": 4.4336151101,
+      "parse_failed": false,
+      "latency_s": 7.692353823,
+      "truth_target": "Rationale: no rationale\n\nScore: 1"
+    },
+    {
+      "window_id": "e39ac81616f6c1c0670832438c0df3029acf3393",
+      "source": "hrdexdb",
+      "episode_id": "inspire_dftp/cactus3/0",
+      "prompt_kind": "outcome",
+      "anchor_s": 0.0,
+      "object": "cactus3",
+      "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then released it. The cactus was clearly lifted and held by the gripper.\n\nScore: 5",
+      "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then released it. The cactus was clearly lifted and held by the gripper.\",\"parse_failed\":false}",
+      "score": 5.0,
+      "expected_score": 4.9990852976,
+      "parse_failed": false,
+      "latency_s": 8.291623223,
+      "truth_target": "Rationale: no rationale\n\nScore: 1"
+    },
+    {
+      "window_id": "baca4c84adee6d2ee555bfae03b65b71d4126f6d",
+      "source": "hrdexdb",
+      "episode_id": "inspire_dftp/cactus3/1",
+      "prompt_kind": "outcome",
+      "anchor_s": 0.0,
+      "object": "cactus3",
+      "raw_text": "Rationale: The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\n\nScore: 5",
+      "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the cactus off the table, then placed it back down.\",\"parse_failed\":false}",
+      "score": 5.0,
+      "expected_score": 4.99894739,
+      "parse_failed": false,
+      "latency_s": 6.898900311,
+      "truth_target": "Rationale: no rationale\n\nScore: 5"
+    },
+    {
+      "window_id": "5f19f6cc9ece87523b9a5f3375cd15de50f29ed1",
+      "source": "hrdexdb",
+      "episode_id": "inspire_dftp/frog_cup/1",
+      "prompt_kind": "outcome",
+      "anchor_s": 0.0,
+      "object": "frog_cup",
+      "raw_text": "Rationale: The robot approached, grasped, and lifted the frog cup off the table, then placed it back down.\n\nScore: 5",
+      "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the frog cup off the table, then placed it back down.\",\"parse_failed\":false}",
+      "score": 5.0,
+      "expected_score": 4.9992094169,
+      "parse_failed": false,
+      "latency_s": 6.881527645,
+      "truth_target": "Rationale: no rationale\n\nScore: 5"
+    },
+    {
+      "window_id": "d6fdf397e3094ac8f1d42abda10e332c36c80623",
+      "source": "hrdexdb",
+      "episode_id": "inspire_dftp/knife_sharpener/0",
+      "prompt_kind": "outcome",
+      "anchor_s": 0.0,
+      "object": "knife_sharpener",
+      "raw_text": "Rationale: The robot approached, grasped, and lifted the knife sharpener off the table, then placed it back down.\n\nScore: 5",
+      "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the knife sharpener off the table, then placed it back down.\",\"parse_failed\":false}",
+      "score": 5.0,
+      "expected_score": 4.9903385409,
+      "parse_failed": false,
+      "latency_s": 7.013120747,
+      "truth_target": "Rationale: no rationale\n\nScore: 5"
+    },
+    {
+      "window_id": "3f03d3967cb1f9ddb7751485bca6aa5111173c2d",
+      "source": "hrdexdb",
+      "episode_id": "inspire_dftp/knife_sharpener/2",
+      "prompt_kind": "outcome",
+      "anchor_s": 0.0,
+      "object": "knife_sharpener",
+      "raw_text": "Rationale: The robot approached, grasped, and lifted the knife sharpener, but the object was later knocked over and ended on its side.\n\nScore: 3",
+      "parsed": "{\"score\":3,\"rationale\":\"The robot approached, grasped, and lifted the knife sharpener, but the object was later knocked over and ended on its side.\",\"parse_failed\":false}",
+      "score": 3.0,
+      "expected_score": 3.3571343997,
+      "parse_failed": false,
+      "latency_s": 7.53244633,
+      "truth_target": "Rationale: no rationale\n\nScore: 1"
+    },
+    {
+      "window_id": "ed7985137047871afee4025ea73526c93d8095f2",
+      "source": "hrdexdb",
+      "episode_id": "inspire_dftp/lotion/1",
+      "prompt_kind": "outcome",
+      "anchor_s": 0.0,
+      "object": "lotion",
+      "raw_text": "Rationale: The robot approached, grasped, and lifted the lotion bottle off the table, but the bottle was later knocked over and ended on its side.\n\nScore: 4",
+      "parsed": "{\"score\":4,\"rationale\":\"The robot approached, grasped, and lifted the lotion bottle off the table, but the bottle was later knocked over and ended on its side.\",\"parse_failed\":false}",
+      "score": 4.0,
+      "expected_score": 4.1909184858,
+      "parse_failed": false,
+      "latency_s": 7.782252039,
+      "truth_target": "Rationale: no rationale\n\nScore: 1"
+    },
+    {
+      "window_id": "e8d856c8864c8f002a6c2d1cdcd1ab1939a3b161",
+      "source": "hrdexdb",
+      "episode_id": "inspire_dftp/lotion/3",
+      "prompt_kind": "outcome",
+      "anchor_s": 0.0,
+      "object": "lotion",
+      "raw_text": "Rationale: The robot approached, grasped, and lifted the lotion bottle off the table, then placed it back down.\n\nScore: 5",
+      "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the lotion bottle off the table, then placed it back down.\",\"parse_failed\":false}",
+      "score": 5.0,
+      "expected_score": 4.9956809496,
+      "parse_failed": false,
+      "latency_s": 6.866507614,
+      "truth_target": "Rationale: no rationale\n\nScore: 5"
+    },
+    {
+      "window_id": "1affb56c5fd99a69447f6d890a047b67446b78f7",
+      "source": "hrdexdb",
+      "episode_id": "inspire_dftp/metal_scoop_small/0",
+      "prompt_kind": "outcome",
+      "anchor_s": 0.0,
+      "object": "metal_scoop_small",
+      "raw_text": "Rationale: The robot approached, grasped, and lifted the small metal scoop off the table, then released it.\n\nScore: 5",
+      "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the small metal scoop off the table, then released it.\",\"parse_failed\":false}",
+      "score": 5.0,
+      "expected_score": 4.9983676967,
+      "parse_failed": false,
+      "latency_s": 6.737691164,
+      "truth_target": "Rationale: no rationale\n\nScore: 5"
+    },
+    {
+      "window_id": "0a91b9144e38be91f9099e2dc7ea1a6f6fe78e72",
+      "source": "hrdexdb",
+      "episode_id": "inspire_dftp/plant_pot/0",
+      "prompt_kind": "outcome",
+      "anchor_s": 0.0,
+      "object": "plant_pot",
+      "raw_text": "Rationale: The robot approached, grasped, and lifted the plant pot off the table, then placed it back down.\n\nScore: 5",
+      "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the plant pot off the table, then placed it back down.\",\"parse_failed\":false}",
+      "score": 5.0,
+      "expected_score": 4.9990558604,
+      "parse_failed": false,
+      "latency_s": 6.910052124,
+      "truth_target": "Rationale: no rationale\n\nScore: 5"
+    },
+    {
+      "window_id": "c92a327a6361caaa76b2e31b2671d025214417ee",
+      "source": "hrdexdb",
+      "episode_id": "inspire_dftp/potato_masher/0",
+      "prompt_kind": "outcome",
+      "anchor_s": 0.0,
+      "object": "potato_masher",
+      "raw_text": "Rationale: The robot approached, grasped, and lifted the potato masher off the table, then released it.\n\nScore: 5",
+      "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the potato masher off the table, then released it.\",\"parse_failed\":false}",
+      "score": 5.0,
+      "expected_score": 4.9995619027,
+      "parse_failed": false,
+      "latency_s": 6.746498988,
+      "truth_target": "Rationale: no rationale\n\nScore: 5"
+    },
+    {
+      "window_id": "03c9384b33da4a61153b600777f461060feb261e",
+      "source": "hrdexdb",
+      "episode_id": "inspire_dftp/potato_masher/5",
+      "prompt_kind": "outcome",
+      "anchor_s": 0.0,
+      "object": "potato_masher",
+      "raw_text": "Rationale: The robot approached, grasped, and lifted the potato masher off the table, then released it. The masher was clearly lifted and held during the episode.\n\nScore: 5",
+      "parsed": "{\"score\":5,\"rationale\":\"The robot approached, grasped, and lifted the potato masher off the table, then released it. The masher was clearly lifted and held during the episode.\",\"parse_failed\":false}",
+      "score": 5.0,
+      "expected_score": 4.9996992844,
+      "parse_failed": false,
+      "latency_s": 8.322771938,
+      "truth_target": "Rationale: no rationale\n\nScore: 1"
+    }
+  ],
+  "source_code_sha256": {
+    "tactile_flora/sources/hrdexdb.py": "d9632c326ea50d4fb8f5a227e8dbfc708d046c4b06feecd02d8f6c521c65066c",
+    "scripts/cluster/prepare_hrdexdb_aligned.py": "2e8609dc4959784cea311aadd4127f747c5869314a19e4ac03bca4f28363aa87"
+  }
+}

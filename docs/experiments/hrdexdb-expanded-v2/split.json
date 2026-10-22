@@ -1,0 +1,3731 @@
+{
+  "dataset": "HRDexDB/HRDexDB",
+  "revision": "98b8f8ea2e361a3c7df38b5d8f3f8395913773f2",
+  "scope": "all Inspire DFTP episodes; one fixed scene camera; source labels",
+  "selection": "all episodes; hash-ordered unseen objects; 16 new test / 8 new val objects",
+  "test_policy": "no test inference until training settings are fixed; historical val remains val",
+  "catalog": {
+    "path": "metadata/episodes.parquet",
+    "sha256": "83a188e6dc539807602f9dcd3709701fd5328ba073859962e8beae9984f3877b",
+    "bytes": 66719
+  },
+  "files_per_episode": [
+    "grasp_result.json",
+    "raw/hand/force.npy",
+    "raw/hand/position.npy",
+    "raw/hand/time.npy",
+    "raw/timestamps/timestamp.npy",
+    "raw/timestamps/frame_id.npy",
+    "vid/22641005.mp4"
+  ],
+  "episodes": [
+    {
+      "episode_id": "inspire_dftp/apple/0",
+      "object_id": "apple",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/apple/1",
+      "object_id": "apple",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/apple/2",
+      "object_id": "apple",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/apple/3",
+      "object_id": "apple",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/apple/5",
+      "object_id": "apple",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/attached_container/0",
+      "object_id": "attached_container",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/attached_container/1",
+      "object_id": "attached_container",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/attached_container/2",
+      "object_id": "attached_container",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/attached_container/3",
+      "object_id": "attached_container",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/attached_container/4",
+      "object_id": "attached_container",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/attached_container/5",
+      "object_id": "attached_container",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/attached_container/7",
+      "object_id": "attached_container",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/attached_container/8",
+      "object_id": "attached_container",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baby_beaker/0",
+      "object_id": "baby_beaker",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baby_beaker/10",
+      "object_id": "baby_beaker",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baby_beaker/11",
+      "object_id": "baby_beaker",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baby_beaker/12",
+      "object_id": "baby_beaker",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baby_beaker/2",
+      "object_id": "baby_beaker",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baby_beaker/4",
+      "object_id": "baby_beaker",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baby_beaker/5",
+      "object_id": "baby_beaker",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baby_beaker/6",
+      "object_id": "baby_beaker",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baby_beaker/9",
+      "object_id": "baby_beaker",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/balloon_whisk/0",
+      "object_id": "balloon_whisk",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/balloon_whisk/1",
+      "object_id": "balloon_whisk",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/balloon_whisk/2",
+      "object_id": "balloon_whisk",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/balloon_whisk/3",
+      "object_id": "balloon_whisk",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/balloon_whisk/4",
+      "object_id": "balloon_whisk",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/balloon_whisk/5",
+      "object_id": "balloon_whisk",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/balloon_whisk/6",
+      "object_id": "balloon_whisk",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/balloon_whisk/7",
+      "object_id": "balloon_whisk",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_basket/0",
+      "object_id": "bamboo_basket",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_basket/1",
+      "object_id": "bamboo_basket",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_basket/2",
+      "object_id": "bamboo_basket",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_basket/3",
+      "object_id": "bamboo_basket",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_basket/4",
+      "object_id": "bamboo_basket",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_basket/5",
+      "object_id": "bamboo_basket",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_basket/6",
+      "object_id": "bamboo_basket",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_basket/7",
+      "object_id": "bamboo_basket",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_box/0",
+      "object_id": "bamboo_box",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_box/1",
+      "object_id": "bamboo_box",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_box/2",
+      "object_id": "bamboo_box",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_box/3",
+      "object_id": "bamboo_box",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_box/4",
+      "object_id": "bamboo_box",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/bamboo_box/5",
+      "object_id": "bamboo_box",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/banana/0",
+      "object_id": "banana",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/banana/1",
+      "object_id": "banana",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/banana/2",
+      "object_id": "banana",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/banana/3",
+      "object_id": "banana",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/banana/4",
+      "object_id": "banana",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baseball/0",
+      "object_id": "baseball",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baseball/1",
+      "object_id": "baseball",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baseball/2",
+      "object_id": "baseball",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baseball/3",
+      "object_id": "baseball",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/baseball/4",
+      "object_id": "baseball",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/black_holder_with_handle/0",
+      "object_id": "black_holder_with_handle",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/black_holder_with_handle/1",
+      "object_id": "black_holder_with_handle",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/black_holder_with_handle/2",
+      "object_id": "black_holder_with_handle",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/black_holder_with_handle/3",
+      "object_id": "black_holder_with_handle",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/black_holder_with_handle/4",
+      "object_id": "black_holder_with_handle",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/black_kitchen_roll_holder/0",
+      "object_id": "black_kitchen_roll_holder",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/black_kitchen_roll_holder/1",
+      "object_id": "black_kitchen_roll_holder",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/black_kitchen_roll_holder/11",
+      "object_id": "black_kitchen_roll_holder",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/black_kitchen_roll_holder/2",
+      "object_id": "black_kitchen_roll_holder",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/black_kitchen_roll_holder/3",
+      "object_id": "black_kitchen_roll_holder",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/black_kitchen_roll_holder/4",
+      "object_id": "black_kitchen_roll_holder",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/black_kitchen_roll_holder/5",
+      "object_id": "black_kitchen_roll_holder",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/black_kitchen_roll_holder/6",
+      "object_id": "black_kitchen_roll_holder",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/black_kitchen_roll_holder/8",
+      "object_id": "black_kitchen_roll_holder",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/black_kitchen_roll_holder/9",
+      "object_id": "black_kitchen_roll_holder",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_alarm/0",
+      "object_id": "blue_alarm",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_alarm/1",
+      "object_id": "blue_alarm",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_alarm/2",
+      "object_id": "blue_alarm",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_alarm/3",
+      "object_id": "blue_alarm",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_alarm/4",
+      "object_id": "blue_alarm",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_alarm/5",
+      "object_id": "blue_alarm",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_vase/0",
+      "object_id": "blue_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_vase/1",
+      "object_id": "blue_vase",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_vase/2",
+      "object_id": "blue_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_vase/3",
+      "object_id": "blue_vase",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_vase/4",
+      "object_id": "blue_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_vase/5",
+      "object_id": "blue_vase",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_vase/6",
+      "object_id": "blue_vase",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/blue_vase/7",
+      "object_id": "blue_vase",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/book/1",
+      "object_id": "book",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/book/2",
+      "object_id": "book",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/book/3",
+      "object_id": "book",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/book/4",
+      "object_id": "book",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/book/5",
+      "object_id": "book",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/book/6",
+      "object_id": "book",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/book/7",
+      "object_id": "book",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/box_pink/0",
+      "object_id": "box_pink",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/box_pink/1",
+      "object_id": "box_pink",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/box_pink/2",
+      "object_id": "box_pink",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/box_pink/3",
+      "object_id": "box_pink",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/box_pink/4",
+      "object_id": "box_pink",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/box_pink/5",
+      "object_id": "box_pink",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/brass_pot/0",
+      "object_id": "brass_pot",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/brass_pot/1",
+      "object_id": "brass_pot",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/brass_pot/2",
+      "object_id": "brass_pot",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/brass_pot/3",
+      "object_id": "brass_pot",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/brass_pot/4",
+      "object_id": "brass_pot",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/brass_pot/5",
+      "object_id": "brass_pot",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/brass_pot/6",
+      "object_id": "brass_pot",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/brass_pot/7",
+      "object_id": "brass_pot",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus/0",
+      "object_id": "cactus",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus/1",
+      "object_id": "cactus",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus/10",
+      "object_id": "cactus",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus/2",
+      "object_id": "cactus",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus/3",
+      "object_id": "cactus",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus/4",
+      "object_id": "cactus",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus/5",
+      "object_id": "cactus",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus/6",
+      "object_id": "cactus",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus/7",
+      "object_id": "cactus",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus/8",
+      "object_id": "cactus",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus/9",
+      "object_id": "cactus",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/0",
+      "object_id": "cactus2",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/1",
+      "object_id": "cactus2",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/10",
+      "object_id": "cactus2",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/11",
+      "object_id": "cactus2",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/12",
+      "object_id": "cactus2",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/13",
+      "object_id": "cactus2",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/14",
+      "object_id": "cactus2",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/15",
+      "object_id": "cactus2",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/16",
+      "object_id": "cactus2",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/3",
+      "object_id": "cactus2",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/5",
+      "object_id": "cactus2",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/7",
+      "object_id": "cactus2",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus2/9",
+      "object_id": "cactus2",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/0",
+      "object_id": "cactus3",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/1",
+      "object_id": "cactus3",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/10",
+      "object_id": "cactus3",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/11",
+      "object_id": "cactus3",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/2",
+      "object_id": "cactus3",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/3",
+      "object_id": "cactus3",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/4",
+      "object_id": "cactus3",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/5",
+      "object_id": "cactus3",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/6",
+      "object_id": "cactus3",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/7",
+      "object_id": "cactus3",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/8",
+      "object_id": "cactus3",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/cactus3/9",
+      "object_id": "cactus3",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/ceramic_elephant_jug/1",
+      "object_id": "ceramic_elephant_jug",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/ceramic_elephant_jug/10",
+      "object_id": "ceramic_elephant_jug",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/ceramic_elephant_jug/11",
+      "object_id": "ceramic_elephant_jug",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/ceramic_elephant_jug/13",
+      "object_id": "ceramic_elephant_jug",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/ceramic_elephant_jug/14",
+      "object_id": "ceramic_elephant_jug",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/ceramic_elephant_jug/2",
+      "object_id": "ceramic_elephant_jug",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/ceramic_elephant_jug/5",
+      "object_id": "ceramic_elephant_jug",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/ceramic_elephant_jug/6",
+      "object_id": "ceramic_elephant_jug",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/ceramic_elephant_jug/7",
+      "object_id": "ceramic_elephant_jug",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/ceramic_elephant_jug/8",
+      "object_id": "ceramic_elephant_jug",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/ceramic_elephant_jug/9",
+      "object_id": "ceramic_elephant_jug",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/circular_frying_pan/0",
+      "object_id": "circular_frying_pan",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/circular_frying_pan/1",
+      "object_id": "circular_frying_pan",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/circular_frying_pan/2",
+      "object_id": "circular_frying_pan",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/circular_frying_pan/3",
+      "object_id": "circular_frying_pan",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/circular_frying_pan/4",
+      "object_id": "circular_frying_pan",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/clothes_hanger/1",
+      "object_id": "clothes_hanger",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/clothes_hanger/3",
+      "object_id": "clothes_hanger",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/clothes_hanger/4",
+      "object_id": "clothes_hanger",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/clothes_hanger/5",
+      "object_id": "clothes_hanger",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/clothes_hanger/6",
+      "object_id": "clothes_hanger",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/coffee_tin/0",
+      "object_id": "coffee_tin",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/coffee_tin/1",
+      "object_id": "coffee_tin",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/coffee_tin/2",
+      "object_id": "coffee_tin",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/coffee_tin/3",
+      "object_id": "coffee_tin",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/coffee_tin/4",
+      "object_id": "coffee_tin",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/coffee_tin/5",
+      "object_id": "coffee_tin",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/coffee_tin/6",
+      "object_id": "coffee_tin",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/coffee_tin/7",
+      "object_id": "coffee_tin",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/coffee_tin/8",
+      "object_id": "coffee_tin",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/colander_green/0",
+      "object_id": "colander_green",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/colander_green/1",
+      "object_id": "colander_green",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/colander_green/2",
+      "object_id": "colander_green",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/colander_green/3",
+      "object_id": "colander_green",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/colander_green/4",
+      "object_id": "colander_green",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/donut/0",
+      "object_id": "donut",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/donut/1",
+      "object_id": "donut",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/donut/2",
+      "object_id": "donut",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/donut/3",
+      "object_id": "donut",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/donut/4",
+      "object_id": "donut",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frame_oak/0",
+      "object_id": "frame_oak",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frame_oak/1",
+      "object_id": "frame_oak",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frame_oak/2",
+      "object_id": "frame_oak",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frame_oak/3",
+      "object_id": "frame_oak",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frame_oak/4",
+      "object_id": "frame_oak",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frame_oak/5",
+      "object_id": "frame_oak",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frame_oak/6",
+      "object_id": "frame_oak",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frame_oak/7",
+      "object_id": "frame_oak",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frame_red/0",
+      "object_id": "frame_red",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frame_red/1",
+      "object_id": "frame_red",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frame_red/2",
+      "object_id": "frame_red",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frame_red/3",
+      "object_id": "frame_red",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frame_red/4",
+      "object_id": "frame_red",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/french_mustard/0",
+      "object_id": "french_mustard",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/french_mustard/1",
+      "object_id": "french_mustard",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/french_mustard/2",
+      "object_id": "french_mustard",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/french_mustard/3",
+      "object_id": "french_mustard",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/french_mustard/4",
+      "object_id": "french_mustard",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/french_mustard/5",
+      "object_id": "french_mustard",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_bowl/0",
+      "object_id": "frog_bowl",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_bowl/1",
+      "object_id": "frog_bowl",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_bowl/2",
+      "object_id": "frog_bowl",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_bowl/3",
+      "object_id": "frog_bowl",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_bowl/4",
+      "object_id": "frog_bowl",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_bowl/5",
+      "object_id": "frog_bowl",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_bowl/6",
+      "object_id": "frog_bowl",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_bowl/7",
+      "object_id": "frog_bowl",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_bowl/8",
+      "object_id": "frog_bowl",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/0",
+      "object_id": "frog_cup",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/1",
+      "object_id": "frog_cup",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/2",
+      "object_id": "frog_cup",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/3",
+      "object_id": "frog_cup",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/4",
+      "object_id": "frog_cup",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/5",
+      "object_id": "frog_cup",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/6",
+      "object_id": "frog_cup",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/7",
+      "object_id": "frog_cup",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/8",
+      "object_id": "frog_cup",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/frog_cup/9",
+      "object_id": "frog_cup",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/fruit_cutter_base/0",
+      "object_id": "fruit_cutter_base",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/fruit_cutter_base/1",
+      "object_id": "fruit_cutter_base",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/fruit_cutter_base/2",
+      "object_id": "fruit_cutter_base",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/fruit_cutter_base/3",
+      "object_id": "fruit_cutter_base",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/fruit_cutter_base/4",
+      "object_id": "fruit_cutter_base",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/fruit_cutter_base/5",
+      "object_id": "fruit_cutter_base",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_attached_container/0",
+      "object_id": "green_attached_container",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_attached_container/1",
+      "object_id": "green_attached_container",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_attached_container/10",
+      "object_id": "green_attached_container",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_attached_container/2",
+      "object_id": "green_attached_container",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_attached_container/3",
+      "object_id": "green_attached_container",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_attached_container/4",
+      "object_id": "green_attached_container",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_attached_container/6",
+      "object_id": "green_attached_container",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_attached_container/7",
+      "object_id": "green_attached_container",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_attached_container/8",
+      "object_id": "green_attached_container",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/0",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/1",
+      "object_id": "green_cactus_vase",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/11",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/13",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/14",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/15",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/16",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/17",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/19",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/2",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/20",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/21",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/22",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/23",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/24",
+      "object_id": "green_cactus_vase",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/3",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/4",
+      "object_id": "green_cactus_vase",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/5",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/6",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/7",
+      "object_id": "green_cactus_vase",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/8",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_cactus_vase/9",
+      "object_id": "green_cactus_vase",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_soap_dispenser/0",
+      "object_id": "green_soap_dispenser",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_soap_dispenser/1",
+      "object_id": "green_soap_dispenser",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_soap_dispenser/2",
+      "object_id": "green_soap_dispenser",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_soap_dispenser/3",
+      "object_id": "green_soap_dispenser",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_soap_dispenser/4",
+      "object_id": "green_soap_dispenser",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/green_soap_dispenser/5",
+      "object_id": "green_soap_dispenser",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/grey_pot/0",
+      "object_id": "grey_pot",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/grey_pot/3",
+      "object_id": "grey_pot",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/grey_pot/4",
+      "object_id": "grey_pot",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/grey_pot/7",
+      "object_id": "grey_pot",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/grid_desktop_organizer/0",
+      "object_id": "grid_desktop_organizer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/grid_desktop_organizer/1",
+      "object_id": "grid_desktop_organizer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/grid_desktop_organizer/2",
+      "object_id": "grid_desktop_organizer",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/grid_desktop_organizer/3",
+      "object_id": "grid_desktop_organizer",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/grid_desktop_organizer/4",
+      "object_id": "grid_desktop_organizer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/grid_desktop_organizer/5",
+      "object_id": "grid_desktop_organizer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/grid_desktop_organizer/6",
+      "object_id": "grid_desktop_organizer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/hammer/0",
+      "object_id": "hammer",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/hammer/1",
+      "object_id": "hammer",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/hammer/11",
+      "object_id": "hammer",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/hammer/13",
+      "object_id": "hammer",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/hammer/15",
+      "object_id": "hammer",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/hammer/2",
+      "object_id": "hammer",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/hammer/3",
+      "object_id": "hammer",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/hammer/4",
+      "object_id": "hammer",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/hammer/5",
+      "object_id": "hammer",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/hammer/6",
+      "object_id": "hammer",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/hammer/7",
+      "object_id": "hammer",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/hammer/8",
+      "object_id": "hammer",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/hammer/9",
+      "object_id": "hammer",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/icecream_scoop/0",
+      "object_id": "icecream_scoop",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/icecream_scoop/1",
+      "object_id": "icecream_scoop",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/icecream_scoop/2",
+      "object_id": "icecream_scoop",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/icecream_scoop/3",
+      "object_id": "icecream_scoop",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/icecream_scoop/4",
+      "object_id": "icecream_scoop",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/icecream_scoop/5",
+      "object_id": "icecream_scoop",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/icecream_scoop/6",
+      "object_id": "icecream_scoop",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/icecream_scoop/7",
+      "object_id": "icecream_scoop",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/icecream_scoop/8",
+      "object_id": "icecream_scoop",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/jja_ramen/0",
+      "object_id": "jja_ramen",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/jja_ramen/1",
+      "object_id": "jja_ramen",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/jja_ramen/2",
+      "object_id": "jja_ramen",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/jja_ramen/3",
+      "object_id": "jja_ramen",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/jja_ramen/4",
+      "object_id": "jja_ramen",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/knife_sharpener/0",
+      "object_id": "knife_sharpener",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/knife_sharpener/1",
+      "object_id": "knife_sharpener",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/knife_sharpener/2",
+      "object_id": "knife_sharpener",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/knife_sharpener/3",
+      "object_id": "knife_sharpener",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/knife_sharpener/4",
+      "object_id": "knife_sharpener",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/knife_sharpener/5",
+      "object_id": "knife_sharpener",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon/0",
+      "object_id": "lemon",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon/1",
+      "object_id": "lemon",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon/2",
+      "object_id": "lemon",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon/3",
+      "object_id": "lemon",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon/4",
+      "object_id": "lemon",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon/5",
+      "object_id": "lemon",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon_squeezer/0",
+      "object_id": "lemon_squeezer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon_squeezer/1",
+      "object_id": "lemon_squeezer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon_squeezer/2",
+      "object_id": "lemon_squeezer",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon_squeezer/3",
+      "object_id": "lemon_squeezer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon_squeezer/4",
+      "object_id": "lemon_squeezer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon_squeezer/6",
+      "object_id": "lemon_squeezer",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon_squeezer/7",
+      "object_id": "lemon_squeezer",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon_squeezer/8",
+      "object_id": "lemon_squeezer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/lemon_squeezer/9",
+      "object_id": "lemon_squeezer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/lilac_food_container/0",
+      "object_id": "lilac_food_container",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/lilac_food_container/1",
+      "object_id": "lilac_food_container",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/lilac_food_container/2",
+      "object_id": "lilac_food_container",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/lilac_food_container/3",
+      "object_id": "lilac_food_container",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/lilac_food_container/4",
+      "object_id": "lilac_food_container",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/lotion/1",
+      "object_id": "lotion",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/lotion/10",
+      "object_id": "lotion",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/lotion/3",
+      "object_id": "lotion",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/lotion/7",
+      "object_id": "lotion",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/lotion/8",
+      "object_id": "lotion",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/lotion/9",
+      "object_id": "lotion",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/meat_thermometer/0",
+      "object_id": "meat_thermometer",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/meat_thermometer/2",
+      "object_id": "meat_thermometer",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/meat_thermometer/4",
+      "object_id": "meat_thermometer",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_measuring_flask/0",
+      "object_id": "metal_measuring_flask",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_measuring_flask/1",
+      "object_id": "metal_measuring_flask",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_measuring_flask/2",
+      "object_id": "metal_measuring_flask",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_measuring_flask/3",
+      "object_id": "metal_measuring_flask",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_measuring_flask/4",
+      "object_id": "metal_measuring_flask",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_measuring_flask/5",
+      "object_id": "metal_measuring_flask",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_measuring_flask/6",
+      "object_id": "metal_measuring_flask",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_measuring_flask/9",
+      "object_id": "metal_measuring_flask",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_big/0",
+      "object_id": "metal_scoop_big",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_big/1",
+      "object_id": "metal_scoop_big",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_big/2",
+      "object_id": "metal_scoop_big",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_big/3",
+      "object_id": "metal_scoop_big",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_big/4",
+      "object_id": "metal_scoop_big",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_big/5",
+      "object_id": "metal_scoop_big",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_big/6",
+      "object_id": "metal_scoop_big",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_big/7",
+      "object_id": "metal_scoop_big",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/0",
+      "object_id": "metal_scoop_small",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/1",
+      "object_id": "metal_scoop_small",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/10",
+      "object_id": "metal_scoop_small",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/11",
+      "object_id": "metal_scoop_small",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/12",
+      "object_id": "metal_scoop_small",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/13",
+      "object_id": "metal_scoop_small",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/2",
+      "object_id": "metal_scoop_small",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/3",
+      "object_id": "metal_scoop_small",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/4",
+      "object_id": "metal_scoop_small",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/5",
+      "object_id": "metal_scoop_small",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/6",
+      "object_id": "metal_scoop_small",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/8",
+      "object_id": "metal_scoop_small",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/metal_scoop_small/9",
+      "object_id": "metal_scoop_small",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/mug_holder/0",
+      "object_id": "mug_holder",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/mug_holder/1",
+      "object_id": "mug_holder",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/mug_holder/10",
+      "object_id": "mug_holder",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/mug_holder/11",
+      "object_id": "mug_holder",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/mug_holder/2",
+      "object_id": "mug_holder",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/mug_holder/3",
+      "object_id": "mug_holder",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/mug_holder/4",
+      "object_id": "mug_holder",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/mug_holder/5",
+      "object_id": "mug_holder",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/mug_holder/6",
+      "object_id": "mug_holder",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/mug_holder/7",
+      "object_id": "mug_holder",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/mug_holder/8",
+      "object_id": "mug_holder",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/mug_holder/9",
+      "object_id": "mug_holder",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/orange/0",
+      "object_id": "orange",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/orange/1",
+      "object_id": "orange",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/orange/2",
+      "object_id": "orange",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/orange/3",
+      "object_id": "orange",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/orange/4",
+      "object_id": "orange",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/orange/5",
+      "object_id": "orange",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/0",
+      "object_id": "organizer_beige",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/1",
+      "object_id": "organizer_beige",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/10",
+      "object_id": "organizer_beige",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/11",
+      "object_id": "organizer_beige",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/12",
+      "object_id": "organizer_beige",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/13",
+      "object_id": "organizer_beige",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/14",
+      "object_id": "organizer_beige",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/2",
+      "object_id": "organizer_beige",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/3",
+      "object_id": "organizer_beige",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/4",
+      "object_id": "organizer_beige",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/5",
+      "object_id": "organizer_beige",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/6",
+      "object_id": "organizer_beige",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/7",
+      "object_id": "organizer_beige",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/8",
+      "object_id": "organizer_beige",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/organizer_beige/9",
+      "object_id": "organizer_beige",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_blue_cup/0",
+      "object_id": "pastel_blue_cup",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_blue_cup/1",
+      "object_id": "pastel_blue_cup",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_blue_cup/2",
+      "object_id": "pastel_blue_cup",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_blue_cup/3",
+      "object_id": "pastel_blue_cup",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_blue_cup/4",
+      "object_id": "pastel_blue_cup",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_blue_cup/5",
+      "object_id": "pastel_blue_cup",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_blue_cup/6",
+      "object_id": "pastel_blue_cup",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_light_green_bowl/0",
+      "object_id": "pastel_light_green_bowl",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_light_green_bowl/1",
+      "object_id": "pastel_light_green_bowl",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_light_green_bowl/2",
+      "object_id": "pastel_light_green_bowl",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_light_green_bowl/3",
+      "object_id": "pastel_light_green_bowl",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_light_green_bowl/4",
+      "object_id": "pastel_light_green_bowl",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_light_green_bowl/5",
+      "object_id": "pastel_light_green_bowl",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pastel_light_green_bowl/6",
+      "object_id": "pastel_light_green_bowl",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pepper_tuna/0",
+      "object_id": "pepper_tuna",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pepper_tuna/1",
+      "object_id": "pepper_tuna",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pepper_tuna/2",
+      "object_id": "pepper_tuna",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pepper_tuna/3",
+      "object_id": "pepper_tuna",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pepper_tuna/4",
+      "object_id": "pepper_tuna",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pepper_tuna/5",
+      "object_id": "pepper_tuna",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pingpong/0",
+      "object_id": "pingpong",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pingpong/1",
+      "object_id": "pingpong",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pingpong/2",
+      "object_id": "pingpong",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pingpong/3",
+      "object_id": "pingpong",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pingpong/4",
+      "object_id": "pingpong",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pingpong/5",
+      "object_id": "pingpong",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pink_clock/0",
+      "object_id": "pink_clock",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pink_clock/1",
+      "object_id": "pink_clock",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pink_clock/2",
+      "object_id": "pink_clock",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pink_clock/3",
+      "object_id": "pink_clock",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pink_clock/4",
+      "object_id": "pink_clock",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pink_clock/5",
+      "object_id": "pink_clock",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pink_clock/6",
+      "object_id": "pink_clock",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pink_clock/7",
+      "object_id": "pink_clock",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pink_clock/8",
+      "object_id": "pink_clock",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/plant_pot/0",
+      "object_id": "plant_pot",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/plant_pot/1",
+      "object_id": "plant_pot",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/plant_pot/2",
+      "object_id": "plant_pot",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/plant_pot/3",
+      "object_id": "plant_pot",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/plant_pot/4",
+      "object_id": "plant_pot",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/plant_pot/5",
+      "object_id": "plant_pot",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/plant_pot/6",
+      "object_id": "plant_pot",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/plant_pot/7",
+      "object_id": "plant_pot",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/plastic_elephant_jug/0",
+      "object_id": "plastic_elephant_jug",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/plastic_elephant_jug/2",
+      "object_id": "plastic_elephant_jug",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/plastic_elephant_jug/3",
+      "object_id": "plastic_elephant_jug",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/plastic_elephant_jug/4",
+      "object_id": "plastic_elephant_jug",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/plastic_elephant_jug/5",
+      "object_id": "plastic_elephant_jug",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/plastic_elephant_jug/6",
+      "object_id": "plastic_elephant_jug",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/plastic_elephant_jug/7",
+      "object_id": "plastic_elephant_jug",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/0",
+      "object_id": "potato_masher",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/1",
+      "object_id": "potato_masher",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/10",
+      "object_id": "potato_masher",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/11",
+      "object_id": "potato_masher",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/13",
+      "object_id": "potato_masher",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/2",
+      "object_id": "potato_masher",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/3",
+      "object_id": "potato_masher",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/5",
+      "object_id": "potato_masher",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/6",
+      "object_id": "potato_masher",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/8",
+      "object_id": "potato_masher",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/potato_masher/9",
+      "object_id": "potato_masher",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/pringles/2",
+      "object_id": "pringles",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pringles/3",
+      "object_id": "pringles",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pringles/5",
+      "object_id": "pringles",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pringles/6",
+      "object_id": "pringles",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pringles/7",
+      "object_id": "pringles",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pringles/8",
+      "object_id": "pringles",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pringles_small/2",
+      "object_id": "pringles_small",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/pringles_small/4",
+      "object_id": "pringles_small",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/rectangular_frying_pan/3",
+      "object_id": "rectangular_frying_pan",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/rectangular_frying_pan/4",
+      "object_id": "rectangular_frying_pan",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/scotch_tape/0",
+      "object_id": "scotch_tape",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/scotch_tape/1",
+      "object_id": "scotch_tape",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/scotch_tape/2",
+      "object_id": "scotch_tape",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/scotch_tape/3",
+      "object_id": "scotch_tape",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/scotch_tape/4",
+      "object_id": "scotch_tape",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/screwdriver/0",
+      "object_id": "screwdriver",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/screwdriver/1",
+      "object_id": "screwdriver",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/screwdriver/2",
+      "object_id": "screwdriver",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/screwdriver/3",
+      "object_id": "screwdriver",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/servingbowl_small/0",
+      "object_id": "servingbowl_small",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/servingbowl_small/1",
+      "object_id": "servingbowl_small",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/servingbowl_small/2",
+      "object_id": "servingbowl_small",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/servingbowl_small/3",
+      "object_id": "servingbowl_small",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/servingbowl_small/4",
+      "object_id": "servingbowl_small",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/servingbowl_small/5",
+      "object_id": "servingbowl_small",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/servingbowl_small/6",
+      "object_id": "servingbowl_small",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/servingbowl_small/7",
+      "object_id": "servingbowl_small",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/servingbowl_small/8",
+      "object_id": "servingbowl_small",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/smallbowl/0",
+      "object_id": "smallbowl",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/smallbowl/1",
+      "object_id": "smallbowl",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/smallbowl/2",
+      "object_id": "smallbowl",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/smallbowl/3",
+      "object_id": "smallbowl",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/smallbowl/4",
+      "object_id": "smallbowl",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/smallbowl/5",
+      "object_id": "smallbowl",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spam_can/0",
+      "object_id": "spam_can",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spam_can/1",
+      "object_id": "spam_can",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spam_can/2",
+      "object_id": "spam_can",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spam_can/3",
+      "object_id": "spam_can",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spam_can/4",
+      "object_id": "spam_can",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spam_can/5",
+      "object_id": "spam_can",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spam_can/6",
+      "object_id": "spam_can",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spam_can/7",
+      "object_id": "spam_can",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spicemill/0",
+      "object_id": "spicemill",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/spicemill/1",
+      "object_id": "spicemill",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/spicemill/2",
+      "object_id": "spicemill",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/spicemill/3",
+      "object_id": "spicemill",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/spicemill/4",
+      "object_id": "spicemill",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/spicemill/5",
+      "object_id": "spicemill",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/spicemill/6",
+      "object_id": "spicemill",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/spicemill/7",
+      "object_id": "spicemill",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/spicemill/8",
+      "object_id": "spicemill",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/spray_bottle/1",
+      "object_id": "spray_bottle",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spray_bottle/2",
+      "object_id": "spray_bottle",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spray_bottle/3",
+      "object_id": "spray_bottle",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spray_bottle/4",
+      "object_id": "spray_bottle",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spray_bottle/5",
+      "object_id": "spray_bottle",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spray_bottle/6",
+      "object_id": "spray_bottle",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spray_bottle/7",
+      "object_id": "spray_bottle",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spray_bottle/8",
+      "object_id": "spray_bottle",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/spray_bottle/9",
+      "object_id": "spray_bottle",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/standing_frame/0",
+      "object_id": "standing_frame",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/standing_frame/1",
+      "object_id": "standing_frame",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/standing_frame/2",
+      "object_id": "standing_frame",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/standing_frame/3",
+      "object_id": "standing_frame",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/standing_frame/4",
+      "object_id": "standing_frame",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/tea_case/0",
+      "object_id": "tea_case",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/tea_case/1",
+      "object_id": "tea_case",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/tea_case/2",
+      "object_id": "tea_case",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/tea_case/3",
+      "object_id": "tea_case",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/tea_case/4",
+      "object_id": "tea_case",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/tennis_ball/0",
+      "object_id": "tennis_ball",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/tennis_ball/1",
+      "object_id": "tennis_ball",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/tennis_ball/2",
+      "object_id": "tennis_ball",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/tennis_ball/3",
+      "object_id": "tennis_ball",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/tennis_ball/4",
+      "object_id": "tennis_ball",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/tennis_ball/5",
+      "object_id": "tennis_ball",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/toothbrush_holder/1",
+      "object_id": "toothbrush_holder",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/toothbrush_holder/10",
+      "object_id": "toothbrush_holder",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/toothbrush_holder/11",
+      "object_id": "toothbrush_holder",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/toothbrush_holder/2",
+      "object_id": "toothbrush_holder",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush/0",
+      "object_id": "washing_brush",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush/1",
+      "object_id": "washing_brush",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush/2",
+      "object_id": "washing_brush",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush/3",
+      "object_id": "washing_brush",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush/4",
+      "object_id": "washing_brush",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush/5",
+      "object_id": "washing_brush",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush/6",
+      "object_id": "washing_brush",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush/7",
+      "object_id": "washing_brush",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush/8",
+      "object_id": "washing_brush",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush2/0",
+      "object_id": "washing_brush2",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush2/1",
+      "object_id": "washing_brush2",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush2/3",
+      "object_id": "washing_brush2",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush2/4",
+      "object_id": "washing_brush2",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush2/5",
+      "object_id": "washing_brush2",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush2/6",
+      "object_id": "washing_brush2",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/washing_brush2/7",
+      "object_id": "washing_brush2",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/wateringcan/0",
+      "object_id": "wateringcan",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/wateringcan/1",
+      "object_id": "wateringcan",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/wateringcan/2",
+      "object_id": "wateringcan",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/wateringcan/6",
+      "object_id": "wateringcan",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/wateringcan/8",
+      "object_id": "wateringcan",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_candle_holder/0",
+      "object_id": "white_candle_holder",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_candle_holder/2",
+      "object_id": "white_candle_holder",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_candle_holder/3",
+      "object_id": "white_candle_holder",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_candle_holder/4",
+      "object_id": "white_candle_holder",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_candle_holder/6",
+      "object_id": "white_candle_holder",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_pen_cup/1",
+      "object_id": "white_pen_cup",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_pen_cup/2",
+      "object_id": "white_pen_cup",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_pen_cup/3",
+      "object_id": "white_pen_cup",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_pen_cup/4",
+      "object_id": "white_pen_cup",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_pen_cup/6",
+      "object_id": "white_pen_cup",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_soap_dish/0",
+      "object_id": "white_soap_dish",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/white_soap_dish/1",
+      "object_id": "white_soap_dish",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/white_soap_dish/2",
+      "object_id": "white_soap_dish",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/white_soap_dish/3",
+      "object_id": "white_soap_dish",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/white_soap_dish/4",
+      "object_id": "white_soap_dish",
+      "success": false,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/white_soap_dish/6",
+      "object_id": "white_soap_dish",
+      "success": true,
+      "split": "val"
+    },
+    {
+      "episode_id": "inspire_dftp/white_wood_handle_watering_can/0",
+      "object_id": "white_wood_handle_watering_can",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_wood_handle_watering_can/1",
+      "object_id": "white_wood_handle_watering_can",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_wood_handle_watering_can/10",
+      "object_id": "white_wood_handle_watering_can",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_wood_handle_watering_can/11",
+      "object_id": "white_wood_handle_watering_can",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_wood_handle_watering_can/2",
+      "object_id": "white_wood_handle_watering_can",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_wood_handle_watering_can/3",
+      "object_id": "white_wood_handle_watering_can",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_wood_handle_watering_can/4",
+      "object_id": "white_wood_handle_watering_can",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_wood_handle_watering_can/5",
+      "object_id": "white_wood_handle_watering_can",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_wood_handle_watering_can/6",
+      "object_id": "white_wood_handle_watering_can",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_wood_handle_watering_can/7",
+      "object_id": "white_wood_handle_watering_can",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_wood_handle_watering_can/8",
+      "object_id": "white_wood_handle_watering_can",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/white_wood_handle_watering_can/9",
+      "object_id": "white_wood_handle_watering_can",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/wipe/0",
+      "object_id": "wipe",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/wipe/1",
+      "object_id": "wipe",
+      "success": true,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/wipe/6",
+      "object_id": "wipe",
+      "success": false,
+      "split": "test"
+    },
+    {
+      "episode_id": "inspire_dftp/wood_organizer/0",
+      "object_id": "wood_organizer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/wood_organizer/1",
+      "object_id": "wood_organizer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/wood_organizer/2",
+      "object_id": "wood_organizer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/wood_organizer/3",
+      "object_id": "wood_organizer",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/wood_organizer/4",
+      "object_id": "wood_organizer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/wood_organizer/5",
+      "object_id": "wood_organizer",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/wood_organizer/6",
+      "object_id": "wood_organizer",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/work_lamp/0",
+      "object_id": "work_lamp",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/work_lamp/13",
+      "object_id": "work_lamp",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/work_lamp/15",
+      "object_id": "work_lamp",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/work_lamp/2",
+      "object_id": "work_lamp",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/work_lamp/3",
+      "object_id": "work_lamp",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/work_lamp/4",
+      "object_id": "work_lamp",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/work_lamp/5",
+      "object_id": "work_lamp",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/work_lamp/6",
+      "object_id": "work_lamp",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/work_lamp/7",
+      "object_id": "work_lamp",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/work_lamp/8",
+      "object_id": "work_lamp",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/work_lamp/9",
+      "object_id": "work_lamp",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/yellow_funnel/0",
+      "object_id": "yellow_funnel",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/yellow_funnel/1",
+      "object_id": "yellow_funnel",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/yellow_funnel/2",
+      "object_id": "yellow_funnel",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/yellow_funnel/3",
+      "object_id": "yellow_funnel",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/yellow_funnel/4",
+      "object_id": "yellow_funnel",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/yellow_wash_tub/0",
+      "object_id": "yellow_wash_tub",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/yellow_wash_tub/1",
+      "object_id": "yellow_wash_tub",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/yellow_wash_tub/2",
+      "object_id": "yellow_wash_tub",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/yellow_wash_tub/3",
+      "object_id": "yellow_wash_tub",
+      "success": false,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/yellow_wash_tub/4",
+      "object_id": "yellow_wash_tub",
+      "success": true,
+      "split": "train"
+    },
+    {
+      "episode_id": "inspire_dftp/yellow_wash_tub/5",
+      "object_id": "yellow_wash_tub",
+      "success": true,
+      "split": "train"
+    }
+  ]
+}

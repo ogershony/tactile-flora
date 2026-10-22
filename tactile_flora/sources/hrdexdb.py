@@ -33,9 +33,11 @@ verified 2026-10-21 from the HF API and file headers (docs/research/datasets.md 
   ``meta["gripper_is_proxy"]``.
 - Cameras: the first camera serial (sorted) in ``vid/`` is used as "scene". UNVERIFIED which
   serial is a sensible scene view; ``cam_param/`` or cameras.parquet may carry roles.
-- Clock: the sync of the mp4s to the sensor time files is not documented. ASSUMPTION: the first
-  video frame coincides with the earliest sample of the used sensor streams, so
-  ``meta["clock_offset_s"]`` is that earliest timestamp. Not verified.
+- Clock: legacy runs assume video starts with the earliest used sensor sample. Opt in with
+  ``hrdexdb_use_video_timestamps`` to map sensor time to encoded video time using the recorded
+  ``raw/timestamps/{timestamp,frame_id}.npy``. The upstream viewer uses one-based frame IDs;
+  both start offset and capture/encoded clock-rate differences are accounted for. Missing or
+  incomplete timelines raise rather than silently reverting to the legacy assumption.
 - Native label: outcome 5 if ``grasp_result.json`` grasp_success is true, else 1 (binary;
   criterion in the paper: lifted and held 10 s). No label when success is null/absent (human).
 - Session / split key: hand type. Every episode goes to split "benchmark".
@@ -104,6 +106,52 @@ def _signed_force(values: np.ndarray) -> np.ndarray:
     ):
         out = np.where(out >= 32768, out - 65536, out)
     return out
+
+
+def video_clock(trial: Path, sensor_time: np.ndarray, fps: float, n_frames: int):
+    """Map recorded sensor time to encoded video seconds using upstream one-based frame IDs.
+
+    Only sensor samples inside the recorded video interval are retained. Missing internal
+    frame timestamps are interpolated; offsets and clock-rate differences are both handled.
+    The upstream viewer uses frame_id - 1 as the zero-based video frame position.
+    """
+    directory = trial / "raw/timestamps"
+    timestamps = np.load(directory / "timestamp.npy", allow_pickle=False).reshape(-1)
+    frames = np.load(directory / "frame_id.npy", allow_pickle=False).reshape(-1)
+    if (
+        len(timestamps) < 2
+        or len(timestamps) != len(frames)
+        or not np.isfinite(timestamps).all()
+        or not np.isfinite(frames).all()
+        or not (np.diff(timestamps) > 0).all()
+        or not (np.diff(frames) > 0).all()
+        or not np.equal(frames, np.floor(frames)).all()
+        or frames[0] != 1
+        or frames[-1] != n_frames
+        or fps <= 0
+    ):
+        raise ValueError(f"invalid or incomplete recorded video timeline: {trial}")
+    mask = (sensor_time >= timestamps[0]) & (sensor_time <= timestamps[-1])
+    if np.count_nonzero(mask) < 2:
+        raise ValueError(f"sensor stream does not overlap recorded video: {trial}")
+    mapped = np.interp(sensor_time[mask], timestamps, (frames - 1) / fps)
+    if not (np.diff(mapped) > 0).all():
+        raise ValueError(f"non-increasing sensor/video clock mapping: {trial}")
+    return (
+        mask,
+        mapped,
+        {
+            "method": "recorded_video_timestamps",
+            "video_start_epoch_s": float(timestamps[0]),
+            "video_start_minus_sensor_start_s": float(timestamps[0] - sensor_time[0]),
+            "capture_span_s": float(timestamps[-1] - timestamps[0]),
+            "encoded_span_s": float((frames[-1] - 1) / fps),
+            "timestamp_rows": len(timestamps),
+            "missing_frame_timestamps": int(n_frames - len(frames)),
+            "max_capture_gap_s": float(np.diff(timestamps).max()),
+            "samples_outside_video": int(len(sensor_time) - mask.sum()),
+        },
+    )
 
 
 @register_source("hrdexdb")
@@ -200,6 +248,11 @@ class HrdexdbAdapter:
         # SourceRootReader prepends the configured root to relative VideoRef paths. Resolve here
         # because ``trial`` already includes that root (which may itself be a relative path).
         scene_ref = probe_video(vids[0].resolve())
+        alignment = {"method": "legacy_sensor_origin"}
+        if self.cfg.hrdexdb_use_video_timestamps:
+            mask, t, alignment = video_clock(trial, t_raw, scene_ref.fps, scene_ref.n_frames or 0)
+            f_a, f_b, g = f_a[mask], f_b[mask], g[mask]
+            offset = alignment["video_start_epoch_s"]
         duration = scene_ref.n_frames / scene_ref.fps if scene_ref.n_frames else float(t[-1])
         rate = rate_from_times(t, fps)
         return Episode(
@@ -229,6 +282,7 @@ class HrdexdbAdapter:
                 "force_units": "raw sensor units (undocumented), signed-int16 decoded then abs",
                 "gripper_is_proxy": True,
                 "fps": fps,
+                "clock_alignment": alignment,
             },
         )
 

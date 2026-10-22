@@ -36,6 +36,8 @@ class SourceConfig(_Strict):
     eval_only: bool
     expected_label_rate: float = Field(ge=0, le=1)
     split_rules: dict[str, Any] = Field(default_factory=dict)
+    # Opt in for HRDexDB runs with downloaded raw/timestamps/{timestamp,frame_id}.npy.
+    hrdexdb_use_video_timestamps: bool = False
     seed: int
 
 

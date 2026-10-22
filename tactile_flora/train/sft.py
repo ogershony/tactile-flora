@@ -147,7 +147,8 @@ def train_steps(
 ) -> list[float]:
     """Run the loop over ``batches`` (one micro-batch each); return the loss of every step.
 
-    Every ``accum`` micro-batches make one optimizer step (a trailing partial group steps too).
+    Every ``accum`` micro-batches make one optimizer step. An ``accumulation_end`` marker
+    closes a short global batch so accumulation cannot cross an epoch boundary.
     ``keep_logits`` passes ``logits_to_keep`` so only the answer suffix is projected to the
     vocabulary (HF models). With ``run_dir`` it writes loss.csv and log.jsonl.
     """
@@ -169,7 +170,11 @@ def train_steps(
     t_last = time.monotonic()
     try:
         while True:
-            group = list(itertools.islice(it, accum))
+            group = []
+            for batch in itertools.islice(it, accum):
+                group.append(batch)
+                if batch.get("accumulation_end", False):
+                    break
             if not group:
                 break
             optimizer.zero_grad(set_to_none=True)
@@ -179,7 +184,11 @@ def train_steps(
                     batch = {k: v.to(device) if hasattr(v, "to") else v for k, v in batch.items()}
                 labels = batch["labels"]
                 weight = float(batch.get("loss_weight", 1.0))
-                inputs = {k: v for k, v in batch.items() if k not in ("labels", "loss_weight")}
+                inputs = {
+                    k: v
+                    for k, v in batch.items()
+                    if k not in ("labels", "loss_weight", "accumulation_end")
+                }
                 kept: int | None = None
                 if keep_logits:
                     kept = labels.size(1) - max(0, _first_answer(labels) - 1)
@@ -256,6 +265,7 @@ def _batches(
                 # Every rank must run the same collectives, even for an uneven final group.
                 # Zero-weight padding contributes no gradient; scaling preserves the true mean.
                 batch["loss_weight"] = padded / len(g) if pos < len(g) else 0.0
+                batch["accumulation_end"] = pos + backend.world_size >= padded
                 yield batch
 
 

@@ -15,6 +15,8 @@ def make_plan(tmp_path: Path):
     data.write_bytes(b"frozen manifest")
     core = tmp_path / "train_core.py"
     core.write_text("learning_code = 1\n")
+    normalization = tmp_path / "norm.json"
+    normalization.write_text('{"scale": 1}\n')
     cfg = TrainConfig(
         manifest=str(data),
         base_model="stub",
@@ -34,6 +36,9 @@ def make_plan(tmp_path: Path):
         "configs": {"force": cfg.model_dump()},
         "manifest_sha256": hashlib.sha256(data.read_bytes()).hexdigest(),
         "core_code_sha256": {str(core): hashlib.sha256(core.read_bytes()).hexdigest()},
+        "input_sha256": {
+            str(normalization): hashlib.sha256(normalization.read_bytes()).hexdigest()
+        },
     }
     (tmp_path / "training-plan.json").write_text(json.dumps(plan))
     return cfg, data, core
@@ -49,7 +54,7 @@ def test_only_the_planned_job_uses_the_frozen_generation_version(tmp_path, monke
     assert planned_report_version(tmp_path, cfg) == "pinned-generation-version"
 
 
-@pytest.mark.parametrize("changed", ["config", "manifest", "code"])
+@pytest.mark.parametrize("changed", ["config", "manifest", "code", "normalization"])
 def test_active_plan_refuses_changed_learning_inputs(tmp_path, monkeypatch, changed):
     cfg, data, core = make_plan(tmp_path)
     monkeypatch.setenv("SLURM_JOB_ID", "123")
@@ -57,7 +62,9 @@ def test_active_plan_refuses_changed_learning_inputs(tmp_path, monkeypatch, chan
         cfg = cfg.model_copy(update={"epochs": 8})
     elif changed == "manifest":
         data.write_bytes(b"different examples")
-    else:
+    elif changed == "code":
         core.write_text("learning_code = 2\n")
+    else:
+        (tmp_path / "norm.json").write_text('{"scale": 2}\n')
     with pytest.raises(ValueError):
         planned_report_version(tmp_path, cfg)
