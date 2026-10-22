@@ -4,6 +4,8 @@ The active working subset is now **25 train / 13 validation** episodes after an 
 all 48 local pilot clips. See [the cleaned dataset](cleaned-dataset.md) for exclusions,
 manifests, provenance and runnable configs. The snapshot and scores below describe the
 original 32/16 pilot; they have not been rewritten as cleaned-subset results.
+Matched force/control training and its queued evaluation are described in
+[the current training experiment](clean-training.md); final results are pending.
 
 This is an exploratory single-hand outcome experiment on 32 training episodes and 16
 validation episodes. Training and validation have disjoint episodes and object names.

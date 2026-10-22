@@ -13,6 +13,10 @@ Slurm job 6321 runs the two trainings sequentially on Matthew's two MI210s with 
 FSDP. Job 6322 is queued with an after-success dependency to evaluate both adapters and the
 released model. Monster's three additional MI210s were configured but unavailable
 (`DOWN+DRAIN+NOT_RESPONDING`) when checked.
+The launcher verifies the active job's planned configuration, manifest and core-code hashes
+before using its pinned report-generation version. This permits documentation commits and
+pushes during the experiment without changing its learning inputs; other launches retain
+the standard stale-manifest check.
 
 Local artifacts under `data/acceptance/hrdexdb-clean-v1/`:
 
