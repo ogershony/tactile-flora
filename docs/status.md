@@ -13,7 +13,10 @@ Recorded video timestamps omitted from the pilot download reveal both start offs
 capture/encoded clock drift. A new explicit source-config option maps sensor time to video
 time; legacy runs retain their previous clock behavior. The aligned released real-force
 diagnostic scores 69.2% (9/13), including refitted normalization, versus 61.5% previously.
-Expanded training preflights pass; no expanded trained-model score is available yet.
+Expanded training preflights pass. Matched force/control training is running as Slurm 6329
+on two MI210s, with development evaluation 6330 and new-test evaluation 6331 queued on
+success dependencies. Each run plans four epochs / 88 updates. No expanded trained-model
+score is available yet.
 See [the expanded experiment](experiments/hrdexdb-expanded-v2.md).
 
 Active HRDexDB working data: **25 train / 13 validation** episodes under

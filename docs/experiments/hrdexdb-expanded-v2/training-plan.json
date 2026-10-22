@@ -1,0 +1,167 @@
+{
+  "scope": "350 aligned training clips; 136 development and 115 new object-disjoint test clips",
+  "base_model": "/home/ogershony/tactile-flora/data/acceptance/released-inference/hub/models--nvidia--Flora-Rewarder/snapshots/7de68d22c4a9decec5ddb7f86ddcaee8f82d3367",
+  "configs": {
+    "force": {
+      "manifest": "data/acceptance/hrdexdb-expanded-v2/manifest/hrdexdb-sft.parquet",
+      "base_model": "/home/ogershony/tactile-flora/data/acceptance/released-inference/hub/models--nvidia--Flora-Rewarder/snapshots/7de68d22c4a9decec5ddb7f86ddcaee8f82d3367",
+      "force_mode": "real",
+      "seed": 17,
+      "epochs": 4,
+      "learning_rate": 2e-05,
+      "warmup_frac": 0.1,
+      "grad_clip": 1.0,
+      "effective_batch": 16,
+      "lora": {
+        "rank": 32,
+        "alpha": 64,
+        "target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj",
+          "gate_proj",
+          "up_proj",
+          "down_proj"
+        ]
+      },
+      "output_dir": "data/acceptance/hrdexdb-expanded-v2/runs"
+    },
+    "control": {
+      "manifest": "data/acceptance/hrdexdb-expanded-v2/manifest/hrdexdb-sft.parquet",
+      "base_model": "/home/ogershony/tactile-flora/data/acceptance/released-inference/hub/models--nvidia--Flora-Rewarder/snapshots/7de68d22c4a9decec5ddb7f86ddcaee8f82d3367",
+      "force_mode": "omitted",
+      "seed": 17,
+      "epochs": 4,
+      "learning_rate": 2e-05,
+      "warmup_frac": 0.1,
+      "grad_clip": 1.0,
+      "effective_batch": 16,
+      "lora": {
+        "rank": 32,
+        "alpha": 64,
+        "target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj",
+          "gate_proj",
+          "up_proj",
+          "down_proj"
+        ]
+      },
+      "output_dir": "data/acceptance/hrdexdb-expanded-v2/runs"
+    }
+  },
+  "manifest_sha256": "97aa546966411acc9fba28c959a4f4e3cada818e7f0cc41bc97604f0573b03fc",
+  "validation_manifest_sha256": "ed814edb18e231549328ffb5db8b8e16b86b62b1f2a7325378f8cdba0f0ded1d",
+  "test_manifest_sha256": "863fbd8ea30a0f7d39edc9d0025505b62e683e341c2155c9ce0f198fba79ce40",
+  "git_hash": "61ce71832672862a8bc0d9b254a6f509e532dcab",
+  "actual_launch_git_hash": "9beaecbc7c738b9f498288869cfedff14a58e252",
+  "report_version_note": "Manifest-generation commit is pinned; actual learning code and inputs are checked by hashes before each run.",
+  "core_code_sha256": {
+    "tactile_flora/__init__.py": "3224e1485b8c492e54b9eabb79ea848a84481b1c6141b704d8a1e7527bddd7be",
+    "tactile_flora/baxter/__init__.py": "0074a61a6ec1cbc82950975c7d666b35d5a450f214a82d74f71d678a664cb1e0",
+    "tactile_flora/baxter/calibrate.py": "f5a23413330bfc5a62dc8ad7e92ed41a1a2df9c643df655bbe271019af3518d7",
+    "tactile_flora/baxter/calibration.py": "5d90b5e3030b2f4b52b18a63128063a492ca31d7b4e5f7f410d6887ed9dba83a",
+    "tactile_flora/baxter/label.py": "d505ea538740a411317677b71f835283ab27946ee76d881d48a09ba4cea8e75c",
+    "tactile_flora/baxter/ros/__init__.py": "b75c61bb2b2210f46b905e28832e2f38edd33302365e92bf8a66b94f97dae2c3",
+    "tactile_flora/baxter/ros/fsr_node.py": "7bde612175fbd9c052b24b5d4724ad3bf5e4b850ec25f1e1a55161ad07f5c68a",
+    "tactile_flora/baxter/ros/recorder.py": "884249022c0293d59b119945cf7bba058766e5161aa7bab22e1f47154e7d052a",
+    "tactile_flora/baxter/ros/transport.py": "ff665518f091a82ed12abc8d79f5219dcb8264f7d4c8929357d2c2c998a2c1a3",
+    "tactile_flora/baxter/serial_protocol.py": "10328f16bb70698c2347cb7113b4b5643322f9ba0fb48561b1f1ec0d1d34d202",
+    "tactile_flora/baxter/to_lerobot.py": "51f586128a58637802d48efb76fb4dad7bcab8589088dabccb654f3b567fcc01",
+    "tactile_flora/cli.py": "ec2d71920ff4bf4ea57bfd226c2be546ea896db85a103e39957af89f0f8ee6a9",
+    "tactile_flora/config.py": "616c6537e398fc34b7a80dc6128323dbb40ee29539422968402c49ed491ee7a4",
+    "tactile_flora/eval/__init__.py": "8c3525469cfe41dab63a7c03fb7e1f11756319aef8a1d4415f22230e1014cdca",
+    "tactile_flora/eval/ablations.py": "d9d9d8c6068e24c48acb8386d15c56b7a5dc03ac8e24e2851fe7fa03c86bc91f",
+    "tactile_flora/eval/cache.py": "6757ad70e8b9ff09000fb88b1af07c4de7ad5fb964c72dd420cae2ca5a45c188",
+    "tactile_flora/eval/harness.py": "ed0d2df038fd7e4115af263e9c335f281899d1b8b85f659541a7f61d00962eeb",
+    "tactile_flora/eval/inference.py": "64e57f5332b8cdf65c2f0655191a8b91dbdba9f8ba7f01149dffcde79affb32b",
+    "tactile_flora/eval/metrics.py": "4fb33dfd9e34f2aca689d4f53d04ae0fb1c087f71aae44db5ab0d736e4632e49",
+    "tactile_flora/eval/roboreward.py": "6cddd3a24da3646d1a491a141d1e7be4c2d307ed1397a24d76a541c39d79a099",
+    "tactile_flora/force/__init__.py": "af7e0e42ff1ce70de4324f70bebc41b634020628af32ef2c361c96c33f3f6c05",
+    "tactile_flora/force/normalize.py": "a1e8e319123fe135c029447de48fc3aaabee5ad1f021005d250437ec1c3b3e1e",
+    "tactile_flora/force/render.py": "749eac296fbc020f54dc94c59440811bcc8853181b200c310941e10e3442be3b",
+    "tactile_flora/force/resample.py": "91d76ea29896d16ff5ca08db7b672ebbdb38f1fdaebe1151681d2f2e621eaf7a",
+    "tactile_flora/labels/__init__.py": "3c49c8935fcfbb566bb97a58b4d19d12f703b30b285a13878bfd96712644f685",
+    "tactile_flora/labels/events.py": "3a1e2fd06573bad2e867ad3e392b4c9478d251b7bf0941ea60c6d812c4fd18d7",
+    "tactile_flora/labels/mapping.py": "7c854d269b337032dff207ccab190ca8b801e434f57b1858f8def5e363e410a5",
+    "tactile_flora/labels/merge.py": "de021d1f33ae163dbbf5bcb33100113e0b47b85a69b0c3a987328770a2490ea4",
+    "tactile_flora/labels/pseudo.py": "0723396a4283714f4a24f56efe406c27dce12a8d336266e7163fb12418e0ac2b",
+    "tactile_flora/labels/windows.py": "62aef8e7425750141165d1586ab47a8dbbbd06b2168acab6047de024123234ca",
+    "tactile_flora/prompts/__init__.py": "1f376fdcf2dd0ea4cd246e93844c18e65e12f0440a1a37879b8ee13f22103040",
+    "tactile_flora/prompts/flora.py": "bf575a29ac3b33cd8eddd2afe03dbbe5829e70dc550073cf255dfd2a4266164a",
+    "tactile_flora/prompts/parse.py": "1ec053bf6fb63e002220b476eb2fa3bcd0792125eb3b1469a847b4938001c5bb",
+    "tactile_flora/prompts/templates.py": "bc5e96b21ceeefc7db4ce662f6dbb072c6c0944e4e83c6c827a9c487837bc559",
+    "tactile_flora/schema.py": "1ff8f9e45bd67324952803e0baeaa589cf06b938ce307b5c94ff8ba318f98042",
+    "tactile_flora/sources/__init__.py": "014077521e8e8f4d7d694dd97327941a7eb4b52ce8b0212ae451667f54249c58",
+    "tactile_flora/sources/_common.py": "9ea95b253a3155e1ded07579fd9e12ff26ec76ca5174886d686ceeeabbd7044a",
+    "tactile_flora/sources/_eval_common.py": "c8369c9bbef0356beb07ec97cd558e5966a9fb4a521bfedec082e98353af61e8",
+    "tactile_flora/sources/_lerobot.py": "2d8a5cc532373e6291734ffebbf51388363f6ef466930c79ae67155aa8763cc6",
+    "tactile_flora/sources/airoa.py": "e40f9a2a069a64fee0c3a2ed2eb34db5828fd5d4e1319fefcfc49318866ef8c7",
+    "tactile_flora/sources/base.py": "8a799627b815d8ea0c77374b5f15bffca31a717a18fe9c4629eecfd8cd4fe3ee",
+    "tactile_flora/sources/baxter.py": "e7b0c742c1a60a18e96077a9f400580da227b9e86fcccb58ab989a1c727dfdeb",
+    "tactile_flora/sources/hrdexdb.py": "d9632c326ea50d4fb8f5a227e8dbfc708d046c4b06feecd02d8f6c521c65066c",
+    "tactile_flora/sources/phantom.py": "7fcbe25cea58b5d2a29b7c48604e153ff89e00334d1070ba55fc34fdc79fe7c2",
+    "tactile_flora/sources/reassemble.py": "7084dd34f8c8ab33b6219bf2dd246b30c6e0891916695e3b43071a7a2cd709f0",
+    "tactile_flora/sources/rh20t.py": "ff5841e005b9b8eac35e8bd0d1d2ce777ca08bf16fa6be006daa3817859c2838",
+    "tactile_flora/sources/sharpadex.py": "f79275fe3689cc1b6df39fcf6dda90c52a97c31600db6f6aa67011f233d83e45",
+    "tactile_flora/sources/softvtbench.py": "1e7e199154ead3b6964cdf27d4a81c6bf0e07d1ea1520d084c3432c1b4a0512a",
+    "tactile_flora/train/__init__.py": "15503e3f9f3a2711597337c17339f3f3dc0b52826cf1dbab579cf755c2bf0cf7",
+    "tactile_flora/train/dataset.py": "849de456b919c1f02a47c0e0e51bf2429a6b2df20f9c76fa5807df473bfb6862",
+    "tactile_flora/train/sft.py": "4725d8a2e9f43ad1d94424eb0555dd94a216c36bbcdba9fb7d60be0dd29faf75",
+    "tactile_flora/verify/__init__.py": "fa6057c491a5199bfafa74da33fa89b54146e02bc3c2e5e98dc1502679d1d3c1",
+    "tactile_flora/verify/checks.py": "91b5915dfe4ab70d74020cf077858e72f5ee5a21032af91e2ce75fe6a2f7646d",
+    "tactile_flora/verify/hashing.py": "85cd262b6278cb279ec04d6bd2c5302c6b2c685b13608827b9c478d8f68e742a",
+    "tactile_flora/verify/manifest.py": "3f9b9be45f49296207388577d14e88eac4db7a005e5e7304f6337abfc65db39e",
+    "tactile_flora/verify/report.py": "c4bbba662cfc0475487f6d5022b1d4849e57432bb6536e269d960352d31405d1",
+    "tactile_flora/verify/windowing.py": "f098ea63b0ceefa1bb31eadaaf4aaef297ce6ac54320ae201d59e15c733ec82d",
+    "tactile_flora/video/__init__.py": "ed60c868b556c969deaa21c21ce2895d5e4d9a2681ab76912042fb3bf11b05bb",
+    "tactile_flora/video/mosaic.py": "ffb78b68b046240eb35f9f123af9c445f32de5c37a2eedcfad2ede9fed03d50b",
+    "tactile_flora/video/readers.py": "7eb692ce5cc1c7cc3825d6f0c2d1bf409bbe63800519cb5dad00ab6141102409",
+    "tactile_flora/video/zarr_compat.py": "88b9e6e8c17d34c4c87d747625e6d11a8c41f841e9d97462d8be0fad14e58f34"
+  },
+  "input_sha256": {
+    "data/acceptance/hrdexdb-expanded-v2/config/sources/hrdexdb.yaml": "182ea28ff74fab1892e62496ff860e7413c7c1ed65cdfe5b212b7b9119a4237b",
+    "data/acceptance/hrdexdb-expanded-v2/config/train-hrdexdb.yaml": "2b8de3ca480020338a04f92c0588bed6c0801c9b978aac29b93f60433c2e4a1a",
+    "data/acceptance/hrdexdb-expanded-v2/config/train-control.yaml": "2d34e0882b580568103eb3bdc279eaae881d07ad9e659c54bda53c0bc4c1a427",
+    "data/acceptance/hrdexdb-expanded-v2/verified/hrdexdb/norm.json": "677ac72a0f1b06d1bb94201d88b164f95263dcbee1d231ddb20e7c8d4bd672c4",
+    "data/acceptance/hrdexdb-expanded-v2/manifest/holdout_ids.json": "514dfce6c4c3ef94826bcb2ad6b95e1d6bbb60bd7855a8fbb582886da807c145",
+    "data/acceptance/hrdexdb-expanded-v2/download-plan.json": "69acf911b3f2240458fa8b435a528edb7e5e30d9edc3364ed2c03330773f7432",
+    "data/acceptance/hrdexdb-expanded-v2/download-receipts.json": "3242b04bb8cf462b564fbba21e962e362ea0a00054b0b7797aa0e70e3aed5724",
+    "data/acceptance/hrdexdb-expanded-v2/alignment-audit.json": "e9a2449bea9d9b10f101b0708185d894eeb93df15492e8c72c0581cb4e48de2f",
+    "data/acceptance/released-inference/force.real-tokenizer.yaml": "219dba7fb4d3c94a09688eeda02ef6d88c4c618dc0cdc3ffad6c32b2156ca833"
+  },
+  "orchestration_sha256": {
+    "scripts/cluster/run_hrdexdb_sft.py": "538ee46faaf46ebd2fe03b5b5ecae1d481c2a5fc1ac9600a4f073121030f8b3a",
+    "scripts/cluster/evaluate_hrdexdb_clean.py": "74be8ca112c1fce91bdee15dd9c5bbeb9b75b2357498c850c9dc84e64cee8357",
+    "data/acceptance/hrdexdb-expanded-v2/jobs/train.sbatch": "473fcf289fb96b7a54861b49e13df351b76294898593d8a56571ca1f8b45022d",
+    "data/acceptance/hrdexdb-expanded-v2/jobs/eval-val.sbatch": "86adcf11da4ed19b655cb4264f8eb66f00e318d62d2c8cf16f30f3e3d5e3dee5",
+    "data/acceptance/hrdexdb-expanded-v2/jobs/eval-test.sbatch": "c0e4706f0b652f21b31a57703dd43cd217002ba1d9dd4e42b169d03f3c8e52e6"
+  },
+  "slurm_training_job": 6329,
+  "slurm_account": "scc",
+  "slurm_qos": "long",
+  "hardware": "matthew: 2 MI210; monster: 3 additional MI210 unavailable",
+  "selection": "Fixed four epochs from released base, seed17; final adapters only; no tuning/checkpoint selection on development or test.",
+  "optimizer_steps_per_run": 88,
+  "evaluation_conditions": {
+    "released": [
+      "omitted",
+      "real"
+    ],
+    "expanded-v2-control": [
+      "omitted"
+    ],
+    "expanded-v2-force": [
+      "real",
+      "shuffled"
+    ]
+  },
+  "frozen_at_utc": "2026-10-22T06:12:30.899341+00:00",
+  "slurm_evaluation_jobs": {
+    "val": 6330,
+    "test": 6331
+  }
+}

@@ -80,3 +80,17 @@ fully, totaling 519,472 frames. No additional labels were flipped or independent
 Both training preflights pass with exactly 350 samples and no frozen holdout leakage.
 Each four-epoch run plans 88 optimizer updates, including its short final batch each epoch.
 Both source configs and train-only normalization are frozen before training.
+
+Training is running as Slurm **6329**, using two MI210s on Matthew, with development
+evaluation **6330** dependent on successful training and test evaluation **6331** dependent
+on successful development evaluation. Both evaluations use the same fixed five conditions
+as the pilot. The training allocation has a 12-hour limit; each evaluation has a four-hour
+limit. No expanded model score is available yet. Observed GPUs are two `gfx90a` devices
+with 63.98 GiB each; Monster's three other MI210s remain unavailable.
+
+[The frozen training plan](hrdexdb-expanded-v2/training-plan.json) records all configurations,
+88 planned updates per run, manifest hashes, actual launch commit, pinned generation commit,
+core-code/input hashes and job dependencies. The manifest-generation commit is `61ce718`;
+later documentation and orchestration commits do not change its learning inputs. Runtime
+packages and devices are in [the environment](hrdexdb-expanded-v2/training-environment.json).
+Batch scripts are preserved alongside these files; raw videos and adapters remain local.

@@ -1,0 +1,26 @@
+{
+  "host": "matthew.nodes.scc.sdsc.edu",
+  "torch": "2.12.1+rocm7.1",
+  "hip": "7.1.52802",
+  "packages": {
+    "transformers": "5.8.1",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "numpy": "2.4.6",
+    "av": "15.1.0"
+  },
+  "gpus": [
+    {
+      "index": 0,
+      "name": "AMD Radeon Graphics",
+      "arch": "gfx90a:sramecc+:xnack-",
+      "total_gib": 63.984375
+    },
+    {
+      "index": 1,
+      "name": "AMD Radeon Graphics",
+      "arch": "gfx90a:sramecc+:xnack-",
+      "total_gib": 63.984375
+    }
+  ]
+}
