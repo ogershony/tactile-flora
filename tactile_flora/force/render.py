@@ -1,7 +1,18 @@
 """Rendering normalized features to the force text block, one line per frame.
 
-Owns: render_lines, render_block, token_count, budget_check, load_tokenizer, TokenBudgetError.
+Owns: render_lines, summary_lines, render_block, token_count, budget_check, load_tokenizer,
+TokenBudgetError.
 Must never: resample, normalize, or decide the ablation mode.
+
+Summary lines (``RenderConfig.summary``): one ``summary <arm>:`` line per arm placed between
+the header and the frame lines. They are pure functions of the same normalized features the
+frame lines show (never of labels): contact segments (runs of c=1, single-frame gaps merged),
+longest and total contact seconds, peak F, the hold phase (frames whose closure g is at least
+80% of the window's maximum, or the contact frames when g is absent), its duration, median F,
+late/early median ratio (last quarter over first quarter of the hold) and the fraction of hold
+frames with F under 20% of the hold median. HRDexDB analysis (2026-10-22) showed these
+trial-relative statistics carry more outcome signal than absolute levels: successful grasps
+hold one sustained plateau while failures grip weakly, re-grasp, or lose force late.
 
 Format: two decimals, arms in L then R order, an absent arm written ``L none`` / ``R none``.
 NaN values (empty resample windows) render as 0.00 with c=0. A missing gripper renders g=0.00
@@ -21,6 +32,8 @@ from __future__ import annotations
 import math
 from collections.abc import Sequence
 from typing import Protocol
+
+import numpy as np
 
 from tactile_flora.config import RenderConfig
 from tactile_flora.schema import Arm, ArmFeatures, ResampledForce
@@ -100,11 +113,91 @@ def render_lines(features: ResampledForce, frame_times: Sequence[float], channel
     return lines
 
 
-def render_block(lines: Sequence[str], cfg: RenderConfig) -> str:
-    """Join lines under the header; an empty ``lines`` (control) gives an empty string."""
+def _runs(flags: Sequence[int]) -> list[tuple[int, int]]:
+    """Inclusive index runs of 1s, merging gaps of exactly one frame."""
+    runs: list[tuple[int, int]] = []
+    start: int | None = None
+    for i, f in enumerate(flags):
+        if f and start is None:
+            start = i
+        elif not f and start is not None:
+            runs.append((start, i - 1))
+            start = None
+    if start is not None:
+        runs.append((start, len(flags) - 1))
+    merged: list[tuple[int, int]] = []
+    for a, b in runs:
+        if merged and a - merged[-1][1] <= 2:
+            merged[-1] = (merged[-1][0], b)
+        else:
+            merged.append((a, b))
+    return merged
+
+
+def _seconds(times: Sequence[float], a: int, b: int) -> float:
+    """Duration covered by frames a..b inclusive: span plus one median frame step."""
+    if len(times) < 2:
+        return 0.0
+    step = float(np.median(np.diff(np.asarray(times, dtype=np.float64))))
+    return float(times[b] - times[a]) + step
+
+
+def summary_lines(features: ResampledForce) -> list[str]:
+    """One label-free ``summary <arm>:`` line per arm (see the module docstring)."""
+    times = list(features.frame_times)
+    out: list[str] = []
+    for arm in ("L", "R"):
+        af = features.arms.get(arm)
+        if af is None:
+            continue
+        if af.c is None:
+            raise ValueError("features must be normalized (c missing) before summarizing")
+        F = np.nan_to_num(np.asarray(af.F, dtype=np.float64))
+        c = [int(v) for v in af.c]
+        runs = _runs(c)
+        longest = max((_seconds(times, a, b) for a, b in runs), default=0.0)
+        total = sum(_seconds(times, a, b) for a, b in runs)
+        if af.g is not None and max(af.g) > 0:
+            g = np.asarray(af.g, dtype=np.float64)
+            hold = g >= 0.8 * float(g.max())
+        else:
+            hold = np.asarray(c, dtype=bool)
+        idx = np.flatnonzero(hold)
+        if idx.size:
+            hf = F[idx]
+            median = float(np.median(hf))
+            q = max(1, idx.size // 4)
+            early = float(np.median(hf[:q]))
+            late_early = float(np.median(hf[-q:]) / early) if early > 0 else 0.0
+            low = float(np.mean(hf < 0.2 * median)) if median > 0 else 1.0
+            hold_s = _seconds(times, int(idx[0]), int(idx[-1]))
+        else:
+            median = late_early = hold_s = 0.0
+            low = 1.0
+        out.append(
+            f"summary {arm}: contacts={len(runs)} longest={_fmt(longest)}s "
+            f"total={_fmt(total)}s peak={_fmt(float(F.max()) if F.size else 0.0)} "
+            f"hold={_fmt(hold_s)}s holdF={_fmt(median)} late/early={_fmt(late_early)} "
+            f"low={int(round(100 * low))}%"
+        )
+    return out
+
+
+def render_block(
+    lines: Sequence[str], cfg: RenderConfig, features: ResampledForce | None = None
+) -> str:
+    """Join lines under the header; an empty ``lines`` (control) gives an empty string.
+
+    With ``cfg.summary`` and ``features`` the summary lines go between the header and the
+    frame lines; summary without features is an error (callers must pass what they rendered).
+    """
     if not lines:
         return ""
-    return "\n".join([cfg.header, *lines])
+    if not cfg.summary:
+        return "\n".join([cfg.header, *lines])
+    if features is None:
+        raise ValueError("render.summary needs the rendered features")
+    return "\n".join([cfg.header, *summary_lines(features), *lines])
 
 
 def token_count(block: str, tokenizer: Tokenizer | None = None) -> int:

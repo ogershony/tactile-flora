@@ -96,22 +96,22 @@ def answer_labels(prompt_ids: Sequence[int], full_ids: Sequence[int]) -> list[in
 
 
 def _block(item: WindowItem, mode: ForceMode, pool: Sequence[ResampledForce], seed: int,
-           force_cfg: ForceConfig) -> tuple[list[str], bool]:  # fmt: skip
-    """Return (force lines to render, video_blank); empty lines mean no block."""
+           force_cfg: ForceConfig) -> tuple[list[str], bool, ResampledForce | None]:  # fmt: skip
+    """Return (force lines, video_blank, rendered features); empty lines mean no block."""
     w = item.window
     if item.features is None:
         if mode == "omitted":
-            return [], False
+            return [], False, None
         if mode in ("real", "video_blank"):
             if not w.force_lines:
                 raise ValueError(f"{w.episode_ref}: force_mode {mode} but the window has no force")
-            return list(w.force_lines), mode == "video_blank"
+            return list(w.force_lines), mode == "video_blank", None
         raise ValueError(f"force_mode {mode} needs resampled features (WindowItem.features)")
     ab = apply_force_mode(item.features, mode, pool=pool, seed=seed)
     if ab.features is None:
-        return [], ab.video_blank
+        return [], ab.video_blank, None
     lines = render.render_lines(ab.features, w.frame_times, item.features.channel)
-    return lines, ab.video_blank
+    return lines, ab.video_blank, ab.features
 
 
 def build_samples(
@@ -147,8 +147,8 @@ def build_samples(
     samples: list[Sample] = []
     for row, item in items:
         w = item.window
-        lines, blank = _block(item, force_mode, pool, seed, force_cfg)
-        block = render.render_block(lines, force_cfg.render) if lines else None
+        lines, blank, rendered = _block(item, force_mode, pool, seed, force_cfg)
+        block = render.render_block(lines, force_cfg.render, rendered) if lines else None
         kw: dict[str, Any] = {
             "task": item.task,
             "camera_roles": item.camera_roles,

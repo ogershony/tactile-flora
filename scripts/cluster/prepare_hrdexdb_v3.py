@@ -42,6 +42,7 @@ def main() -> None:
     parser.add_argument("--base", type=Path, default=BASE)
     parser.add_argument("--contact-min-frac", type=float, default=0.05)
     parser.add_argument("--tare-s", type=float, default=1.0)
+    parser.add_argument("--summary", action="store_true", help="Enable render.summary lines.")
     args = parser.parse_args()
     base, previous = args.base, args.previous
     if (base / "manifest").exists():
@@ -70,7 +71,8 @@ def main() -> None:
         update={
             "resample": force_template.resample.model_copy(
                 update={"contact_min_frac": args.contact_min_frac}
-            )
+            ),
+            "render": force_template.render.model_copy(update={"summary": args.summary}),
         }
     )
     (base / "config").mkdir(exist_ok=True)
@@ -101,7 +103,9 @@ def main() -> None:
         )
         lines = render.render_lines(norm, times, ep.force.channel)
         tokens = render.budget_check(
-            render.render_block(lines, force_cfg.render), force_cfg.render.max_tokens, tokenizer
+            render.render_block(lines, force_cfg.render, norm),
+            force_cfg.render.max_tokens,
+            tokenizer,
         )
         arm = norm.arms["R"]
         forces = np.nan_to_num(np.asarray(arm.F, dtype=np.float64))
@@ -114,6 +118,7 @@ def main() -> None:
                 "force_offsets": ep.meta["force_offsets"],
                 "gripper_convention": ep.meta["gripper_convention"],
                 "outcome_block_tokens": tokens,
+                "summary": render.summary_lines(norm) if force_cfg.render.summary else [],
                 "outcome_lines": len(lines),
                 "F_max": float(forces.max()),
                 "F_mean": float(forces.mean()),

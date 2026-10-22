@@ -70,6 +70,9 @@ class RenderConfig(_Strict):
     max_tokens: int
     clip_max: float
     tokenizer_json: str | None = None
+    # Prepend one label-free summary line per arm (contact segments, longest contact, peak,
+    # hold duration, hold force, late/early hold ratio, low-force hold fraction) to the block.
+    summary: bool = False
 
 
 class EventsConfig(_Strict):

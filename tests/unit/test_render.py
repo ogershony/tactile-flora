@@ -106,3 +106,55 @@ def test_time_never_negative_zero() -> None:
         arms={"L": ArmFeatures(F=[0.1], dF=[0.0], g=None, c=[0])},
     )
     assert render_lines(f, [-0.001], "wrist")[0].startswith("t=0.00 ")
+
+
+def _hold_features() -> ResampledForce:
+    # 12 frames at 0.5 s: free, two contact segments separated by a one-frame gap (merged),
+    # then a sustained hold; closure peaks over the last six frames.
+    times = [0.5 * i for i in range(12)]
+    F = [0.0, 0.0, 0.3, 0.4, 0.0, 1.8, 2.0, 2.0, 2.0, 1.9, 0.0, 0.0]
+    c = [0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0]
+    g = [0.1, 0.1, 0.5, 0.6, 0.6, 0.9, 1.0, 1.0, 1.0, 0.95, 0.9, 0.2]
+    return ResampledForce(
+        channel="pad",
+        frame_times=times,
+        arms={"R": ArmFeatures(F=F, delta=[0.0] * 12, dF=[0.0] * 12, g=g, c=c)},
+    )
+
+
+def test_summary_lines_describe_contacts_and_hold() -> None:
+    from tactile_flora.force.render import summary_lines
+
+    (line,) = summary_lines(_hold_features())
+    # One merged contact run of frames 2..9 (gap at frame 4 merged): 4.0 s; peak 2.00.
+    # Hold = closure >= 0.8 * max: frames 5..10 (3.0 s); hold F median 1.90, early quarter
+    # (first frame, 1.8) vs late quarter (last frame, 0.0) -> 0.00; one of six below 20%; the
+    # hold median is the mean of the middle two sorted values (1.9, 2.0).
+    assert line == (
+        "summary R: contacts=1 longest=4.00s total=4.00s peak=2.00 hold=3.00s holdF=1.95 "
+        "late/early=0.00 low=17%"
+    )
+
+
+def test_summary_lines_fall_back_to_contact_frames_without_closure() -> None:
+    from tactile_flora.force.render import summary_lines
+
+    f = _hold_features()
+    f.arms["R"] = f.arms["R"].model_copy(update={"g": None})
+    (line,) = summary_lines(f)
+    assert "hold=4.00s" in line and "contacts=1" in line
+
+
+def test_render_block_summary_is_gated_and_needs_features() -> None:
+    f = _hold_features()
+    lines = render_lines(f, list(f.frame_times), "pad")
+    plain = render_block(lines, CFG.render)
+    assert "summary" not in plain
+    cfg = CFG.render.model_copy(update={"summary": True})
+    with pytest.raises(ValueError, match="needs the rendered features"):
+        render_block(lines, cfg)
+    block = render_block(lines, cfg, f)
+    assert block.split("\n")[0] == cfg.header
+    assert block.split("\n")[1].startswith("summary R: contacts=1")
+    assert block.split("\n")[2:] == lines
+    assert render_block([], cfg, f) == ""
