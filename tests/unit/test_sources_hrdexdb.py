@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from shutil import copytree
 
@@ -154,3 +155,81 @@ def test_unsupported_hands_raise(tmp_path: Path) -> None:
             a.load(eid)
     assert a.native_labels(ids[0]) == []
     assert np.isclose(1.0, 1.0)
+
+
+def test_tared_excess_subtracts_leading_offsets_and_floors_at_zero() -> None:
+    from tactile_flora.sources.hrdexdb import tared_excess
+
+    t = np.array([0.0, 0.5, 1.0, 1.5, 2.0])
+    values = np.array([[100, -20], [102, -22], [98, -18], [1100, -30], [100, 500]])
+    excess, offsets = tared_excess(values, t, tare_s=1.0)
+    np.testing.assert_array_equal(offsets, [100, -20])
+    np.testing.assert_array_equal(excess[:, 0], [0, 2, 0, 1000, 0])
+    np.testing.assert_array_equal(excess[:, 1], [0, 0, 2, 0, 520])
+    # A single leading sample is still a valid tare.
+    excess, offsets = tared_excess(values[:1], t[:1], tare_s=0.001)
+    np.testing.assert_array_equal(offsets, [100, -20])
+    np.testing.assert_array_equal(excess, [[0, 0]])
+
+
+def _inspire_trial(root: Path, position: np.ndarray, force: np.ndarray) -> str:
+    from tests.fixtures._video import write_mp4
+
+    trial = root / "inspire_dftp" / "mug" / "0"
+    (trial / "raw" / "hand").mkdir(parents=True)
+    (trial / "grasp_result.json").write_text(json.dumps({"grasp_success": False}))
+    np.save(trial / "raw" / "hand" / "force.npy", force.astype(np.int64))
+    np.save(trial / "raw" / "hand" / "position.npy", position.astype(np.float64))
+    np.save(trial / "raw" / "hand" / "time.npy", 50.0 + np.arange(len(force)) / 30)
+    write_mp4(trial / "vid" / "22641005.mp4", len(force), 30)
+    return "inspire_dftp/mug/0"
+
+
+def test_tared_representation_ranks_channels_by_peak_excess_and_flips_inspire_closure(
+    tmp_path: Path,
+) -> None:
+    n = 12
+    # Channel 1 rests at a large offset (legacy picks it by mean); channel 2 rests at 0 and
+    # spikes on contact; channel 3 rests negative (uint16 wrap) and spikes on contact.
+    force = np.zeros((n, 6))
+    force[:, 1] = 150
+    force[6:, 2] = [600, 600, 0, 0, 0, 0]
+    force[6:, 3] = [300, 300, 300, 0, 0, 0]
+    force[:, 3] -= 40
+    force[:, 4] = 110
+    encoded = np.where(force < 0, force + 65536, force)
+    # Inspire angles: 1000 is open; the hand closes from frame 6.
+    position = np.full((n, 6), 1000.0)
+    position[6:] = 400.0
+    eid = _inspire_trial(tmp_path, position, encoded)
+    legacy = HrdexdbAdapter(_cfg().model_copy(update={"root": str(tmp_path)})).load(eid)
+    assert legacy.meta["tactile_channels"] == [1, 4]
+    assert legacy.gripper is not None
+    assert legacy.gripper.arms["R"][0] == 1.0  # inverted: open hand reported as closed
+    cfg = _cfg().model_copy(
+        update={
+            "root": str(tmp_path),
+            "hrdexdb_force_representation": "tared",
+            "hrdexdb_tare_s": 0.1,
+        }
+    )
+    tared = HrdexdbAdapter(cfg).load(eid)
+    assert tared.meta["tactile_channels"] == [2, 3]
+    assert tared.meta["force_representation"] == "tared"
+    assert tared.meta["gripper_convention"] == "inspire_angle_1000_open"
+    np.testing.assert_allclose(tared.meta["force_offsets"], [0, 150, 0, -40, 110, 0])
+    arm = tared.force.arms["R"]
+    assert arm.kind == "pad"
+    np.testing.assert_allclose(arm.f_a, [0] * 6 + [600, 600] + [0] * 4)
+    np.testing.assert_allclose(arm.f_b, [0] * 6 + [300] * 3 + [0] * 3)
+    assert tared.gripper is not None
+    g = tared.gripper.arms["R"]
+    assert g[0] == 0.0 and g[-1] == 1.0  # open at the start, closed at the end
+    assert list(tared.force.t) == list(legacy.force.t)
+
+
+def test_legacy_fixture_is_unchanged_by_the_representation_default() -> None:
+    assert SourceConfig.model_fields["hrdexdb_force_representation"].default == "legacy"
+    ep = HrdexdbAdapter(_cfg()).load(EID)
+    assert ep.meta["force_representation"] == "legacy"
+    assert ep.meta["force_offsets"] is None

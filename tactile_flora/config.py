@@ -38,6 +38,13 @@ class SourceConfig(_Strict):
     split_rules: dict[str, Any] = Field(default_factory=dict)
     # Opt in for HRDexDB runs with downloaded raw/timestamps/{timestamp,frame_id}.npy.
     hrdexdb_use_video_timestamps: bool = False
+    # HRDexDB force representation. "legacy": absolute raw values, the two channels with the
+    # largest mean, hand closure proxy assuming larger joint values mean more closed. "tared":
+    # per-trial resting offsets (median of the first ``hrdexdb_tare_s`` seconds of the sensor
+    # stream) subtracted and floored at zero, the two channels with the largest peak excess,
+    # and inspire_dftp closure sign-corrected (Inspire angles are 1000 open, 0 closed).
+    hrdexdb_force_representation: Literal["legacy", "tared"] = "legacy"
+    hrdexdb_tare_s: float = Field(default=1.0, gt=0)
     seed: int
 
 
@@ -49,6 +56,10 @@ class ResampleConfig(_Strict):
     group_period_s: float
     raw_rate_hz: float
     contact_sigma: float
+    # Floor on the contact threshold as a fraction of the grasp scale: tau is at least
+    # baseline + contact_min_frac * (grasp - baseline). 0 keeps the pure sigma rule. Needed for
+    # tared integer sensors whose free-space sigma is below one raw unit (HRDexDB inspire_dftp).
+    contact_min_frac: float = Field(default=0.0, ge=0, lt=1)
 
 
 class RenderConfig(_Strict):

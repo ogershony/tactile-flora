@@ -67,7 +67,7 @@ def completed_run(tmp_path, monkeypatch):
 
 def test_summary_checks_and_exports_completed_comparison(tmp_path, monkeypatch):
     completed_run(tmp_path, monkeypatch)
-    summary.main()
+    summary.main([])
     result = json.loads((tmp_path / "final-result.json").read_text())
     assert len(result["training_artifacts"]) == 2
     assert result["evaluation"]["test"]["cells"][0]["failure_recall"] == 1.0
@@ -81,5 +81,5 @@ def test_summary_refuses_different_truth_targets(tmp_path, monkeypatch):
     pred.loc[0, "truth_target"] = "Score: 1"
     pred.to_parquet(path)
     with pytest.raises(ValueError, match="different truth targets"):
-        summary.main()
+        summary.main([])
     assert not (tmp_path / "final-result.json").exists()

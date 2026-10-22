@@ -103,8 +103,11 @@ def fit(
     stream argument). Per episode and arm the baseline is the median and sigma the std of those
     raw samples; the source constants are the median of the per-episode baselines and the median
     of the per-episode sigmas (robust to between-episode baseline spread). Grasp is the median of
-    frame-level F over frames with g > 0.6 and F > tau. The norm_version is the sha256 of the
-    resulting constants, as before.
+    frame-level F over frames with g > 0.6 and F > tau. With ``cfg.contact_min_frac`` > 0 the
+    threshold is raised to at least that fraction of the provisional grasp excess and the grasp
+    median is recomputed above the raised threshold; sigma is then reported as
+    (tau - baseline) / contact_sigma so the stored constants stay self-consistent. The
+    norm_version is the sha256 of the resulting constants, as before.
     """
     baselines: dict[Arm, list[float]] = {}
     sigmas: dict[Arm, list[float]] = {}
@@ -135,6 +138,14 @@ def fit(
         if not held:
             raise NormError(f"arm {arm}: no grasp frames (g > {_GRIPPER_CLOSED}, F > tau)")
         grasp = float(np.median(held))
+        floor = baseline + cfg.contact_min_frac * (grasp - baseline)
+        if cfg.contact_min_frac > 0 and floor > tau:
+            tau = floor
+            held = [f for f, _ in grasp_cands.get(arm, []) if f > tau]
+            if not held:
+                raise NormError(f"arm {arm}: no grasp frames above the floored tau {tau}")
+            grasp = float(np.median(held))
+            sigma = (tau - baseline) / cfg.contact_sigma
         if grasp == baseline:
             raise NormError(f"arm {arm}: grasp equals baseline ({grasp}); cannot normalize")
         arms[arm] = ArmNorm(

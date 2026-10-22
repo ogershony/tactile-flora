@@ -26,6 +26,16 @@ def main() -> None:
     parser.add_argument("--benchmark", default="hrdexdb_clean_outcome")
     parser.add_argument("--control-run", default="clean-v1-control")
     parser.add_argument("--force-run", default="clean-v1-force")
+    parser.add_argument(
+        "--force-config",
+        type=Path,
+        default=Path("data/acceptance/released-inference/force.real-tokenizer.yaml"),
+    )
+    parser.add_argument(
+        "--force-modes",
+        default="real,shuffled",
+        help="Comma-separated force modes evaluated on the force adapter.",
+    )
     parser.add_argument("--worker", type=int, choices=range(3), help=argparse.SUPPRESS)
     parser.add_argument(
         "--reuse-released", action="store_true", help="Reuse the completed released-model cells."
@@ -33,15 +43,14 @@ def main() -> None:
     args = parser.parse_args()
     eval_path = args.eval_config or args.base / "config/eval.yaml"
     cfg = load_config(eval_path, EvalConfig)
-    force_cfg = load_config(
-        "data/acceptance/released-inference/force.real-tokenizer.yaml", ForceConfig
-    )
+    force_cfg = load_config(args.force_config, ForceConfig)
     training = json.loads((args.base / "training-plan.json").read_text())
     model_id = training["base_model"]
+    force_modes = [m for m in args.force_modes.split(",") if m]
     conditions = [
         ("released", ["omitted", "real"]),
         (str(args.base / "runs" / args.control_run / "adapter"), ["omitted"]),
-        (str(args.base / "runs" / args.force_run / "adapter"), ["real", "shuffled"]),
+        (str(args.base / "runs" / args.force_run / "adapter"), force_modes),
     ]
     for checkpoint, _ in conditions[1:]:
         if not (Path(checkpoint) / "adapter_model.safetensors").is_file():
@@ -59,7 +68,11 @@ def main() -> None:
         "training_plan_sha256": hashlib.sha256(
             (args.base / "training-plan.json").read_bytes()
         ).hexdigest(),
-        "selection": "final epoch for both adapters; fixed five evaluation conditions; no tuning",
+        "selection": (
+            f"final epoch for both adapters; fixed {2 + 1 + len(force_modes)} evaluation "
+            "conditions; no tuning"
+        ),
+        "force_config": str(args.force_config),
         "seed": 0,
     }
     stem = (
@@ -108,6 +121,10 @@ def main() -> None:
                 args.control_run,
                 "--force-run",
                 args.force_run,
+                "--force-config",
+                str(args.force_config),
+                "--force-modes",
+                args.force_modes,
             ],
             check=True,
         )

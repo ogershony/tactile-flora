@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import csv
 import hashlib
 import json
@@ -18,17 +19,23 @@ from tactile_flora.verify import manifest
 BASE = Path("data/acceptance/hrdexdb-expanded-v2")
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
     """Check artifacts, identities and truth targets before summarizing fixed conditions."""
-    plan = json.loads((BASE / "training-plan.json").read_text())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--base", type=Path, default=None)
+    parser.add_argument("--force-run", default="expanded-v2-force")
+    parser.add_argument("--control-run", default="expanded-v2-control")
+    args = parser.parse_args(argv)
+    base = args.base if args.base is not None else BASE
+    plan = json.loads((base / "training-plan.json").read_text())
     result = {
         "scope": "Object-disjoint source-label evaluation; no independent human gold labels",
         "training_plan": plan,
         "training_artifacts": [],
         "evaluation": {},
     }
-    for name in ["expanded-v2-force", "expanded-v2-control"]:
-        directory = BASE / "runs" / name
+    for name in [args.force_run, args.control_run]:
+        directory = base / "runs" / name
         with (directory / "loss.csv").open() as handle:
             losses = list(csv.DictReader(handle))
         if len(losses) != plan["optimizer_steps_per_run"]:
@@ -65,14 +72,14 @@ def main() -> None:
         ("val", "validation_manifest_sha256"),
         ("test", "test_manifest_sha256"),
     ]:
-        expected_hash = manifest.manifest_hash(BASE / f"manifest/{split}.parquet")
+        expected_hash = manifest.manifest_hash(base / f"manifest/{split}.parquet")
         if expected_hash != plan[hash_key]:
             raise ValueError(f"frozen {split} manifest changed")
         expected_ids = {
-            r.episode_id for r in manifest.read_manifest(BASE / f"manifest/{split}.parquet")
+            r.episode_id for r in manifest.read_manifest(base / f"manifest/{split}.parquet")
         }
         evaluation = json.loads(
-            (BASE / f"evaluation-hrdexdb_aligned_{split}-result.json").read_text()
+            (base / f"evaluation-hrdexdb_aligned_{split}-result.json").read_text()
         )
         expected_cells = {
             (checkpoint, mode)
@@ -95,7 +102,7 @@ def main() -> None:
         )
         for metrics in evaluation["results"]:
             tag, mode = checkpoint_tag(metrics["checkpoint"]), metrics["force_mode"]
-            path = BASE / "eval" / tag / f"hrdexdb_aligned_{split}" / mode
+            path = base / "eval" / tag / f"hrdexdb_aligned_{split}" / mode
             pred = pd.read_parquet(path / "predictions.parquet").sort_values("episode_id")
             if (
                 set(pred.episode_id) != expected_ids
@@ -133,8 +140,8 @@ def main() -> None:
             "",
         ]
     )
-    (BASE / "final-result.json").write_text(json.dumps(result, indent=2) + "\n")
-    (BASE / "final-result.md").write_text("\n".join(lines))
+    (base / "final-result.json").write_text(json.dumps(result, indent=2) + "\n")
+    (base / "final-result.md").write_text("\n".join(lines))
     print("\n".join(lines), flush=True)
 
 

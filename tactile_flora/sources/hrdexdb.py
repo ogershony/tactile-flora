@@ -30,7 +30,18 @@ verified 2026-10-21 from the HF API and file headers (docs/research/datasets.md 
 - Gripper: no gripper scalar exists; the hand closure proxy is the mean over columns of
   ``raw/hand/position.npy``, min/max-normalized per trial to 0 (open) .. 1 (closed). This is a
   PROXY: it assumes larger joint values mean more closed, and is flagged in
-  ``meta["gripper_is_proxy"]``.
+  ``meta["gripper_is_proxy"]``. For inspire_dftp that assumption is WRONG: Inspire hand
+  angles run 1000 (open) to 0 (closed), verified 2026-10-22 on all 601 retained expanded
+  clips (median correlation of the joint mean with total force -0.87, negative in 98.7%).
+  The legacy representation keeps the inverted proxy so earlier runs stay reproducible.
+- Force representation (``SourceConfig.hrdexdb_force_representation``): "legacy" takes
+  absolute raw values and the two channels with the largest MEAN, which is dominated by
+  per-channel resting offsets (inspire_dftp channel medians about 13/144/-1/56/110/29 raw
+  units against contact peaks of 1,000-3,000) and so varies from trial to trial of the same
+  object. "tared" subtracts each channel's resting offset (median of the first
+  ``hrdexdb_tare_s`` seconds of the sensor stream, before any video crop), floors at zero,
+  ranks channels by PEAK excess, and for inspire_dftp flips the closure proxy so 1 is closed.
+  The tare uses only the trial's own leading samples, never labels or other trials.
 - Cameras: the first camera serial (sorted) in ``vid/`` is used as "scene". UNVERIFIED which
   serial is a sensible scene view; ``cam_param/`` or cameras.parquet may carry roles.
 - Clock: legacy runs assume video starts with the earliest used sensor sample. Opt in with
@@ -106,6 +117,25 @@ def _signed_force(values: np.ndarray) -> np.ndarray:
     ):
         out = np.where(out >= 32768, out - 65536, out)
     return out
+
+
+def tared_excess(values: np.ndarray, t: np.ndarray, tare_s: float) -> tuple[np.ndarray, np.ndarray]:
+    """Subtract per-channel resting offsets (median of the first ``tare_s`` s) and floor at 0.
+
+    Returns (excess, offsets). With fewer than two leading samples the first sample is the
+    offset. Negative excess (readings below rest) is clipped to zero: it carries no contact
+    information and would otherwise be turned into spurious force by a later abs().
+    """
+    signed = np.asarray(values, dtype=np.float64).reshape(len(values), -1)
+    t = np.asarray(t, dtype=np.float64).reshape(-1)
+    if len(t) != len(signed):
+        raise ValueError("force samples and time base differ in length")
+    lead = t <= t[0] + tare_s
+    if np.count_nonzero(lead) < 2:
+        lead = np.zeros(len(t), dtype=bool)
+        lead[0] = True
+    offsets = np.median(signed[lead], axis=0)
+    return np.clip(signed - offsets, 0.0, None), offsets
 
 
 def video_clock(trial: Path, sensor_time: np.ndarray, fps: float, n_frames: int):
@@ -223,9 +253,17 @@ class HrdexdbAdapter:
         trial = self._trial(episode_id)
         fps = self._fps.get(episode_id, DEFAULT_FPS)
         stem = _TACTILE_FILES[hand]
-        raw = np.abs(_signed_force(np.load(trial / "raw" / "hand" / f"{stem}.npy")))
-        raw = raw.reshape(len(raw), -1)
-        t_raw = _read_time(trial, stem, len(raw), fps)
+        signed = _signed_force(np.load(trial / "raw" / "hand" / f"{stem}.npy"))
+        signed = signed.reshape(len(signed), -1)
+        t_raw = _read_time(trial, stem, len(signed), fps)
+        tared = self.cfg.hrdexdb_force_representation == "tared"
+        offsets: np.ndarray | None = None
+        if tared:
+            raw, offsets = tared_excess(signed, t_raw, self.cfg.hrdexdb_tare_s)
+            top = np.argsort(-raw.max(axis=0), kind="stable")[:2]
+        else:
+            raw = np.abs(signed)
+            top = np.argsort(-raw.mean(axis=0), kind="stable")[:2]
 
         pos = np.asarray(np.load(trial / "raw" / "hand" / "position.npy"), dtype=np.float64)
         pos = pos.reshape(len(pos), -1)
@@ -233,13 +271,16 @@ class HrdexdbAdapter:
 
         offset = float(min(t_raw[0], t_pos[0]))
         t = t_raw - offset
-        top = np.argsort(-raw.mean(axis=0), kind="stable")[:2]
         top = np.concatenate([top, top[:1]]) if len(top) == 1 else top
         f_a, f_b = raw[:, top[0]], raw[:, top[1]]
 
         closure = pos.mean(axis=1)
         span = float(closure.max() - closure.min())
         closure = (closure - closure.min()) / span if span > 0 else np.zeros_like(closure)
+        gripper_convention = "larger_joint_value_is_closed"
+        if tared and hand == "inspire_dftp":
+            closure = 1.0 - closure  # Inspire angles: 1000 open, 0 closed
+            gripper_convention = "inspire_angle_1000_open"
         g = closure[nearest_index(t_pos - offset, t)]
 
         vids = sorted((trial / "vid").glob("*.mp4"))
@@ -279,8 +320,16 @@ class HrdexdbAdapter:
                 "camera_serial": vids[0].stem,
                 "tactile_file": f"raw/hand/{stem}.npy",
                 "tactile_channels": [int(top[0]), int(top[1])],
-                "force_units": "raw sensor units (undocumented), signed-int16 decoded then abs",
+                "force_units": (
+                    "raw sensor units (undocumented), signed-int16 decoded, per-trial resting "
+                    "offset subtracted and floored at zero"
+                    if tared
+                    else "raw sensor units (undocumented), signed-int16 decoded then abs"
+                ),
+                "force_representation": self.cfg.hrdexdb_force_representation,
+                "force_offsets": None if offsets is None else [float(v) for v in offsets],
                 "gripper_is_proxy": True,
+                "gripper_convention": gripper_convention,
                 "fps": fps,
                 "clock_alignment": alignment,
             },

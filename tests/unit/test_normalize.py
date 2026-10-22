@@ -88,3 +88,21 @@ def test_free_space_requires_open_gripper_and_clip_option() -> None:
     clipped = normalize.apply(f, consts, CFG.render).arms["L"]
     assert max(clipped.F) <= 3.0 and min(clipped.F) >= 0.0
     assert any(a != b for a, b in zip(raw.F, clipped.F, strict=True))
+
+
+def test_contact_floor_raises_tau_and_refits_grasp() -> None:
+    raw = [_feats(s) for s in range(3)]
+    plain = normalize.fit(raw, CFG.resample, source="synthetic").arms["L"]
+    # A floor below the sigma rule changes nothing.
+    low = CFG.resample.model_copy(update={"contact_min_frac": 0.001})
+    assert normalize.fit(raw, low, source="synthetic").arms["L"] == plain
+    high = CFG.resample.model_copy(update={"contact_min_frac": 0.5})
+    floored = normalize.fit(raw, high, source="synthetic").arms["L"]
+    assert floored.baseline == plain.baseline
+    assert floored.tau > plain.tau
+    assert floored.tau == pytest.approx(floored.baseline + 0.5 * (plain.grasp - plain.baseline))
+    assert floored.tau == pytest.approx(
+        floored.baseline + CFG.resample.contact_sigma * floored.sigma
+    )
+    assert floored.grasp >= plain.grasp
+    assert floored.scale == pytest.approx(floored.grasp - floored.baseline)

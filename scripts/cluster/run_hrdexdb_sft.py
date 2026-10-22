@@ -57,11 +57,14 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--config", type=Path)
     parser.add_argument("--run-name", default="hrdexdb-outcome-sft")
+    parser.add_argument(
+        "--force-config",
+        type=Path,
+        default=Path("data/acceptance/released-inference/force.real-tokenizer.yaml"),
+    )
     args = parser.parse_args()
     cfg = load_config(args.config or args.base / "config/train-hrdexdb.yaml", TrainConfig)
-    force_cfg = load_config(
-        "data/acceptance/released-inference/force.real-tokenizer.yaml", ForceConfig
-    )
+    force_cfg = load_config(args.force_config, ForceConfig)
     source_cfg = load_config(args.base / "config/sources/hrdexdb.yaml", SourceConfig)
     adapter = make_adapter("hrdexdb", source_cfg)
     adapter.discover(Path(source_cfg.root))
