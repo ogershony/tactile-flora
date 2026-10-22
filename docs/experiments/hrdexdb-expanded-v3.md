@@ -21,7 +21,8 @@ defaults keep all of them so earlier runs stay reproducible; v3 opts out of them
    raw units, so the three-sigma threshold flagged every nonzero reading.
 
 Measured on the exact rendered lines, a gradient-boosted classifier over simple block
-statistics reached development AUROC 0.57 for v2's representation. The same probe on the raw
+statistics reached development AUROC 0.57 for v2's representation (features such as the
+contact fraction and saturation fraction barely differ between outcomes). The same probe on the raw
 force with per-trial tare gives 0.78, and the trial-relative statistics below give 0.80.
 
 ## What the force carries
@@ -51,6 +52,18 @@ no label-free encoding examined makes it strong on its own.
   frame lines: contact segments, longest and total contact, peak, hold duration, hold force,
   late/early hold ratio, low-force hold fraction. It is computed from the same normalized
   features that the lines show, including under the shuffled and zero ablations.
+- `render.classifier_json`: the summary line ends with the success probability of a
+  force-only gradient-boosted classifier (`tactile_flora/force/classifier.py`) fitted on the
+  350 training clips only, exported to JSON and evaluated in numpy. Training episodes show
+  the score of the object-grouped fold model that never saw them (out-of-fold accuracy
+  78.3%, AUROC 0.764), so the fine-tuned model learns how far to trust it instead of
+  over-trusting in-sample predictions; development and test clips use the full model.
+  Richer features did not help the classifier (every model tried lands at CV AUROC
+  0.76-0.78), but stacking its score with the v2 control's own video score lifts
+  development accuracy from 83.1% to 88.2% (AUROC 0.886 to 0.910, object-grouped CV on the
+  136 clips). This is the mechanism the run tests: whether the VLM learns that weighting.
+  Any gain from this line comes partly from a small classifier, not only from the VLM
+  reading raw force; the plain summary statistics and frame lines remain in the block.
 - Everything else is matched to v2: same frozen splits and window ids, same released base,
   four epochs, seed 17, LoRA rank 32 / alpha 64, learning rate 2e-5, effective batch 16,
   88 updates per run, final checkpoints only. The control is retrained so run-to-run noise
@@ -65,6 +78,18 @@ Artifacts: `data/acceptance/hrdexdb-expanded-v3/` (raw is a symlink to v2's down
 Reproduce from the repository root after the v2 download and audit exist:
 
 ```sh
-OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv/bin/python scripts/cluster/prepare_hrdexdb_v3.py --summary
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv/bin/python scripts/cluster/prepare_hrdexdb_v3.py --summary --classifier
 .venv/bin/python scripts/cluster/launch_hrdexdb_v3.py --after <job to wait for>
 ```
+
+## Launch
+
+Submitted 2026-10-22 as Slurm **6339** (force then control, two MI210s, after the v2 report
+job 6332), development evaluation **6340**, test evaluation **6341** and report **6342**, each
+dependent on the previous job's success. The [frozen plan](hrdexdb-expanded-v3/training-plan.json)
+pins manifest-generation commit `a72f6a3`, core-code and input hashes including the
+[classifier](hrdexdb-expanded-v3/force-classifier.json) and [force config](hrdexdb-expanded-v3/force.yaml);
+the launcher's provenance check was simulated for job 6339 before submission. Dry runs
+tokenize every training sample at about 17.2k (force) and 14.5k (control) tokens; the largest
+outcome force block is 2,700 tokens. Six dev/test conditions: released omitted/real, control
+omitted, force real/shuffled/video_blank.

@@ -1,4 +1,19 @@
-# Status report (2026-10-21)
+# Status report (2026-10-22)
+
+Expanded v2 development results are complete (Slurm 6330, 136 object-disjoint clips, zero
+parse failures): released FLORA 66.2% without and with force; control SFT 82.4% / AUROC 0.899;
+force SFT 81.6% / 0.902 with real force and 78.7% / 0.885 with shuffled donors. The trained
+force model reads the block a little but does not beat the trained control. The test
+evaluation (6331) and report (6332) are running. A deep dive found the v2 force block was
+nearly uninformative (inverted closure proxy, offset-ranked channels, 37.5-unit grasp scale
+saturating every contact) and that HRDexDB force is a moderate predictor at best
+(force-only object-grouped CV AUROC 0.76-0.78), although it is complementary to video
+(stacked video + force score lifts dev accuracy 83% to 88%). The v3 run with a corrected
+representation, label-free summary lines and an out-of-fold force-classifier probability in
+the block is queued as Slurm 6339 (training), 6340 (dev), 6341 (test) and 6342 (report).
+See [the v3 experiment](experiments/hrdexdb-expanded-v3.md).
+
+## Earlier status (2026-10-21)
 
 Matched four-epoch cleaned-pilot training and evaluation completed (Slurm jobs 6321/6325).
 The control adapter matches released no-force accuracy at 84.6% (11/13); the force adapter
