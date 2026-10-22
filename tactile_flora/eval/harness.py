@@ -463,7 +463,12 @@ def run_eval(
                     blank = abl.video_blank
                     if abl.features is not None:
                         lines = render.render_lines(abl.features, w.frame_times, ep.force.channel)
-                        block = render.render_block(lines, force_cfg.render, abl.features) or None
+                        block = (
+                            render.render_block(
+                                lines, force_cfg.render, abl.features, ep.episode_id
+                            )
+                            or None
+                        )
                 k += 1
                 rationale = w.prompt_kind == "outcome" and not spec.score_only
                 bundle = build_prompt(

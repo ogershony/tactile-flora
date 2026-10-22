@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pyarrow as pa
@@ -22,10 +23,10 @@ import pyarrow.parquet as pq
 import yaml
 
 from tactile_flora.config import ForceConfig, SourceConfig, load_config
-from tactile_flora.force import normalize, render
+from tactile_flora.force import classifier, normalize, render
 from tactile_flora.force.resample import resample
 from tactile_flora.labels.windows import outcome_frame_indices
-from tactile_flora.schema import HoldoutFile
+from tactile_flora.schema import HoldoutFile, ResampledForce
 from tactile_flora.sources.hrdexdb import HrdexdbAdapter
 from tactile_flora.verify import full_git_hash, manifest
 from tactile_flora.verify.windowing import episode_windows
@@ -43,6 +44,11 @@ def main() -> None:
     parser.add_argument("--contact-min-frac", type=float, default=0.05)
     parser.add_argument("--tare-s", type=float, default=1.0)
     parser.add_argument("--summary", action="store_true", help="Enable render.summary lines.")
+    parser.add_argument(
+        "--classifier",
+        action="store_true",
+        help="Fit the force-only classifier on training clips and show its probability.",
+    )
     args = parser.parse_args()
     base, previous = args.base, args.previous
     if (base / "manifest").exists():
@@ -90,20 +96,62 @@ def main() -> None:
         times = np.arange(0, ep.duration_s, force_cfg.resample.frame_period_s).tolist()
         features.append(resample(ep.force, ep.gripper, times, force_cfg.resample))
     consts = normalize.fit(features, force_cfg.resample, source="hrdexdb")
+    outcome_norm: dict[str, ResampledForce] = {}
+    for entry in kept:
+        ep = episodes[entry["episode_id"]]
+        cam = ep.cameras["scene"]
+        times = [i / cam.fps for i in outcome_frame_indices(cam.n_frames, cam.fps)]
+        outcome_norm[entry["episode_id"]] = normalize.apply(
+            resample(ep.force, ep.gripper, times, force_cfg.resample), consts, force_cfg.render
+        )
+    scorer_report: dict[str, Any] | None = None
+    if args.classifier:
+        if not args.summary:
+            raise ValueError("--classifier needs --summary")
+        train_rows = [r for r in kept if r["split"] == "train"]
+        scorer = classifier.fit_cv(
+            np.stack(
+                [classifier.extract_features(outcome_norm[r["episode_id"]]) for r in train_rows]
+            ),
+            np.asarray([int(r["success"]) for r in train_rows]),
+            [r["object_id"] for r in train_rows],
+            [r["episode_id"] for r in train_rows],
+            source="hrdexdb",
+        )
+        scorer_path = base / "config/force-classifier.json"
+        scorer.save(scorer_path)
+        force_cfg = force_cfg.model_copy(
+            update={
+                "render": force_cfg.render.model_copy(
+                    update={"classifier_json": str(scorer_path.resolve())}
+                )
+            }
+        )
+        (base / "config/force.yaml").write_text(
+            yaml.safe_dump(force_cfg.model_dump(mode="json"), sort_keys=False)
+        )
+        scorer_report = {
+            "path": str(scorer_path),
+            "sha256": hashlib.sha256(scorer_path.read_bytes()).hexdigest(),
+            "cv_metrics": scorer.cv_metrics,
+            "params": scorer.params,
+            "feature_names": list(classifier.FEATURE_NAMES),
+            "fit_episodes": len(train_rows),
+            "note": (
+                "fitted on training clips only; training episodes render the score of the "
+                "object-grouped fold model that never saw them"
+            ),
+        }
     tokenizer = render.load_tokenizer(force_cfg.render)
     version = full_git_hash()
     rows, records = [], []
     for entry in kept:
         ep = episodes[entry["episode_id"]]
-        cam = ep.cameras["scene"]
-        idx = outcome_frame_indices(cam.n_frames, cam.fps)
-        times = [i / cam.fps for i in idx]
-        norm = normalize.apply(
-            resample(ep.force, ep.gripper, times, force_cfg.resample), consts, force_cfg.render
-        )
+        norm = outcome_norm[entry["episode_id"]]
+        times = list(norm.frame_times)
         lines = render.render_lines(norm, times, ep.force.channel)
         tokens = render.budget_check(
-            render.render_block(lines, force_cfg.render, norm),
+            render.render_block(lines, force_cfg.render, norm, ep.episode_id),
             force_cfg.render.max_tokens,
             tokenizer,
         )
@@ -118,7 +166,11 @@ def main() -> None:
                 "force_offsets": ep.meta["force_offsets"],
                 "gripper_convention": ep.meta["gripper_convention"],
                 "outcome_block_tokens": tokens,
-                "summary": render.summary_lines(norm) if force_cfg.render.summary else [],
+                "summary": (
+                    render.summary_lines(norm, force_cfg.render.classifier_json, ep.episode_id)
+                    if force_cfg.render.summary
+                    else []
+                ),
                 "outcome_lines": len(lines),
                 "F_max": float(forces.max()),
                 "F_mean": float(forces.mean()),
@@ -209,6 +261,7 @@ def main() -> None:
         "representation": source_cfg.model_dump(),
         "force_config": force_cfg.model_dump(mode="json"),
         "normalization": {**consts.model_dump(mode="json"), "norm_version": consts.version()},
+        "force_classifier": scorer_report,
         "kept_counts": {s: sum(r["split"] == s for r in kept) for s in ["train", "val", "test"]},
         "manifest_hashes": holdout.manifests,
         "git_hash": version,

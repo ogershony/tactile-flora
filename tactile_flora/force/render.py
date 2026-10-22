@@ -29,6 +29,7 @@ Qwen3.5 tokenizer.json path; load_tokenizer(cfg) then returns it for budget_chec
 
 from __future__ import annotations
 
+import functools
 import math
 from collections.abc import Sequence
 from typing import Protocol
@@ -36,6 +37,7 @@ from typing import Protocol
 import numpy as np
 
 from tactile_flora.config import RenderConfig
+from tactile_flora.force.classifier import ForceScorer, load_scorer
 from tactile_flora.schema import Arm, ArmFeatures, ResampledForce
 
 FALLBACK_TOKENS_PER_CHAR = 0.75
@@ -142,10 +144,25 @@ def _seconds(times: Sequence[float], a: int, b: int) -> float:
     return float(times[b] - times[a]) + step
 
 
-def summary_lines(features: ResampledForce) -> list[str]:
-    """One label-free ``summary <arm>:`` line per arm (see the module docstring)."""
+@functools.lru_cache(maxsize=4)
+def _scorer(path: str) -> ForceScorer:
+    return load_scorer(path)
+
+
+def summary_lines(
+    features: ResampledForce,
+    scorer: ForceScorer | str | None = None,
+    episode_id: str | None = None,
+) -> list[str]:
+    """One label-free ``summary <arm>:`` line per arm (see the module docstring).
+
+    With ``scorer`` (a ForceScorer or the path of its JSON) the arm it was fitted for also
+    shows ``P(success)`` from the force-only classifier; ``episode_id`` selects the
+    out-of-fold model for training episodes.
+    """
     times = list(features.frame_times)
     out: list[str] = []
+    model = _scorer(scorer) if isinstance(scorer, str) else scorer
     for arm in ("L", "R"):
         af = features.arms.get(arm)
         if af is None:
@@ -174,22 +191,29 @@ def summary_lines(features: ResampledForce) -> list[str]:
         else:
             median = late_early = hold_s = 0.0
             low = 1.0
-        out.append(
+        line = (
             f"summary {arm}: contacts={len(runs)} longest={_fmt(longest)}s "
             f"total={_fmt(total)}s peak={_fmt(float(F.max()) if F.size else 0.0)} "
             f"hold={_fmt(hold_s)}s holdF={_fmt(median)} late/early={_fmt(late_early)} "
             f"low={int(round(100 * low))}%"
         )
+        if model is not None and model.arm == arm:
+            line += f" force-only classifier P(success)={_fmt(model.score(features, episode_id))}"
+        out.append(line)
     return out
 
 
 def render_block(
-    lines: Sequence[str], cfg: RenderConfig, features: ResampledForce | None = None
+    lines: Sequence[str],
+    cfg: RenderConfig,
+    features: ResampledForce | None = None,
+    episode_id: str | None = None,
 ) -> str:
     """Join lines under the header; an empty ``lines`` (control) gives an empty string.
 
     With ``cfg.summary`` and ``features`` the summary lines go between the header and the
     frame lines; summary without features is an error (callers must pass what they rendered).
+    ``cfg.classifier_json`` adds the force-only probability, out-of-fold for ``episode_id``.
     """
     if not lines:
         return ""
@@ -197,7 +221,8 @@ def render_block(
         return "\n".join([cfg.header, *lines])
     if features is None:
         raise ValueError("render.summary needs the rendered features")
-    return "\n".join([cfg.header, *summary_lines(features), *lines])
+    summary = summary_lines(features, cfg.classifier_json, episode_id)
+    return "\n".join([cfg.header, *summary, *lines])
 
 
 def token_count(block: str, tokenizer: Tokenizer | None = None) -> int:

@@ -73,6 +73,9 @@ class RenderConfig(_Strict):
     # Prepend one label-free summary line per arm (contact segments, longest contact, peak,
     # hold duration, hold force, late/early hold ratio, low-force hold fraction) to the block.
     summary: bool = False
+    # Optional force-only outcome classifier (force/classifier.py JSON) whose success
+    # probability is appended to each summary line; training episodes get out-of-fold scores.
+    classifier_json: str | None = None
 
 
 class EventsConfig(_Strict):

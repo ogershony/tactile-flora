@@ -148,7 +148,11 @@ def build_samples(
     for row, item in items:
         w = item.window
         lines, blank, rendered = _block(item, force_mode, pool, seed, force_cfg)
-        block = render.render_block(lines, force_cfg.render, rendered) if lines else None
+        block = (
+            render.render_block(lines, force_cfg.render, rendered, row.episode_id)
+            if lines
+            else None
+        )
         kw: dict[str, Any] = {
             "task": item.task,
             "camera_roles": item.camera_roles,

@@ -157,6 +157,7 @@ def main() -> None:
         base / "config/train-control.yaml",
         base / "config/force.yaml",
         base / "verified/hrdexdb/norm.json",
+        *[p for p in [base / "config/force-classifier.json"] if p.exists()],
         base / "manifest/holdout_ids.json",
         base / "representation-audit.json",
         Path("data/acceptance/hrdexdb-expanded-v2/download-plan.json"),
