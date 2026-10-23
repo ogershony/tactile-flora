@@ -1,5 +1,38 @@
 # Status report (2026-10-22)
 
+## Recovery update, 2026-10-22 22:48 PDT
+
+Two v5 recipe experiments on the existing object-disjoint DFTP split are already submitted:
+modality dropout (`6378` training → `6379` development → `6380` test), followed by dropout
+plus a force chart (`6381` → `6382` → `6383`). Job 6378 is running on both MI210s on
+`matthew`; its first five optimizer updates are finite. The v5 arms have no evaluation
+results yet. Their frozen plans, inputs and jobs were retained through the server restart.
+
+The queued evaluator would have failed because it required `training-plan.json`, whereas
+v5 stores one `training-plan-<arm>.json` per arm. It now resolves the selected arm's plan
+(or explicit `--plan`), validates only the selected worker's adapter, and writes separate
+per-arm evaluation provenance. Legacy shared plans still work. The comparison script now
+rejects incomplete/duplicate populations, changed identities or truth, and invalid scores;
+it supports a saved Markdown report and requires both splits when requested.
+
+CPU report job **6384**, dependent on successful completion of 6383, checks all six planned
+evaluation cells and writes `data/acceptance/hrdexdb-expanded-v5/paired-comparison.md`.
+It compares both arms against the existing v2 video control and v3 tactile model using the
+fixed threshold, exact McNemar tests and object bootstrap intervals. Multiple comparisons
+are explicitly described as unadjusted. No checkpoint or threshold selection was added.
+
+Provenance limitation: eight v5a core-file hashes differ from its frozen plan after the
+pre-existing chart implementation commit; its data/config hashes still match. This disk
+audit does not establish which source bytes the running process imported. v5b's core and
+data/config hashes match its frozen plan. Recovery changed no core model files or learning
+inputs. Details and evaluator repair hashes: `data/acceptance/hrdexdb-expanded-v5/evaluation-repair.json`.
+
+Validation after the repair: **401 tests passed**; Pyright and Ruff checks for the changed
+Python files pass. See [the experiment plan](../writeup/v4-plan.md) for the preceding recipe
+decisions and cancelled fold experiments.
+
+## Earlier expanded development results
+
 Expanded v2 development results are complete (Slurm 6330, 136 object-disjoint clips, zero
 parse failures): released FLORA 66.2% without and with force; control SFT 82.4% / AUROC 0.899;
 force SFT 81.6% / 0.902 with real force and 78.7% / 0.885 with shuffled donors. The trained

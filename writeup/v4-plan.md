@@ -189,3 +189,18 @@ base). Arm joint torque and object pose were downloaded and audited and both rej
 signals: torque alone is AUROC 0.63 and lowers the pooled force classifier, and the trial
 protocol is lift-briefly-and-replace, so pose-derived hold labels do not apply.
 
+### Recovery and reporting, 2026-10-22 22:48
+
+The six GPU jobs survived the server restart. The evaluator now resolves each arm's own
+frozen training plan; its previous hard-coded shared-plan path was absent in the v5 base
+and would have stopped the first evaluation. Per-arm receipts remain separate. CPU job
+6384 waits for successful completion of 6383, requires all six planned cells, and writes
+`data/acceptance/hrdexdb-expanded-v5/paired-comparison.md`. The comparison rejects missing
+clips, duplicate windows, changed labels/identities and invalid scores; it preserves the
+4.0 success threshold and marks statistical comparisons as unadjusted.
+
+The v5a plan predates the chart commit: eight current core-file hashes differ from its
+frozen hashes, although its data/config hashes match. v5b's hashes all match. This recovery
+did not change training code or inputs, and the original plans were retained. The audit
+and evaluator repair hashes are saved as `evaluation-repair.json` under the v5 base.
+

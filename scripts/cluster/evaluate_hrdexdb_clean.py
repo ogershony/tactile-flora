@@ -18,6 +18,14 @@ from tactile_flora.video.readers import SourceRootReader
 BASE = Path("data/acceptance/hrdexdb-clean-v1")
 
 
+def training_plan_path(base: Path, force_run: str, explicit: Path | None = None) -> Path:
+    """Resolve an arm's frozen plan, retaining the legacy shared-plan layout."""
+    if explicit is not None:
+        return explicit
+    arm_plan = base / f"training-plan-{force_run}.json"
+    return arm_plan if arm_plan.is_file() else base / "training-plan.json"
+
+
 def main() -> None:
     """Score every planned condition without tuning or choosing a best validation checkpoint."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -26,6 +34,9 @@ def main() -> None:
     parser.add_argument("--benchmark", default="hrdexdb_clean_outcome")
     parser.add_argument("--control-run", default="clean-v1-control")
     parser.add_argument("--force-run", default="clean-v1-force")
+    parser.add_argument(
+        "--plan", type=Path, help="Frozen training plan (defaults to the arm's plan)."
+    )
     parser.add_argument(
         "--force-config",
         type=Path,
@@ -44,7 +55,8 @@ def main() -> None:
     eval_path = args.eval_config or args.base / "config/eval.yaml"
     cfg = load_config(eval_path, EvalConfig)
     force_cfg = load_config(args.force_config, ForceConfig)
-    training = json.loads((args.base / "training-plan.json").read_text())
+    plan_path = training_plan_path(args.base, args.force_run, args.plan)
+    training = json.loads(plan_path.read_text())
     model_id = training["base_model"]
     force_modes = [m for m in args.force_modes.split(",") if m]
     conditions = [
@@ -52,7 +64,10 @@ def main() -> None:
         (str(args.base / "runs" / args.control_run / "adapter"), ["omitted"]),
         (str(args.base / "runs" / args.force_run / "adapter"), force_modes),
     ]
-    for checkpoint, _ in conditions[1:]:
+    selected = conditions if args.worker is None else [conditions[args.worker]]
+    for checkpoint, _ in selected:
+        if checkpoint == "released":
+            continue
         if not (Path(checkpoint) / "adapter_model.safetensors").is_file():
             raise ValueError(f"missing trained adapter: {checkpoint}")
     plan = {
@@ -65,9 +80,8 @@ def main() -> None:
         "val_manifest_hash": manifest.manifest_hash(args.base / "manifest/val.parquet"),
         "evaluation_manifest_hash": manifest.manifest_hash(cfg.benchmarks[args.benchmark].manifest),
         "train_manifest_hash": manifest.manifest_hash(args.base / "manifest/hrdexdb-sft.parquet"),
-        "training_plan_sha256": hashlib.sha256(
-            (args.base / "training-plan.json").read_bytes()
-        ).hexdigest(),
+        "training_plan_sha256": hashlib.sha256(plan_path.read_bytes()).hexdigest(),
+        "training_plan_path": str(plan_path),
         "selection": (
             f"final epoch for both adapters; fixed {2 + 1 + len(force_modes)} evaluation "
             "conditions; no tuning"
@@ -80,6 +94,9 @@ def main() -> None:
         if args.benchmark == "hrdexdb_clean_outcome"
         else f"evaluation-{args.benchmark}"
     )
+    if plan_path.name != "training-plan.json":
+        # Different arms share a base directory; their provenance must not overwrite each other.
+        stem = f"{stem}-{args.force_run}"
     (args.base / f"{stem}-plan.json").write_text(json.dumps(plan, indent=2) + "\n")
     if args.worker is not None:
         checkpoint, modes = conditions[args.worker]
@@ -121,6 +138,8 @@ def main() -> None:
                 args.control_run,
                 "--force-run",
                 args.force_run,
+                "--plan",
+                str(plan_path),
                 "--force-config",
                 str(args.force_config),
                 "--force-modes",
