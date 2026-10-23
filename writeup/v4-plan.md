@@ -164,3 +164,28 @@ stops instead of running all 4 epochs.
 Everything runs on the `long` partition so nothing preempts anything. Expected: fold B numbers
 between 05:00 and 11:00 on 2026-10-23 depending on the early stop, fold C 8 to 14 h after that.
 
+## Status, 2026-10-22 22:35: v4 folds cancelled, v5 recipe arms running
+
+The fold chain was cancelled after a defect was found in the early-stop monitor (it measured the
+end-of-turn token, not the score digit, so every arm would have stopped at exactly two epochs with
+the learning rate half-annealed). With about twelve GPU hours available, the budget went to two
+recipe changes on the v3 split, where the v2 control and the v3 tactile arm already exist on the
+same 251 held-out clips:
+
+| Arm | Change under test | Jobs | Eval cells |
+|---|---|---|---|
+| v5a-dropout | modality dropout: 30% of training clips also appear with mid-gray video and the real force block (455 samples) | 6378 → 6379 → 6380 | dev real + video_blank, test real |
+| v5b-chart | the same dropout plus the force trace rendered as a 96 px chart appended as one temporal group (297 visual tokens instead of 288) | 6381 → 6382 → 6383, behind 6380 | dev chart_text + chart, test chart_text |
+
+Why these two: the force-only classifier beats both fine-tuned VLMs on test (76.5% vs 72.2%),
+and the tactile VLM given force alone scores 53.7% on dev, so the VLM under-reads the block it
+is given. Dropout forces the force path to carry the answer on its own; the chart presents the
+trace in a form the vision encoder already reads.
+
+Also measured today, no GPU: the stacked head (tactile score + control score + classifier
+logit, fit on dev, applied once to test) reaches dev 88.2% out-of-object and test 76.5%,
+against the tactile VLM's 85.3% and 72.2% (`eval/expanded-v3-force/stack-result.md` under the v3
+base). Arm joint torque and object pose were downloaded and audited and both rejected as
+signals: torque alone is AUROC 0.63 and lowers the pooled force classifier, and the trial
+protocol is lift-briefly-and-replace, so pose-derived hold labels do not apply.
+
