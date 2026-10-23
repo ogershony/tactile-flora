@@ -41,7 +41,6 @@ from collections.abc import Callable, Collection, Iterable, Iterator, Sequence
 from pathlib import Path
 from typing import Any, Protocol
 
-import numpy as np
 import yaml
 
 from tactile_flora.config import ForceConfig, TrainConfig
@@ -58,7 +57,8 @@ from tactile_flora.train.dataset import (
     variant_counts,
 )
 from tactile_flora.verify import full_git_hash, holdout_path, manifest
-from tactile_flora.video.mosaic import clip_frames, source_frame_count, video_metadata
+from tactile_flora.video.force_chart import clip_array as chart_clip_array
+from tactile_flora.video.mosaic import source_frame_count, video_metadata
 from tactile_flora.video.readers import SourceRootReader
 
 log = logging.getLogger("tactile_flora.train")
@@ -544,11 +544,7 @@ class HFBackend:
         """Default video_loader: the (T, H, W, 3) uint8 mosaic clip of ``sample``."""
         if sample.episode is None:
             raise ValueError(f"{sample.window_id}: sample has no episode to read video from")
-        v = sample.video
-        frames = clip_frames(
-            sample.episode, self.reader, v.frame_times, v.roles, blank=v.blank, cell_px=v.cell_px
-        )
-        return np.stack(frames)
+        return chart_clip_array(sample.episode, sample.video, self.reader)
 
     def make_batch(self, sample: Sample) -> dict[str, Any]:
         """Run the processor on the sample's chat and decoded clip; mask all but the answer."""

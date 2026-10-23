@@ -450,6 +450,7 @@ def run_eval(
             for wid, w in zip(b.window_ids, b.windows, strict=True):
                 block: str | None = None
                 blank = False
+                chart = None
                 if need_force:
                     ident = PoolEntry(
                         features=feat_of[wid],
@@ -461,7 +462,8 @@ def run_eval(
                         feat_of[wid], force_mode, pool=pool, seed=seed + k, identity=ident
                     )
                     blank = abl.video_blank
-                    if abl.features is not None:
+                    chart = abl.features if abl.chart else None
+                    if abl.features is not None and abl.text:
                         lines = render.render_lines(abl.features, w.frame_times, ep.force.channel)
                         block = (
                             render.render_block(
@@ -480,6 +482,7 @@ def run_eval(
                     camera_roles=tuple(ep.cameras),
                     fps=cam.fps,
                     frame_indices=_frame_indices(w, cam.fps, cam.n_frames),
+                    force_chart=chart,
                 )
                 dense = w.prompt_kind == "dense"
                 regex = dense_regex() if dense else outcome_regex(rationale)
@@ -681,7 +684,7 @@ def run_grid(
     return done
 
 
-MODE_ORDER = ("omitted", "zero", "real", "shuffled", "video_blank")
+MODE_ORDER = ("omitted", "zero", "real", "shuffled", "video_blank", "chart", "chart_text")
 
 
 def _fmt(v: float | None) -> str:

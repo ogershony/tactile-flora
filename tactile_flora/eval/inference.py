@@ -39,9 +39,9 @@ from pydantic import BaseModel
 
 from tactile_flora.prompts.flora import VideoSpec
 from tactile_flora.schema import Episode, FrameReader
+from tactile_flora.video.force_chart import clip_array as chart_clip_array
 from tactile_flora.video.mosaic import (
     VideoMetadataDict,
-    clip_frames,
     source_frame_count,
     video_metadata,
 )
@@ -188,16 +188,8 @@ class StubBackend:
 
 
 def clip_array(episode: Episode, video: VideoSpec, reader: FrameReader) -> np.ndarray:
-    """Return the (T, H, W, 3) uint8 clip for ``video`` via video.mosaic.clip_frames."""
-    frames = clip_frames(
-        episode,
-        reader,
-        video.frame_times,
-        video.roles,
-        blank=video.blank,
-        cell_px=video.cell_px,
-    )
-    return np.stack(frames)
+    """Return the (T, H, W, 3) uint8 clip for ``video`` (mosaic frames, then any chart group)."""
+    return chart_clip_array(episode, video, reader)
 
 
 def _video_metadata(video: VideoSpec, episode: Episode) -> VideoMetadataDict:

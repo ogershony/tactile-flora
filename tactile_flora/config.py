@@ -13,7 +13,7 @@ from typing import Any, Literal, TypeVar
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-ForceMode = Literal["real", "omitted", "zero", "shuffled", "video_blank"]
+ForceMode = Literal["real", "omitted", "zero", "shuffled", "video_blank", "chart", "chart_text"]
 
 
 class _Strict(BaseModel):

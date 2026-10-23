@@ -21,6 +21,12 @@ FORCE_SENTENCE = (
     "time."
 )
 
+CHART_SENTENCE = (
+    "The last temporal group of the clip is not camera footage: it is a chart of the whole "
+    "clip's normalized grip force (red, dashed line at the median grasp), hand closure (blue) "
+    "and contact (gray band along the bottom), with frame ticks."
+)
+
 VIDEO_MARKER = "<video>"
 
 DENSE_SYSTEM = """\

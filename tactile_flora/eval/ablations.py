@@ -40,6 +40,8 @@ class AblatedForce(BaseModel):
 
     features: ResampledForce | None
     video_blank: bool = False
+    text: bool = True  # render the text block
+    chart: bool = False  # append the chart frames
 
 
 def _zero(features: ResampledForce) -> ResampledForce:
@@ -126,4 +128,10 @@ def apply_force_mode(
         return AblatedForce(features=_zero(features))
     if mode == "shuffled":
         return AblatedForce(features=_shuffle(features, pool, seed, identity))
-    return AblatedForce(features=features, video_blank=True)
+    if mode == "chart":
+        return AblatedForce(features=features, text=False, chart=True)
+    if mode == "chart_text":
+        return AblatedForce(features=features, text=True, chart=True)
+    if mode == "video_blank":
+        return AblatedForce(features=features, video_blank=True)
+    raise ValueError(f"unknown force mode {mode!r}")

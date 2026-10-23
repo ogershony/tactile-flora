@@ -97,23 +97,34 @@ def answer_labels(prompt_ids: Sequence[int], full_ids: Sequence[int]) -> list[in
     return [IGNORE_INDEX] * n + list(full_ids[n:])
 
 
-def _block(item: WindowItem, mode: ForceMode, pool: Sequence[ResampledForce], seed: int,
-           force_cfg: ForceConfig) -> tuple[list[str], bool, ResampledForce | None]:  # fmt: skip
-    """Return (force lines, video_blank, rendered features); empty lines mean no block."""
+def _block(
+    item: WindowItem,
+    mode: ForceMode,
+    pool: Sequence[ResampledForce],
+    seed: int,
+    force_cfg: ForceConfig,
+) -> tuple[list[str], bool, ResampledForce | None, ResampledForce | None]:
+    """Return (force lines, video_blank, rendered features, chart features).
+
+    Empty lines mean no text block; a non-None chart means the chart frames are appended.
+    """
     w = item.window
     if item.features is None:
         if mode == "omitted":
-            return [], False, None
+            return [], False, None, None
         if mode in ("real", "video_blank"):
             if not w.force_lines:
                 raise ValueError(f"{w.episode_ref}: force_mode {mode} but the window has no force")
-            return list(w.force_lines), mode == "video_blank", None
+            return list(w.force_lines), mode == "video_blank", None, None
         raise ValueError(f"force_mode {mode} needs resampled features (WindowItem.features)")
     ab = apply_force_mode(item.features, mode, pool=pool, seed=seed)
     if ab.features is None:
-        return [], ab.video_blank, None
+        return [], ab.video_blank, None, None
+    chart = ab.features if ab.chart else None
+    if not ab.text:
+        return [], ab.video_blank, None, chart
     lines = render.render_lines(ab.features, w.frame_times, item.features.channel)
-    return lines, ab.video_blank, ab.features
+    return lines, ab.video_blank, ab.features, chart
 
 
 def select_dropout(window_ids: Sequence[str], frac: float, seed: int, tag: str) -> frozenset[str]:
@@ -170,7 +181,13 @@ def build_samples(
     samples: list[Sample] = []
 
     def tokenized(
-        row: ManifestRow, item: WindowItem, block: str | None, *, blank: bool, variant: str
+        row: ManifestRow,
+        item: WindowItem,
+        block: str | None,
+        *,
+        blank: bool,
+        variant: str,
+        chart: ResampledForce | None = None,
     ) -> Sample:
         w = item.window
         bundle = build_prompt(
@@ -180,6 +197,7 @@ def build_samples(
             task=item.task,
             camera_roles=item.camera_roles,
             fps=item.fps,
+            force_chart=chart,
         )
         messages = to_messages(bundle)
         prompt_ids = tokenizer.encode_prompt(messages, bundle.video)
@@ -199,7 +217,7 @@ def build_samples(
 
     for row, item in items:
         w = item.window
-        lines, blank, rendered = _block(item, force_mode, pool, seed, force_cfg)
+        lines, blank, rendered, chart = _block(item, force_mode, pool, seed, force_cfg)
         block = (
             render.render_block(lines, force_cfg.render, rendered, row.episode_id)
             if lines
@@ -214,11 +232,13 @@ def build_samples(
             )
         chosen = row.window_id in blank_ids or row.window_id in omit_ids
         if not (drop.replace and chosen):
-            samples.append(tokenized(row, item, block, blank=blank, variant="base"))
+            samples.append(tokenized(row, item, block, blank=blank, variant="base", chart=chart))
         if row.window_id in blank_ids:
-            if block is None:
+            if block is None and chart is None:
                 raise ValueError(f"{row.window_id}: video_blank dropout needs a force block")
-            samples.append(tokenized(row, item, block, blank=True, variant="video_blank"))
+            samples.append(
+                tokenized(row, item, block, blank=True, variant="video_blank", chart=chart)
+            )
         if row.window_id in omit_ids:
             samples.append(tokenized(row, item, None, blank=False, variant="force_omitted"))
     return sorted(samples, key=lambda s: (s.n_tokens, s.window_id, s.variant))
