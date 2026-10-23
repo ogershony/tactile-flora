@@ -39,18 +39,18 @@ def sha256(path: Path | str) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def header(name: str, base: Path, hours: int) -> str:
-    """Slurm preamble for a long-partition GPU step."""
+def header(name: str, base: Path, hours: int, partition: str = "long") -> str:
+    """Slurm preamble for a GPU step; ``normal`` (4 h cap) is not preempted by other users."""
     return "\n".join(
         [
             "#!/bin/bash",
             "#SBATCH --account=scc",
-            "#SBATCH --qos=long",
-            "#SBATCH --partition=long",
+            f"#SBATCH --qos={partition}",
+            f"#SBATCH --partition={partition}",
             "#SBATCH --nodelist=matthew",
             "#SBATCH --gres=mi210:2",
-            "#SBATCH --mem=128G",
-            "#SBATCH --cpus-per-task=16",
+            f"#SBATCH --mem={'128G' if partition == 'long' else '64G'}",
+            f"#SBATCH --cpus-per-task={16 if partition == 'long' else 8}",
             f"#SBATCH --time={hours:02d}:00:00",
             f"#SBATCH --job-name={name}",
             f"#SBATCH --output={REPO / base}/jobs/{name.removeprefix('flora-')}-%j.log",
@@ -84,6 +84,7 @@ def main() -> None:
     parser.add_argument("--test-modes", default="real")
     parser.add_argument("--after", help="Slurm job id the training waits for (afterany).")
     parser.add_argument("--train-hours", type=int, default=8)
+    parser.add_argument("--partition", choices=["long", "normal"], default="long")
     parser.add_argument("--no-submit", action="store_true")
     args = parser.parse_args()
     base = args.base
@@ -103,12 +104,13 @@ def main() -> None:
         f"scripts/cluster/run_hrdexdb_sft.py --base {base} --force-config {force_cfg} "
         f"--config {cfg_path} --run-name {args.run_name} --plan {plan_path}"
     )
-    text = header(f"flora-{args.tag}-train", base, args.train_hours)
+    hours = min(args.train_hours, 4) if args.partition == "normal" else args.train_hours
+    text = header(f"flora-{args.tag}-train", base, hours, args.partition)
     text += f"{TORCHRUN} --standalone --nnodes=1 --nproc-per-node=2 {sft}\n"
     paths = {"train": jobs / f"train-{args.run_name}.sbatch"}
     paths["train"].write_text(text)
     for split, modes in [("val", args.val_modes), ("test", args.test_modes)]:
-        text = header(f"flora-{args.tag}-{split}", base, 4)
+        text = header(f"flora-{args.tag}-{split}", base, 4, args.partition)
         text += (
             f"{PYTHON} -u scripts/cluster/evaluate_hrdexdb_clean.py --base {base} "
             f"--eval-config {base}/config/eval-{split}.yaml --benchmark hrdexdb_aligned_{split} "
@@ -154,7 +156,7 @@ def main() -> None:
         "slurm_training_job": None,
         "slurm_training_jobs": [],
         "slurm_account": "scc",
-        "slurm_qos": "long",
+        "slurm_qos": args.partition,
         "hardware": "matthew: 2 MI210",
         "selection": (
             "v3 recipe plus the recipe change above and an early stop on the training "
