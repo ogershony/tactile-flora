@@ -39,8 +39,14 @@ def sha256(path: Path | str) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def header(name: str, base: Path, hours: int, partition: str = "long") -> str:
-    """Slurm preamble for a GPU step; ``normal`` (4 h cap) is not preempted by other users."""
+def header(
+    name: str, base: Path, hours: int, partition: str = "long", *, training: bool = False
+) -> str:
+    """Slurm preamble for a GPU step; ``normal`` (4 h cap) is not preempted by other users.
+
+    Training loads the 27B model on two ranks and needs 128 GB of host memory (64 GB was
+    OOM-killed in 4 minutes); evaluation runs one rank and fits in 64 GB.
+    """
     return "\n".join(
         [
             "#!/bin/bash",
@@ -49,8 +55,8 @@ def header(name: str, base: Path, hours: int, partition: str = "long") -> str:
             f"#SBATCH --partition={partition}",
             "#SBATCH --nodelist=matthew",
             "#SBATCH --gres=mi210:2",
-            f"#SBATCH --mem={'128G' if partition == 'long' else '64G'}",
-            f"#SBATCH --cpus-per-task={16 if partition == 'long' else 8}",
+            f"#SBATCH --mem={'128G' if training else '64G'}",
+            f"#SBATCH --cpus-per-task={16 if training else 8}",
             f"#SBATCH --time={hours:02d}:00:00",
             f"#SBATCH --job-name={name}",
             f"#SBATCH --output={REPO / base}/jobs/{name.removeprefix('flora-')}-%j.log",
@@ -105,7 +111,7 @@ def main() -> None:
         f"--config {cfg_path} --run-name {args.run_name} --plan {plan_path}"
     )
     hours = min(args.train_hours, 4) if args.partition == "normal" else args.train_hours
-    text = header(f"flora-{args.tag}-train", base, hours, args.partition)
+    text = header(f"flora-{args.tag}-train", base, hours, args.partition, training=True)
     text += f"{TORCHRUN} --standalone --nnodes=1 --nproc-per-node=2 {sft}\n"
     paths = {"train": jobs / f"train-{args.run_name}.sbatch"}
     paths["train"].write_text(text)
