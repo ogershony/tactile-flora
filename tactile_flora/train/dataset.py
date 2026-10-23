@@ -23,14 +23,15 @@ n_tokens (packing-free; batch size 1 per GPU, gradient accumulation in sft.py).
 
 from __future__ import annotations
 
+import random
 from collections.abc import Callable, Collection, Sequence
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Literal, Protocol
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
 
-from tactile_flora.config import ForceConfig, ForceMode
+from tactile_flora.config import ForceConfig, ForceMode, ModalityDropout
 from tactile_flora.eval.ablations import apply_force_mode
 from tactile_flora.force import normalize, render
 from tactile_flora.prompts.flora import VideoSpec, build_prompt, prompt_diff, to_messages
@@ -83,6 +84,7 @@ class Sample(BaseModel):
     input_ids: list[int]
     labels: list[int]
     n_tokens: int
+    variant: Literal["base", "video_blank", "force_omitted"] = "base"
 
 
 def answer_labels(prompt_ids: Sequence[int], full_ids: Sequence[int]) -> list[int]:
@@ -114,6 +116,22 @@ def _block(item: WindowItem, mode: ForceMode, pool: Sequence[ResampledForce], se
     return lines, ab.video_blank, ab.features
 
 
+def select_dropout(window_ids: Sequence[str], frac: float, seed: int, tag: str) -> frozenset[str]:
+    """Return the seeded, order-independent subset of ``round(frac * n)`` window ids."""
+    ids = sorted(set(window_ids))
+    rng = random.Random(f"{seed}:{tag}")
+    rng.shuffle(ids)
+    return frozenset(ids[: round(frac * len(ids))])
+
+
+def variant_counts(samples: Sequence[Sample]) -> dict[str, int]:
+    """Count samples per modality-dropout variant."""
+    out: dict[str, int] = {}
+    for s in samples:
+        out[s.variant] = out.get(s.variant, 0) + 1
+    return out
+
+
 def build_samples(
     manifest_path: Path | str,
     force_mode: ForceMode,
@@ -125,6 +143,7 @@ def build_samples(
     seed: int = 0,
     splits: Sequence[str] = ("train",),
     eval_only_sources: Collection[str] | None = None,
+    dropout: ModalityDropout | None = None,
 ) -> list[Sample]:
     """Build tokenized samples for every manifest row in ``splits``, sorted by n_tokens.
 
@@ -144,7 +163,40 @@ def build_samples(
         if item is not None:
             items.append((row, item))
     pool = [it.features for _, it in items if it.features is not None]
+    drop = dropout or ModalityDropout()
+    ids = [row.window_id for row, _ in items]
+    blank_ids = select_dropout(ids, drop.video_blank, seed, "video_blank")
+    omit_ids = select_dropout(ids, drop.force_omitted, seed, "force_omitted")
     samples: list[Sample] = []
+
+    def tokenized(
+        row: ManifestRow, item: WindowItem, block: str | None, *, blank: bool, variant: str
+    ) -> Sample:
+        w = item.window
+        bundle = build_prompt(
+            w,
+            block,
+            video_blank=blank,
+            task=item.task,
+            camera_roles=item.camera_roles,
+            fps=item.fps,
+        )
+        messages = to_messages(bundle)
+        prompt_ids = tokenizer.encode_prompt(messages, bundle.video)
+        full_ids = tokenizer.encode_with_answer(messages, w.target, bundle.video)
+        return Sample(
+            window_id=row.window_id,
+            messages=messages,
+            video=bundle.video,
+            episode=item.episode,
+            force_block=block,
+            target=w.target,
+            input_ids=list(full_ids),
+            labels=answer_labels(prompt_ids, full_ids),
+            n_tokens=len(full_ids),
+            variant=variant,  # type: ignore[arg-type]
+        )
+
     for row, item in items:
         w = item.window
         lines, blank, rendered = _block(item, force_mode, pool, seed, force_cfg)
@@ -153,11 +205,6 @@ def build_samples(
             if lines
             else None
         )
-        kw: dict[str, Any] = {
-            "task": item.task,
-            "camera_roles": item.camera_roles,
-            "fps": item.fps,
-        }
         if block is not None:
             prompt_diff(
                 w.model_copy(update={"force_lines": tuple(lines)}),
@@ -165,24 +212,16 @@ def build_samples(
                 task=item.task,
                 camera_roles=item.camera_roles,
             )
-        bundle = build_prompt(w, block, video_blank=blank, **kw)
-        messages = to_messages(bundle)
-        prompt_ids = tokenizer.encode_prompt(messages, bundle.video)
-        full_ids = tokenizer.encode_with_answer(messages, w.target, bundle.video)
-        samples.append(
-            Sample(
-                window_id=row.window_id,
-                messages=messages,
-                video=bundle.video,
-                episode=item.episode,
-                force_block=block,
-                target=w.target,
-                input_ids=list(full_ids),
-                labels=answer_labels(prompt_ids, full_ids),
-                n_tokens=len(full_ids),
-            )
-        )
-    return sorted(samples, key=lambda s: (s.n_tokens, s.window_id))
+        chosen = row.window_id in blank_ids or row.window_id in omit_ids
+        if not (drop.replace and chosen):
+            samples.append(tokenized(row, item, block, blank=blank, variant="base"))
+        if row.window_id in blank_ids:
+            if block is None:
+                raise ValueError(f"{row.window_id}: video_blank dropout needs a force block")
+            samples.append(tokenized(row, item, block, blank=True, variant="video_blank"))
+        if row.window_id in omit_ids:
+            samples.append(tokenized(row, item, None, blank=False, variant="force_omitted"))
+    return sorted(samples, key=lambda s: (s.n_tokens, s.window_id, s.variant))
 
 
 def token_histogram(samples: Sequence[Sample]) -> dict[str, float]:
@@ -326,6 +365,13 @@ class QwenTokenizerAdapter:
         text = text.replace(pad, pad * n, 1) if pad in text else text
         ids: list[int] = self.processor.tokenizer(text, add_special_tokens=False)["input_ids"]
         return ids
+
+    def score_token_ids(self) -> list[int]:
+        """Token ids of the digits 1-5 (single tokens in the Qwen vocabulary)."""
+        ids = [self.processor.tokenizer.convert_tokens_to_ids(str(d)) for d in range(1, 6)]
+        if any(i is None or i < 0 for i in ids):
+            raise ValueError("score digits are not single tokens in this tokenizer")
+        return [int(i) for i in ids]
 
     def encode_prompt(self, messages: Sequence[dict[str, Any]], video: VideoSpec) -> list[int]:
         """Prompt ids with the generation prompt."""

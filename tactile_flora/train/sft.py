@@ -55,6 +55,7 @@ from tactile_flora.train.dataset import (
     build_samples,
     estimate_wallclock,
     token_histogram,
+    variant_counts,
 )
 from tactile_flora.verify import full_git_hash, holdout_path, manifest
 from tactile_flora.video.mosaic import clip_frames, source_frame_count, video_metadata
@@ -125,12 +126,17 @@ def _answer_loss(logits: Any, labels: Any, kept: int | None) -> Any:
     )
 
 
-def _score_loss(logits: Any, labels: Any, kept: int | None) -> Any | None:
-    """Cross-entropy at the score digit alone: the answer's last token before end-of-turn.
+def _score_loss(
+    logits: Any, labels: Any, kept: int | None, score_ids: Sequence[int] | None = None
+) -> Any | None:
+    """Cross-entropy at the score digit alone.
 
     The outcome answer is a constant template plus one digit, so the mean answer loss reaches
     its floor once the template is memorized; this term tracks whether the digit is still being
-    learned. Samples with fewer than two answer tokens are skipped; None when none qualify.
+    learned. With ``score_ids`` (the token ids of "1".."5") the digit is the LAST answer label
+    among them, which skips the end-of-turn and newline tokens the chat template appends.
+    Without them the second-to-last answer token is used (stub tokenizers in tests). Samples
+    without a qualifying position are skipped; None when none qualify.
     """
     torch = _torch()
     if kept is not None:
@@ -138,9 +144,15 @@ def _score_loss(logits: Any, labels: Any, kept: int | None) -> Any | None:
     values = []
     for b in range(labels.size(0)):
         idx = (labels[b] != IGNORE_INDEX).nonzero().flatten()
-        if len(idx) < 2:
-            continue
-        pos = int(idx[-2])
+        if score_ids is not None:
+            idx = idx[torch.isin(labels[b][idx], torch.tensor(list(score_ids), device=idx.device))]
+            if len(idx) < 1:
+                continue
+            pos = int(idx[-1])
+        else:
+            if len(idx) < 2:
+                continue
+            pos = int(idx[-2])
         values.append(
             torch.nn.functional.cross_entropy(
                 logits[b, pos - 1].float().unsqueeze(0), labels[b, pos].unsqueeze(0)
@@ -169,6 +181,7 @@ def train_steps(
     params: Sequence[Any] | None = None,
     autocast_bf16: bool = False,
     early_stop: tuple[float, int, int] | None = None,
+    score_token_ids: Sequence[int] | None = None,
 ) -> list[float]:
     """Run the loop over ``batches`` (one micro-batch each); return the loss of every step.
 
@@ -228,7 +241,7 @@ def train_steps(
                     out = model(**inputs)
                     logits = getattr(out, "logits", out)
                     loss = _answer_loss(logits, labels, kept) * weight / len(group)
-                    score = _score_loss(logits.detach(), labels, kept)
+                    score = _score_loss(logits.detach(), labels, kept, score_token_ids)
                 loss.backward()
                 total += float(loss.detach())
                 if score is not None:
@@ -369,19 +382,26 @@ def train(
     tok = tokenizer or QwenTokenizerAdapter(cfg.base_model)
     samples = build_samples(
         mp, cfg.force_mode, force_cfg, data_root, tokenizer=tok, windows_source=windows_source,
-        seed=cfg.seed, eval_only_sources=eval_only_sources,
+        seed=cfg.seed, eval_only_sources=eval_only_sources, dropout=cfg.modality_dropout,
     )  # fmt: skip
     hist = token_histogram(samples)
+    variants = variant_counts(samples)
     eta_s = estimate_wallclock(samples, s_per_window) * cfg.epochs
     if rank == 0:
-        print(f"samples: {len(samples)}  force_mode: {cfg.force_mode}")
+        print(f"samples: {len(samples)}  force_mode: {cfg.force_mode}  variants: {variants}")
         print("tokens: " + "  ".join(f"{k}={v:.0f}" for k, v in hist.items()))
         print(f"estimated wall-clock: {eta_s / 3600:.2f} h at {s_per_window:g} s/window")
     if dry_run:
         if rank == 0:
             (run_dir / "dry_run.json").write_text(
                 json.dumps(
-                    {"n_samples": len(samples), "histogram": hist, "eta_s": eta_s}, indent=2
+                    {
+                        "n_samples": len(samples),
+                        "variants": variants,
+                        "histogram": hist,
+                        "eta_s": eta_s,
+                    },
+                    indent=2,
                 ),
                 encoding="utf-8",
             )
@@ -427,6 +447,7 @@ def train(
         params=params,
         autocast_bf16=isinstance(backend, HFBackend),
         early_stop=early_stop,
+        score_token_ids=getattr(tok, "score_token_ids", lambda: None)(),
     )
     adapter_dir = run_dir / "adapter"
     if backend.rank == 0:

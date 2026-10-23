@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Literal, TypeVar
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 ForceMode = Literal["real", "omitted", "zero", "shuffled", "video_blank"]
 
@@ -113,6 +113,20 @@ class LoraConfig(_Strict):
     target_modules: list[str]
 
 
+class ModalityDropout(_Strict):
+    """Per-sample modality dropout for training (defaults reproduce the plain recipe).
+
+    ``video_blank``: fraction of training rows that ALSO get a copy with mid-gray video and the
+    real force block, so the force path must carry the answer on its own. ``force_omitted``:
+    fraction that also get a copy without the force block. ``replace`` swaps the copies in for
+    the originals instead of adding them. Selection is seeded and independent of row order.
+    """
+
+    video_blank: float = Field(default=0.0, ge=0, le=1)
+    force_omitted: float = Field(default=0.0, ge=0, le=1)
+    replace: bool = False
+
+
 class TrainConfig(_Strict):
     """LoRA SFT run configuration (configs/train/*.yaml)."""
 
@@ -134,6 +148,14 @@ class TrainConfig(_Strict):
     early_stop_score_loss: float | None = Field(default=None, gt=0)
     early_stop_window: int = Field(default=10, ge=1)
     early_stop_min_epochs: int = Field(default=2, ge=0)
+    modality_dropout: ModalityDropout = Field(default_factory=ModalityDropout)
+
+    @model_validator(mode="after")
+    def _dropout_needs_a_block(self) -> TrainConfig:
+        d = self.modality_dropout
+        if self.force_mode == "omitted" and (d.video_blank or d.force_omitted):
+            raise ValueError("modality_dropout needs a force block; force_mode is omitted")
+        return self
 
 
 class BenchmarkSpec(_Strict):

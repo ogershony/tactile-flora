@@ -38,7 +38,16 @@ def main(argv: list[str] | None = None) -> None:
         directory = base / "runs" / name
         with (directory / "loss.csv").open() as handle:
             losses = list(csv.DictReader(handle))
-        if len(losses) != plan["optimizer_steps_per_run"]:
+        if "optimizer_steps_per_run" in plan:
+            expected = {int(plan["optimizer_steps_per_run"])}
+        else:  # fold / v5 plans: a fixed step count per epoch and an optional early stop
+            per_epoch = int(plan["optimizer_steps_per_epoch"])
+            train_cfg = plan["configs"]["force"]
+            low = per_epoch * int(train_cfg.get("early_stop_min_epochs", train_cfg["epochs"]))
+            if train_cfg.get("early_stop_score_loss") is None:
+                low = per_epoch * int(train_cfg["epochs"])
+            expected = set(range(low, per_epoch * int(train_cfg["epochs"]) + 1))
+        if len(losses) not in expected:
             raise ValueError(f"unexpected optimizer update count: {name}")
         if (directory / "manifest_hash.txt").read_text().strip() != plan["manifest_sha256"]:
             raise ValueError(f"training manifest mismatch: {name}")

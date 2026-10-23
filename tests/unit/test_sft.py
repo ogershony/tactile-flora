@@ -262,3 +262,21 @@ def test_early_stop_on_score_loss(tmp_path: Path) -> None:
     # Without the rule nothing changes.
     losses = sft.train_steps(_Wrap(model), batches, opt, sch, accum=1, grad_clip=1.0)
     assert len(losses) == 20
+
+
+def test_score_loss_picks_the_last_digit_token_before_the_template_tail() -> None:
+    torch = pytest.importorskip("torch")
+    # answer: [template..., digit=5, im_end=90, newline=91]; digits are ids 1..5
+    labels = torch.tensor([[-100, -100, 30, 31, 5, 90, 91]])
+    logits = torch.zeros(1, 7, VOCAB)
+    logits[0, 3, 5] = 8.0  # position 3 predicts position 4 (the digit) confidently
+    logits[0, 4, 90] = 8.0
+    with_ids = sft._score_loss(logits, labels, None, score_ids=[1, 2, 3, 4, 5])
+    without = sft._score_loss(logits, labels, None)
+    assert with_ids is not None and without is not None
+    assert float(with_ids) < 0.05  # the digit itself (logit 8 against 96 zeros)
+    assert float(without) < 0.05  # second-to-last token: im_end here, also confident
+    logits[0, 3, 5] = 0.0
+    unsure = sft._score_loss(logits, labels, None, score_ids=[1, 2, 3, 4, 5])
+    assert unsure is not None and float(unsure) > 1.0
+    assert sft._score_loss(logits, labels, None, score_ids=[7]) is None
