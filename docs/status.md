@@ -1,4 +1,22 @@
-# Status report (2026-10-22)
+# Status report (2026-10-23)
+
+## Relaunch, 2026-10-23 morning
+
+Last night's v5 arm A training (`6395`, `normal` partition, 128 GB) ran out of its 4 h limit
+on optimizer step ~80 of 87 and saved no adapter: the run has 455 samples per epoch (350 clips
+plus 105 video-blank dropout variants), so three epochs need about 4.3 h with model load. The
+dependent evaluation, arm B and report jobs became unsatisfiable. Both arms are relaunched
+with **two epochs** (58 updates) and a new `max_wall_minutes: 215` training budget: the loop
+stops after the first update that overruns the budget and still saves the adapter. Stop
+decisions (budget and the existing score-loss early stop) are now reduced across both ranks.
+The timed-out plan, pipeline files and partial run are archived under
+`data/acceptance/hrdexdb-expanded-v5/attempts/timeout-6395/`.
+
+New chain, all on `normal`: arm A `6428` training -> `6429` development -> `6430` test;
+arm B `6431` training (afterany 6430) -> `6432` development -> `6433` test; CPU report
+`6434` (afterok 6433) writes `paired-comparison.md`. Fifteen dead jobs from the earlier
+chains (6340-6343, 6384, 6390-6394, 6396-6400) are still pending and must be cancelled by hand.
+Pre-relaunch validation: trainer, config, plan and comparison tests pass; Ruff and Pyright pass.
 
 ## Recovery update, 2026-10-22 22:48 PDT
 
