@@ -45,6 +45,10 @@ class SourceConfig(_Strict):
     # and inspire_dftp closure sign-corrected (Inspire angles are 1000 open, 0 closed).
     hrdexdb_force_representation: Literal["legacy", "tared"] = "legacy"
     hrdexdb_tare_s: float = Field(default=1.0, gt=0)
+    # Per-hand multiplier applied to the raw force before taring, so hands whose sensors report
+    # different units share one set of normalization constants (fitted on training trials
+    # only, e.g. {"inspire_f1": 2.9} brings the F1 median grasp onto the DFTP scale).
+    hrdexdb_hand_scale: dict[str, float] = Field(default_factory=dict)
     seed: int
 
 
@@ -123,6 +127,13 @@ class TrainConfig(_Strict):
     effective_batch: int
     lora: LoraConfig
     output_dir: str
+    # Optional early stop on the training loss of the score digit (the answer token before
+    # end-of-turn): stop once at least ``early_stop_min_epochs`` are done and the mean score
+    # loss over the last ``early_stop_window`` optimizer steps is below
+    # ``early_stop_score_loss``. None keeps the fixed epoch count.
+    early_stop_score_loss: float | None = Field(default=None, gt=0)
+    early_stop_window: int = Field(default=10, ge=1)
+    early_stop_min_epochs: int = Field(default=2, ge=0)
 
 
 class BenchmarkSpec(_Strict):

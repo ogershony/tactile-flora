@@ -231,3 +231,34 @@ def test_full_train_with_backend_factory(tmp_path: Path) -> None:
         assert (run / name).exists(), name
     assert (run / "git_hash.txt").read_text().strip() == "rv"
     assert (run / "loss.csv").read_text().count("\n") == 3  # header + 2 steps (3 samples, batch 2)
+
+
+def test_early_stop_on_score_loss(tmp_path: Path) -> None:
+    torch = pytest.importorskip("torch")
+    nn = torch.nn
+    model = nn.Sequential(nn.Embedding(VOCAB, 8), nn.Linear(8, VOCAB))
+    opt = torch.optim.AdamW(model.parameters(), lr=0.05)
+    sch = sft.make_scheduler(opt, 20, 0.1)
+    ids = torch.randint(0, VOCAB, (1, 12), generator=torch.Generator().manual_seed(0))
+    labels = ids.clone()
+    labels[:, :8] = -100
+    batches = [{"input_ids": ids, "labels": labels}] * 20
+    # A floor no finite loss can miss: training stops as soon as min_steps and the window allow.
+    losses = sft.train_steps(
+        _Wrap(model),
+        batches,
+        opt,
+        sch,
+        accum=1,
+        grad_clip=1.0,
+        run_dir=tmp_path,
+        early_stop=(1e9, 3, 5),
+    )
+    assert len(losses) == 5
+    rows = (tmp_path / "loss.csv").read_text().splitlines()
+    assert rows[0] == "step,loss,lr,score_loss" and len(rows) == 6
+    assert float(rows[1].split(",")[3]) > 0
+    assert '"early_stop": 5' in (tmp_path / "log.jsonl").read_text()
+    # Without the rule nothing changes.
+    losses = sft.train_steps(_Wrap(model), batches, opt, sch, accum=1, grad_clip=1.0)
+    assert len(losses) == 20

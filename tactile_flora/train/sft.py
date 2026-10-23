@@ -125,6 +125,30 @@ def _answer_loss(logits: Any, labels: Any, kept: int | None) -> Any:
     )
 
 
+def _score_loss(logits: Any, labels: Any, kept: int | None) -> Any | None:
+    """Cross-entropy at the score digit alone: the answer's last token before end-of-turn.
+
+    The outcome answer is a constant template plus one digit, so the mean answer loss reaches
+    its floor once the template is memorized; this term tracks whether the digit is still being
+    learned. Samples with fewer than two answer tokens are skipped; None when none qualify.
+    """
+    torch = _torch()
+    if kept is not None:
+        labels = labels[:, -kept:]
+    values = []
+    for b in range(labels.size(0)):
+        idx = (labels[b] != IGNORE_INDEX).nonzero().flatten()
+        if len(idx) < 2:
+            continue
+        pos = int(idx[-2])
+        values.append(
+            torch.nn.functional.cross_entropy(
+                logits[b, pos - 1].float().unsqueeze(0), labels[b, pos].unsqueeze(0)
+            )
+        )
+    return torch.stack(values).mean() if values else None
+
+
 def _first_answer(labels: Any) -> int:
     idx = (labels[0] != IGNORE_INDEX).nonzero()
     return int(idx[0, 0])
@@ -144,6 +168,7 @@ def train_steps(
     keep_logits: bool = False,
     params: Sequence[Any] | None = None,
     autocast_bf16: bool = False,
+    early_stop: tuple[float, int, int] | None = None,
 ) -> list[float]:
     """Run the loop over ``batches`` (one micro-batch each); return the loss of every step.
 
@@ -156,13 +181,14 @@ def train_steps(
     model.train()
     clip_params = list(params) if params is not None else list(model.parameters())
     losses: list[float] = []
+    score_losses: list[float] = []
     csv_fh = jsonl_fh = None
     writer: Any = None
     if run_dir is not None:
         run_dir.mkdir(parents=True, exist_ok=True)
         csv_fh = open(run_dir / "loss.csv", "w", newline="", encoding="utf-8")  # noqa: SIM115
         writer = csv.writer(csv_fh)
-        writer.writerow(["step", "loss", "lr"])
+        writer.writerow(["step", "loss", "lr", "score_loss"])
         jsonl_fh = open(run_dir / "log.jsonl", "w", encoding="utf-8")  # noqa: SIM115
     it: Iterator[dict[str, Any]] = iter(batches)
     step = 0
@@ -179,6 +205,7 @@ def train_steps(
                 break
             optimizer.zero_grad(set_to_none=True)
             total = 0.0
+            score_total = 0.0
             for batch in group:
                 if device is not None:
                     batch = {k: v.to(device) if hasattr(v, "to") else v for k, v in batch.items()}
@@ -201,8 +228,11 @@ def train_steps(
                     out = model(**inputs)
                     logits = getattr(out, "logits", out)
                     loss = _answer_loss(logits, labels, kept) * weight / len(group)
+                    score = _score_loss(logits.detach(), labels, kept)
                 loss.backward()
                 total += float(loss.detach())
+                if score is not None:
+                    score_total += float(score) * weight / len(group)
                 tokens += int(labels.size(1))
             clip = getattr(model, "clip_grad_norm_", None)
             if callable(clip):
@@ -214,8 +244,9 @@ def train_steps(
             scheduler.step()
             step += 1
             losses.append(total)
+            score_losses.append(score_total)
             if writer is not None and csv_fh is not None:
-                writer.writerow([step, f"{total:.6f}", f"{lr:.3e}"])
+                writer.writerow([step, f"{total:.6f}", f"{lr:.3e}", f"{score_total:.6f}"])
                 csv_fh.flush()
             if jsonl_fh is not None and step % log_every == 0:
                 now = time.monotonic()
@@ -225,6 +256,7 @@ def train_steps(
                 rec = {
                     "step": step,
                     "loss": total,
+                    "score_loss": score_total,
                     "lr": lr,
                     "tok_s": tokens / max(now - t_last, 1e-9),
                     "gpu_mem_gb": mem,
@@ -233,6 +265,30 @@ def train_steps(
                 jsonl_fh.flush()
                 log.info("step %d loss %.4f lr %.2e tok/s %.0f", step, total, lr, rec["tok_s"])
                 t_last, tokens = now, 0
+            if early_stop is not None:
+                floor, window, min_steps = early_stop
+                recent = score_losses[-window:]
+                if step >= min_steps and len(recent) >= window and sum(recent) / window < floor:
+                    log.info(
+                        "early stop at step %d: mean score loss %.4f < %.4f",
+                        step,
+                        sum(recent) / window,
+                        floor,
+                    )
+                    if jsonl_fh is not None:
+                        jsonl_fh.write(
+                            json.dumps(
+                                {
+                                    "early_stop": step,
+                                    "mean_score_loss": sum(recent) / window,
+                                    "floor": floor,
+                                    "window": window,
+                                }
+                            )
+                            + "\n"
+                        )
+                        jsonl_fh.flush()
+                    break
     finally:
         for fh in (csv_fh, jsonl_fh):
             if fh is not None:
@@ -351,6 +407,13 @@ def train(
     accum = max(1, math.ceil(cfg.effective_batch / backend.world_size))
     total_steps = len(groups) * cfg.epochs
     scheduler = make_scheduler(optimizer, total_steps, cfg.warmup_frac)
+    early_stop = None
+    if cfg.early_stop_score_loss is not None:
+        early_stop = (
+            cfg.early_stop_score_loss,
+            cfg.early_stop_window,
+            len(groups) * cfg.early_stop_min_epochs,
+        )
     train_steps(
         backend.model,
         _batches(groups, backend, cfg.epochs),
@@ -363,6 +426,7 @@ def train(
         keep_logits=isinstance(backend, HFBackend),
         params=params,
         autocast_bf16=isinstance(backend, HFBackend),
+        early_stop=early_stop,
     )
     adapter_dir = run_dir / "adapter"
     if backend.rank == 0:

@@ -32,7 +32,10 @@ def planned_report_version(base: Path, cfg: TrainConfig) -> str | None:
         return None
     plan = json.loads(path.read_text())
     job = os.environ.get("SLURM_JOB_ID")
-    if job is None or str(plan.get("slurm_training_job")) != job:
+    planned = {str(plan.get("slurm_training_job"))} | {
+        str(j) for j in plan.get("slurm_training_jobs", [])
+    }
+    if job is None or job not in planned:
         return None
     if cfg.model_dump() not in plan["configs"].values():
         raise ValueError("configuration differs from the active training plan")
