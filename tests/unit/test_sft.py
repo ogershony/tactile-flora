@@ -280,3 +280,45 @@ def test_score_loss_picks_the_last_digit_token_before_the_template_tail() -> Non
     unsure = sft._score_loss(logits, labels, None, score_ids=[1, 2, 3, 4, 5])
     assert unsure is not None and float(unsure) > 1.0
     assert sft._score_loss(logits, labels, None, score_ids=[7]) is None
+
+
+def test_wall_budget_stops_after_the_step_that_overruns(tmp_path: Path) -> None:
+    import time
+
+    torch = pytest.importorskip("torch")
+    nn = torch.nn
+    model = nn.Sequential(nn.Embedding(VOCAB, 8), nn.Linear(8, VOCAB))
+    opt = torch.optim.AdamW(model.parameters(), lr=0.05)
+    sch = sft.make_scheduler(opt, 20, 0.1)
+    ids = torch.randint(0, VOCAB, (1, 12), generator=torch.Generator().manual_seed(0))
+    labels = ids.clone()
+    labels[:, :8] = -100
+    batches = [{"input_ids": ids, "labels": labels}] * 20
+    # A budget that was already spent before the loop started: exactly one step runs, so the
+    # adapter saved afterwards reflects real training rather than an untouched model.
+    losses = sft.train_steps(
+        _Wrap(model),
+        batches,
+        opt,
+        sch,
+        accum=1,
+        grad_clip=1.0,
+        run_dir=tmp_path,
+        wall_budget=(time.monotonic() - 100.0, 1.0),
+    )
+    assert len(losses) == 1
+    record = json.loads((tmp_path / "log.jsonl").read_text().splitlines()[-1])
+    assert record["wall_budget_stop"] == 1 and record["elapsed_s"] > record["budget_s"]
+    # A generous budget changes nothing.
+    losses = sft.train_steps(
+        _Wrap(model), batches, opt, sch, accum=1, grad_clip=1.0,
+        wall_budget=(time.monotonic(), 3600.0),
+    )  # fmt: skip
+    assert len(losses) == 20
+
+
+def test_train_config_accepts_a_wall_budget(tmp_path: Path) -> None:
+    mp = write_manifest(tmp_path / "manifest" / "train.parquet", report_version="rv")
+    assert _cfg(tmp_path, mp, max_wall_minutes=215).max_wall_minutes == 215
+    with pytest.raises(ValueError):
+        _cfg(tmp_path, mp, max_wall_minutes=0)

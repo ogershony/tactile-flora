@@ -148,6 +148,10 @@ class TrainConfig(_Strict):
     early_stop_score_loss: float | None = Field(default=None, gt=0)
     early_stop_window: int = Field(default=10, ge=1)
     early_stop_min_epochs: int = Field(default=2, ge=0)
+    # Optional wall-clock budget measured from the start of ``train`` (model load included):
+    # once exceeded, the loop stops after the current optimizer step and the adapter is saved,
+    # so a Slurm time limit cannot discard a nearly finished run. None trains every epoch.
+    max_wall_minutes: float | None = Field(default=None, gt=0)
     modality_dropout: ModalityDropout = Field(default_factory=ModalityDropout)
 
     @model_validator(mode="after")

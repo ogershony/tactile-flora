@@ -182,6 +182,7 @@ def train_steps(
     autocast_bf16: bool = False,
     early_stop: tuple[float, int, int] | None = None,
     score_token_ids: Sequence[int] | None = None,
+    wall_budget: tuple[float, float] | None = None,
 ) -> list[float]:
     """Run the loop over ``batches`` (one micro-batch each); return the loss of every step.
 
@@ -189,6 +190,10 @@ def train_steps(
     closes a short global batch so accumulation cannot cross an epoch boundary.
     ``keep_logits`` passes ``logits_to_keep`` so only the answer suffix is projected to the
     vocabulary (HF models). With ``run_dir`` it writes loss.csv and log.jsonl.
+    ``wall_budget`` is ``(time.monotonic() at the start, budget in seconds)``: the loop stops
+    after the first optimizer step that ends past the budget. Both this and ``early_stop`` are
+    decided jointly across ranks (any rank asking to stop stops all), so no rank is left
+    waiting in a collective.
     """
     torch = _torch()
     model.train()
@@ -278,35 +283,46 @@ def train_steps(
                 jsonl_fh.flush()
                 log.info("step %d loss %.4f lr %.2e tok/s %.0f", step, total, lr, rec["tok_s"])
                 t_last, tokens = now, 0
+            stop: dict[str, Any] | None = None
             if early_stop is not None:
                 floor, window, min_steps = early_stop
                 recent = score_losses[-window:]
                 if step >= min_steps and len(recent) >= window and sum(recent) / window < floor:
-                    log.info(
-                        "early stop at step %d: mean score loss %.4f < %.4f",
-                        step,
-                        sum(recent) / window,
-                        floor,
-                    )
-                    if jsonl_fh is not None:
-                        jsonl_fh.write(
-                            json.dumps(
-                                {
-                                    "early_stop": step,
-                                    "mean_score_loss": sum(recent) / window,
-                                    "floor": floor,
-                                    "window": window,
-                                }
-                            )
-                            + "\n"
-                        )
-                        jsonl_fh.flush()
-                    break
+                    stop = {
+                        "early_stop": step,
+                        "mean_score_loss": sum(recent) / window,
+                        "floor": floor,
+                        "window": window,
+                    }
+            if stop is None and wall_budget is not None:
+                started, budget_s = wall_budget
+                elapsed = time.monotonic() - started
+                if elapsed > budget_s:
+                    stop = {"wall_budget_stop": step, "elapsed_s": elapsed, "budget_s": budget_s}
+            if _any_rank(stop is not None, device):
+                if stop is None:  # another rank asked; record that this one followed
+                    stop = {"peer_stop": step}
+                log.info("stopping at step %d: %s", step, json.dumps(stop))
+                if jsonl_fh is not None:
+                    jsonl_fh.write(json.dumps(stop) + "\n")
+                    jsonl_fh.flush()
+                break
     finally:
         for fh in (csv_fh, jsonl_fh):
             if fh is not None:
                 fh.close()
     return losses
+
+
+def _any_rank(flag: bool, device: Any) -> bool:
+    """Return whether any rank set ``flag`` (a plain bool outside a torch.distributed group)."""
+    torch = _torch()
+    dist = getattr(torch, "distributed", None)
+    if dist is None or not dist.is_available() or not dist.is_initialized():
+        return flag
+    t = torch.tensor([int(flag)], device=device if device is not None else "cpu")
+    dist.all_reduce(t, op=dist.ReduceOp.MAX)
+    return bool(int(t.item()))
 
 
 def ordered_groups(
@@ -374,6 +390,7 @@ def train(
     report_version: str | None = None,
 ) -> Path:
     """Run (or dry-run) one SFT run and return its run directory."""
+    started = time.monotonic()  # the wall budget counts model load and sample building too
     version = report_version or full_git_hash()
     mp = _check_preconditions(cfg, data_root, allow_stale_manifest, version)
     run_dir = Path(cfg.output_dir) / (run_name or f"sft-{cfg.force_mode}")
@@ -448,6 +465,7 @@ def train(
         autocast_bf16=isinstance(backend, HFBackend),
         early_stop=early_stop,
         score_token_ids=getattr(tok, "score_token_ids", lambda: None)(),
+        wall_budget=(started, cfg.max_wall_minutes * 60) if cfg.max_wall_minutes else None,
     )
     adapter_dir = run_dir / "adapter"
     if backend.rank == 0:
