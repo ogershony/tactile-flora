@@ -124,3 +124,43 @@ These are legitimate because dev is held out from training, and they need no ret
 - The dead v3 chain (jobs 6340 to 6343) still needs cancelling.
 - `jobs/eval-train.sbatch` passes a `--skip-released` flag the eval script does not define; fix
   before reusing the train-set eval.
+
+## Status, 2026-10-22 evening: Track A gate failed for inspire_f1, v4 pivoted to rotated folds
+
+The inspire_f1 download (587 trials, 13 GB) and loader are done, and the signal audit the gate
+asked for was run on all 586 labeled trials (`data/acceptance/hrdexdb-expanded-v4/f1-signal-audit.json`):
+
+| Force-only, object-grouped 5-fold CV | clips | failures | AUROC | majority |
+|---|---:|---:|---:|---:|
+| inspire_dftp (the hand already used) | 618 | 231 | 0.738 | 62.6% |
+| inspire_f1 | 586 | 164 | 0.729 | 72.0% |
+| inspire_f1, trials with sensor contact only | 439 | 98 | 0.716 | 77.7% |
+
+f1 is not higher signal, and 97 of its 422 successful grasps register no fingertip force at all
+(peak under 10 raw units), concentrated on bowls, baskets, funnels and dish racks where the
+contact lands off the sensors. A force model trained on it would learn that "no force" is
+compatible with success. Cross-hand transfer of scale-free force features is AUROC 0.63, so the
+two hands do not even share a signature. Decision: f1 is not used for force training.
+
+v4 keeps the DFTP signal that produced the v3 gain and attacks the power problem directly with
+two rotated object folds (`scripts/cluster/prepare_hrdexdb_folds.py`): v3's training objects
+are split in two hash-ordered halves, fold B holds out one half and fold C the other, each
+trained on everything else with v3's recipe, normalization and classifier refitted on that
+fold's training trials. This adds 350 new object-disjoint held-out clips (fold B 177, fold C
+173) on top of v3's 251, every v3 training object evaluated out-of-object exactly once.
+
+Training also gained a loss on the score digit alone and an early stop on it (mean over 10
+updates below 0.03 after at least 2 epochs), so an arm that has memorized its training digits
+stops instead of running all 4 epochs.
+
+| Job | Step | Depends on | Limit |
+|---|---|---|---|
+| 6368 | fold B force SFT (424 clips) | running since 21:20 | 10 h |
+| 6369 | fold B control SFT | 6368 | 10 h |
+| 6370, 6371 | fold B dev and test eval (released, control, force real, force shuffled) | chained | 6 h each |
+| 6372 | fold B report | 6371 | 1 h |
+| 6373 to 6377 | fold C, same chain | after 6372 | |
+
+Everything runs on the `long` partition so nothing preempts anything. Expected: fold B numbers
+between 05:00 and 11:00 on 2026-10-23 depending on the early stop, fold C 8 to 14 h after that.
+
