@@ -1,0 +1,22 @@
+# results.json dev_threshold (HRDexDB TEST at the E[s] cut maximizing DEV BA; failure if E[s] <= cut) and per-hand TEST AUROC (Colab, 2026-10-24 ~03:04 UTC)
+force_classifier|hrdexdb_v4_test|none   cut 3.868 BA 0.659 FR 0.748 SR 0.570
+fusion_released|hrdexdb_v4_test|none    cut -0.685 (rank fraction) BA 0.751 FR 0.556 SR 0.946
+fusion_v4_control|hrdexdb_v4_test|none  cut -0.587 (rank fraction) BA 0.823 FR 0.795 SR 0.852
+hand_prior|hrdexdb_v4_test|none         cut -0.244 BA 0.500 FR 1.000 SR 0.000
+released|hrdexdb_v4_test|omitted        cut 3.176 BA 0.775 FR 0.636 SR 0.913
+released|hrdexdb_v4_test|real           cut 3.229 BA 0.763 FR 0.722 SR 0.805
+v4_control|hrdexdb_v4_test|omitted      cut 4.109 BA 0.886 FR 0.921 SR 0.852
+v4_force|hrdexdb_v4_test|omitted        cut 4.109 BA 0.883 FR 0.868 SR 0.899
+v4_force|hrdexdb_v4_test|real           cut 3.604 BA 0.909 FR 0.854 SR 0.964
+v4_force|hrdexdb_v4_test|shuffled       cut 3.822 BA 0.900 FR 0.861 SR 0.939
+# per-hand HRDexDB TEST AUROC (inspire_dftp / inspire_f1)
+force_classifier|none 0.783 / 0.708
+fusion_released|none 0.856 / 0.849
+fusion_v4_control|none 0.906 / 0.932
+hand_prior|none 0.500 / 0.500
+released|omitted 0.759 / 0.874
+released|real 0.878 / 0.906
+v4_control|omitted 0.959 / 0.976
+v4_force|omitted 0.959 / 0.982
+v4_force|real 0.941 / 0.981
+v4_force|shuffled 0.947 / 0.983

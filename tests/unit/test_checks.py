@@ -182,7 +182,7 @@ def test_sync_without_gripper_passes() -> None:
 def test_normalization_fails_on_wrong_constants() -> None:
     c = CTX.norm
     arms = {a: ArmNorm(**{**n.model_dump(), "scale": 3 * n.scale}) for a, n in c.arms.items()}
-    wrong = NormConstants(source=c.source, channel=c.channel, arms=arms)
+    wrong = NormConstants(source=c.source, channel=c.channel, groups={"all": arms})
     r = checks.check_normalization(EP, make_ctx(EPS, norm=wrong))
     assert not r.passed and "grasp median" in r.detail
     assert not checks.check_normalization(EP, make_ctx(EPS, norm=None)).passed
@@ -388,3 +388,43 @@ def test_prompt_diff_uses_tokenizer_json(tmp_path: Path) -> None:
     )
     r = checks.check_prompt_diff(EP, make_ctx(EPS, render_cfg=cfg))
     assert r.passed and r.value == 1.0
+
+
+def test_normalization_check_uses_the_episode_group_constants() -> None:
+    from tactile_flora.force import normalize
+    from tactile_flora.force.resample import resample
+    from tests.fixtures.verify_ctx import TIMES
+
+    feats = [resample(e.force, e.gripper, TIMES, FORCE_CFG.resample) for e in EPS]
+    grouped = normalize.fit([("Carton", f) for f in feats], FORCE_CFG.resample, source="phantom")
+    carton = EP.model_copy(update={"source": "phantom", "meta": {"task_folder": "Carton_fail"}})
+    r = checks.check_normalization(carton, make_ctx(EPS, norm=grouped))
+    assert r.passed and r.value is not None and abs(r.value - 1.0) < 0.35
+    # an episode whose group was never fitted fails the check instead of raising
+    r = checks.check_normalization(EP, make_ctx(EPS, norm=grouped))
+    assert not r.passed and "no constants for group" in r.detail
+
+
+def test_normalization_check_grasp_frames_follow_the_fitted_rule() -> None:
+    from tactile_flora.force.normalize import ArmNorm, NormConstants
+
+    c = CTX.norm
+    # same constants, but declared to have been fitted with the p75 fallback at g >= 0.3:
+    # the check must then count the half-closed frames as grasp frames too
+    arms = {
+        a: ArmNorm(**{**n.model_dump(), "grasp_rule": "p75", "grasp_g": 0.3})
+        for a, n in c.arms.items()
+    }
+    loose = NormConstants(source=c.source, channel=c.channel, groups={"all": arms})
+    strict = checks.check_normalization(EP, CTX)
+    r = checks.check_normalization(EP, make_ctx(EPS, norm=loose))
+    assert r.passed and r.value is not None and strict.value is not None
+    assert r.value < strict.value  # the closing frames pull the grasp median down
+
+
+def test_normalization_check_marks_episodes_excluded_from_the_fit() -> None:
+    plain = json.loads(checks.check_normalization(EP, CTX).detail)
+    assert "excluded" not in plain
+    flagged = EP.model_copy(update={"meta": {"exclude_from_norm_fit": True}})
+    doc = json.loads(checks.check_normalization(flagged, CTX).detail)
+    assert doc["excluded"] is True and doc["grasp"] == plain["grasp"]

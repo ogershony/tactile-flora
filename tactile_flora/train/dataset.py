@@ -19,10 +19,16 @@ window's own force lines) and ``omitted`` are possible. Every sample asserts, vi
 Masking: the prompt (chat template with generation prompt) and prompt+answer are tokenized
 separately; labels are -100 everywhere except the answer tokens. Samples are returned sorted by
 n_tokens (packing-free; batch size 1 per GPU, gradient accumulation in sft.py).
+
+Weights: ``Sample.weight`` is the class-balance factor sft.py multiplies into each micro-batch
+loss. It is ``failure_weight`` for an outcome window whose target parses (prompts.parse) to a
+score <= ``FAILURE_SCORE_MAX``, ``dense_failure_weight`` for a dense window whose Worst digit is
+<= ``DENSE_FAILURE_MAX``, and 1.0 for every other sample.
 """
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable, Collection, Sequence
 from pathlib import Path
 from typing import Any, Protocol
@@ -33,12 +39,24 @@ from pydantic import BaseModel, ConfigDict
 from tactile_flora.config import ForceConfig, ForceMode
 from tactile_flora.eval.ablations import apply_force_mode
 from tactile_flora.force import normalize, render
-from tactile_flora.prompts.flora import VideoSpec, build_prompt, prompt_diff, to_messages
+from tactile_flora.prompts.flora import (
+    VideoSpec,
+    build_prompt,
+    force_sentence_for,
+    prompt_diff,
+    to_messages,
+)
+from tactile_flora.prompts.parse import parse_dense, parse_outcome
 from tactile_flora.schema import Episode, ManifestRow, ResampledForce, Window
 from tactile_flora.verify import manifest as manifest_mod
-from tactile_flora.video.mosaic import VISUAL_TOKEN_CAP
+from tactile_flora.video.mosaic import VISUAL_TOKEN_CAP, Collage
 
 IGNORE_INDEX = -100
+# An outcome target scored at or below this counts as a failure for cfg.failure_weight.
+FAILURE_SCORE_MAX = 2
+# A dense target whose Worst digit is at or below this counts as non-normal for
+# cfg.dense_failure_weight (1 failure, 2 suboptimal, 3 normal).
+DENSE_FAILURE_MAX = 2
 
 
 class Tokenizer(Protocol):
@@ -83,6 +101,35 @@ class Sample(BaseModel):
     input_ids: list[int]
     labels: list[int]
     n_tokens: int
+    # class-balance loss factor (see the module docstring); sft.py multiplies it into loss_weight
+    weight: float = 1.0
+
+
+def score_only_target(target: str) -> str:
+    """``Score: N`` for an outcome target with or without a rationale (the final score digit)."""
+    m = re.search(r"(?:^|\n)Score:\s*([1-5])\s*$", target.strip())
+    if m is None:
+        raise ValueError(f"not an outcome target: {target!r}")
+    return f"Score: {m.group(1)}"
+
+
+def is_dense_failure_target(target: str) -> bool:
+    """Return True when ``target`` is a dense answer whose Worst digit is <= DENSE_FAILURE_MAX.
+
+    A target that does not parse as dense (outcome answers included) is never a dense failure.
+    """
+    d = parse_dense(target)
+    return not d.parse_failed and d.worst <= DENSE_FAILURE_MAX
+
+
+def is_failure_target(target: str) -> bool:
+    """Return True when ``target`` is an outcome answer scored <= FAILURE_SCORE_MAX.
+
+    Uses the outcome grammar of prompts.parse, so a dense answer (``Worst: ...``) or any text
+    that does not parse is never a failure.
+    """
+    score = parse_outcome(target).score
+    return score is not None and score <= FAILURE_SCORE_MAX
 
 
 def answer_labels(prompt_ids: Sequence[int], full_ids: Sequence[int]) -> list[int]:
@@ -110,7 +157,9 @@ def _block(item: WindowItem, mode: ForceMode, pool: Sequence[ResampledForce], se
     ab = apply_force_mode(item.features, mode, pool=pool, seed=seed)
     if ab.features is None:
         return [], ab.video_blank, None
-    lines = render.render_lines(ab.features, w.frame_times, item.features.channel)
+    lines = render.render_lines(
+        ab.features, w.frame_times, item.features.channel, cfg=force_cfg.render
+    )
     return lines, ab.video_blank, ab.features
 
 
@@ -125,9 +174,17 @@ def build_samples(
     seed: int = 0,
     splits: Sequence[str] = ("train",),
     eval_only_sources: Collection[str] | None = None,
+    failure_weight: float = 1.0,
+    dense_failure_weight: float = 1.0,
+    collage: Collage = "cell",
+    score_only: bool = False,
 ) -> list[Sample]:
     """Build tokenized samples for every manifest row in ``splits``, sorted by n_tokens.
 
+    ``failure_weight`` (TrainConfig.failure_weight) becomes ``Sample.weight`` of every outcome
+    window whose target is a failure (``is_failure_target``) and ``dense_failure_weight`` that of
+    every dense window with a non-normal group (``is_dense_failure_target``); all other samples
+    get 1.0.
     Raises EvalOnlyTrainError if a row of an eval_only source is in a train split. The eval_only
     sources are ``eval_only_sources`` or, by default, every configs/sources/*.yaml with
     ``eval_only: true`` plus labels.mapping.EVAL_ONLY_SOURCES.
@@ -144,31 +201,43 @@ def build_samples(
         if item is not None:
             items.append((row, item))
     pool = [it.features for _, it in items if it.features is not None]
+    sentence = force_sentence_for(force_cfg.render)
     samples: list[Sample] = []
     for row, item in items:
         w = item.window
         lines, blank, rendered = _block(item, force_mode, pool, seed, force_cfg)
         block = (
-            render.render_block(lines, force_cfg.render, rendered, row.episode_id)
+            render.render_block(
+                lines, force_cfg.render, rendered, row.episode_id, source=row.source
+            )
             if lines
             else None
         )
+        rationale = not (score_only and w.prompt_kind == "outcome")
+        target = w.target if rationale else score_only_target(w.target)
         kw: dict[str, Any] = {
             "task": item.task,
             "camera_roles": item.camera_roles,
             "fps": item.fps,
+            "force_sentence": sentence,
         }
         if block is not None:
             prompt_diff(
                 w.model_copy(update={"force_lines": tuple(lines)}),
-                header=force_cfg.render.header,
+                block=block,
+                force_sentence=sentence,
+                with_rationale=rationale,
                 task=item.task,
                 camera_roles=item.camera_roles,
             )
-        bundle = build_prompt(w, block, video_blank=blank, **kw)
+        bundle = build_prompt(
+            w, block, video_blank=blank, with_rationale=rationale, collage=collage, **kw
+        )
         messages = to_messages(bundle)
         prompt_ids = tokenizer.encode_prompt(messages, bundle.video)
-        full_ids = tokenizer.encode_with_answer(messages, w.target, bundle.video)
+        full_ids = tokenizer.encode_with_answer(messages, target, bundle.video)
+        failed = w.prompt_kind == "outcome" and is_failure_target(target)
+        dense_failed = w.prompt_kind == "dense" and is_dense_failure_target(target)
         samples.append(
             Sample(
                 window_id=row.window_id,
@@ -176,10 +245,13 @@ def build_samples(
                 video=bundle.video,
                 episode=item.episode,
                 force_block=block,
-                target=w.target,
+                target=target,
                 input_ids=list(full_ids),
                 labels=answer_labels(prompt_ids, full_ids),
                 n_tokens=len(full_ids),
+                weight=(
+                    failure_weight if failed else dense_failure_weight if dense_failed else 1.0
+                ),
             )
         )
     return sorted(samples, key=lambda s: (s.n_tokens, s.window_id))
@@ -223,8 +295,9 @@ def _eval_only_sources(sources_dir: Path = Path("configs/sources")) -> set[str]:
 def adapter_windows_source(data_root: Path, force_cfg: ForceConfig) -> WindowsSource:
     """Default ``windows_source``: rebuild windows with the manifest's source adapter.
 
-    Reads data_root/verified/<source>/norm.json; resolves rows by ``window_id``. Episodes are
-    cached one at a time per source (rows are sorted by episode in the manifest).
+    Reads data_root/verified/<source>/norm.json and applies the episode's ``norm_group``
+    constants; resolves rows by ``window_id``. Episodes are cached one at a time per source
+    (rows are sorted by episode in the manifest).
     """
     from tactile_flora.sources.base import make_adapter
     from tactile_flora.verify import report
@@ -272,6 +345,7 @@ def adapter_windows_source(data_root: Path, force_cfg: ForceConfig) -> WindowsSo
                     ),
                     c,
                     force_cfg.render,
+                    group=normalize.norm_group(ep),
                 )
                 wid = manifest_mod.window_id(ep.source, ep.episode_id, w.prompt_kind, w.anchor_s)
                 out[wid] = WindowItem(

@@ -6,6 +6,7 @@ from tactile_flora.sources import (  # noqa: F401
     hrdexdb,
     phantom,
     reassemble,
+    reassemble_lerobot,
     rh20t,
     sharpadex,
     softvtbench,

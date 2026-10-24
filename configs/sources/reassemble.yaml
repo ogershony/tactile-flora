@@ -9,3 +9,7 @@ split_rules:
   by: session
   note: placeholder until milestone 5
 seed: 0
+# Pooled 99th-percentile-of-F' gate (spec default 3). The gravity-compensated grasp scale on these
+# light parts is about 0.26 N (p10 0.08 N), so a normal 11.8 N peak is F' (11.8 - 0.43) / 0.26
+# = 44; the clip at render.clip_max still bounds the rendered block. See docs/deviations.md 3.
+norm_p99_max: 60

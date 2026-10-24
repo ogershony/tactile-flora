@@ -1,8 +1,11 @@
+import json
 from pathlib import Path
 
 import pyarrow.parquet as pq
 import pytest
+from typer.testing import CliRunner
 
+from tactile_flora import cli
 from tactile_flora.config import SourceConfig
 from tactile_flora.schema import CheckResult, Episode, HoldoutFile
 from tactile_flora.verify import manifest as mf
@@ -199,3 +202,149 @@ def test_unknown_split_rejected() -> None:
         mf.assign_split(EPS[0], {"bogus": ["s0"]})
     with pytest.raises(ValueError):
         mf.assign_split(EPS[0], {"val": ["s0"], "test": ["pad-0"]})
+
+
+def test_rows_record_the_norm_group(tmp_path: Path) -> None:
+    carton = make_pad_episode(7).model_copy(
+        update={"source": "phantom", "meta": {"task_folder": "Carton_fail", "object": "Carton"}}
+    )
+    results = {**RESULTS, carton.episode_id: dict(OK)}
+    rows = mf.build_manifest(
+        CFG, _pairs([*EPS, carton]), results, "nv", "rv", None, SPLITS, tmp_path / "m.parquet"
+    )
+    groups = {r.episode_id: r.norm_group for r in rows}
+    assert groups[carton.episode_id] == "Carton"
+    assert {g for e, g in groups.items() if e != carton.episode_id} == {"all"}
+    assert "norm_group" in pq.read_table(tmp_path / "m.parquet").schema.names
+    assert mf.read_manifest(tmp_path / "m.parquet") == rows
+
+
+def test_build_manifest_uses_the_source_sync_gate(tmp_path: Path) -> None:
+    lagged = {
+        e.episode_id: {**OK, "sync": CheckResult(passed=True, value=0.15, action="shift")}
+        for e in EPS
+    }
+    with pytest.raises(mf.SourceFailedError, match="sync_median"):
+        _build(tmp_path / "m.parquet", results=lagged)
+    relaxed = CFG.model_copy(update={"sync_median_s": 0.2})
+    rows = _build(tmp_path / "m.parquet", cfg=relaxed, results=lagged)
+    assert len(rows) == 6 and all(r.shift_s == -0.15 for r in rows)
+
+
+def test_build_manifest_uses_the_source_p99_gate(tmp_path: Path) -> None:
+    import json
+
+    doc = {"grasp": [1.0], "free": [0.0], "p99": [44.0], "problems": []}
+    tailed = {
+        e.episode_id: {**OK, "normalization": CheckResult(passed=True, detail=json.dumps(doc))}
+        for e in EPS
+    }
+    with pytest.raises(mf.SourceFailedError, match="normalization"):
+        _build(tmp_path / "m.parquet", results=tailed)
+    relaxed = CFG.model_copy(update={"norm_p99_max": 60.0})
+    assert len(_build(tmp_path / "m.parquet", cfg=relaxed, results=tailed)) == 6
+
+
+def test_build_manifest_uses_the_source_grasp_band(tmp_path: Path) -> None:
+    doc = {"grasp": [1.25], "free": [0.0], "p99": [2.0], "problems": []}
+    heavy = {
+        e.episode_id: {**OK, "normalization": CheckResult(passed=True, detail=json.dumps(doc))}
+        for e in EPS
+    }
+    with pytest.raises(mf.SourceFailedError, match="normalization"):
+        _build(tmp_path / "m.parquet", results=heavy)
+    relaxed = CFG.model_copy(update={"norm_grasp_range": (0.8, 1.3)})
+    assert len(_build(tmp_path / "m.parquet", cfg=relaxed, results=heavy)) == 6
+
+
+def _other_source(path: Path, results=None) -> list:
+    """A second source ("other") with the same six sessions, val = s4, built into ``path``."""
+    eps = [e.model_copy(update={"source": "other", "episode_id": f"o-{e.episode_id}"}) for e in EPS]
+    res = results or {e.episode_id: dict(OK) for e in eps}
+    pairs = [(e, [outcome_window(e, CONSTS)]) for e in eps]
+    cfg = CFG.model_copy(update={"name": "other"})
+    return mf.build_manifest(cfg, pairs, res, "nv2", "rv2", None, {"val": ["s4"]}, path)
+
+
+def test_merge_manifests_concatenates_filters_and_keeps_fields(tmp_path: Path) -> None:
+    a, b = tmp_path / "a.parquet", tmp_path / "b.parquet"
+    _build(a)
+    _other_source(b)
+    rows = mf.merge_manifests([a, b], tmp_path / "train.parquet", splits=("train",))
+    assert {r.split for r in rows} == {"train"}
+    assert len(rows) == 4 + 5  # a: 6 - val - test; b: 6 - val
+    by_src = {r.source: r for r in rows}
+    assert by_src["synthetic"].report_version == "rv" and by_src["synthetic"].norm_version == "nv"
+    assert by_src["other"].report_version == "rv2" and by_src["other"].norm_version == "nv2"
+    assert {r.norm_group for r in rows} == {"all"} and {r.license for r in rows} == {"CC0"}
+    assert mf.read_manifest(tmp_path / "train.parquet") == rows
+    assert rows == sorted(rows, key=lambda r: (r.source, r.episode_id, r.prompt_kind, r.anchor_s))
+    assert len(mf.merge_manifests([a, b], tmp_path / "all.parquet")) == 12
+    val = mf.merge_manifests([a, b], tmp_path / "val.parquet", splits=["val"])
+    assert [(r.source, r.episode_id) for r in val] == [("other", "o-pad-4"), ("synthetic", "pad-4")]
+    # identical duplicates collapse; a differing duplicate, an empty or unknown selection refuse
+    assert mf.merge_manifests([a, a], tmp_path / "dup.parquet") == mf.read_manifest(a)
+    with pytest.raises(ValueError, match="no rows"):
+        mf.merge_manifests([a, b], tmp_path / "x.parquet", splits=["benchmark"])
+    with pytest.raises(ValueError, match="unknown splits"):
+        mf.merge_manifests([a], tmp_path / "x.parquet", splits=["nope"])
+    with pytest.raises(ValueError, match="at least one"):
+        mf.merge_manifests([a], tmp_path / "x.parquet", splits=[])
+    changed = [
+        r.model_copy(update={"norm_group": "egg"}) if i == 0 else r
+        for i, r in enumerate(mf.read_manifest(a))
+    ]
+    mf.write_rows(changed, tmp_path / "a2.parquet")
+    with pytest.raises(mf.MergeConflictError):
+        mf.merge_manifests([a, tmp_path / "a2.parquet"], tmp_path / "x.parquet")
+    assert not (tmp_path / "x.parquet").exists()
+
+
+def test_merge_manifests_filters_prompt_kinds(tmp_path: Path) -> None:
+    a = tmp_path / "a.parquet"
+    _build(a)
+    every = mf.read_manifest(a)
+    kinds = {r.prompt_kind for r in every}
+    assert kinds == {"outcome"}  # the synthetic source carries outcome windows only
+    rows = mf.merge_manifests([a], tmp_path / "o.parquet", prompt_kinds=["outcome"])
+    assert rows == every
+    with pytest.raises(ValueError, match="no rows"):
+        mf.merge_manifests([a], tmp_path / "d.parquet", prompt_kinds=["dense"])
+    for bad in ([], ["nope"]):
+        with pytest.raises(ValueError, match="prompt kinds"):
+            mf.merge_manifests([a], tmp_path / "x.parquet", prompt_kinds=bad)
+    (tmp_path / "manifest").mkdir()
+    _build(tmp_path / "manifest" / "a.parquet")
+    args = ["manifest", "merge", "--out", "o", "--split", "train", "--data-root", str(tmp_path)]
+    res = CliRunner().invoke(cli.app, [*args, "--prompt-kind", "outcome", "a"])
+    assert res.exit_code == 0 and "rows: 4" in res.output, res.output
+    res = CliRunner().invoke(cli.app, [*args, "--prompt-kind", "dense", "a"])
+    assert res.exit_code == 1 and "ValueError" in (res.output + str(res.stderr or ""))
+
+
+def test_merge_shifts_sidecar_keys_by_source(tmp_path: Path) -> None:
+    shift = CheckResult(passed=True, value=0.05, action="shift")
+    res = {e: {**r, "sync": shift} for e, r in RESULTS.items()}
+    a = tmp_path / "a.parquet"
+    _build(a, results=res)
+    rows = mf.merge_manifests([a], tmp_path / "m.parquet", splits=["train"])
+    side = json.loads((tmp_path / "m.shifts.json").read_text())
+    assert side == {f"synthetic/{r.episode_id}": 0.05 for r in rows} and len(side) == 4
+    # a merged file is itself a valid input (its sidecar is already keyed by source)
+    again = mf.merge_manifests([tmp_path / "m.parquet"], tmp_path / "m2.parquet")
+    assert again == rows
+    assert json.loads((tmp_path / "m2.shifts.json").read_text()) == side
+
+
+def test_cli_manifest_merge(tmp_path: Path) -> None:
+    (tmp_path / "manifest").mkdir()
+    _build(tmp_path / "manifest" / "a.parquet")
+    _other_source(tmp_path / "manifest" / "b.parquet")
+    args = ["manifest", "merge", "--out", "train", "--split", "train", "--data-root", str(tmp_path)]
+    res = CliRunner().invoke(cli.app, [*args, "a", "b"])
+    assert res.exit_code == 0, res.output
+    assert "rows: 9" in res.output and "other train outcome: 5" in res.output
+    assert len(mf.read_manifest(tmp_path / "manifest" / "train.parquet")) == 9
+    args = ["manifest", "merge", "--out", "x", "--split", "benchmark", "--data-root", str(tmp_path)]
+    bad = CliRunner().invoke(cli.app, [*args, "a"])
+    assert bad.exit_code == 1 and "ValueError" in (bad.output + str(bad.stderr or ""))

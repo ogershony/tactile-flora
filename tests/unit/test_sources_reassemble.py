@@ -65,6 +65,17 @@ def test_labels_and_splits() -> None:
     assert sum(len(v) for v in a.splits().values()) == 1
 
 
+def test_known_issues_table_has_readme_rows_and_measured_additions() -> None:
+    from tactile_flora.sources.reassemble import KNOWN_ISSUES
+
+    readme_ft_invalid = ["2025-01-11-14-45-48", "2025-01-11-15-27-19", "2025-01-11-15-35-08"]
+    measured = ["2025-01-13-18-06-08", "2025-01-13-18-16-38"]
+    for stem in readme_ft_invalid + measured:
+        assert KNOWN_ISSUES[stem] == ["ft_invalid_last_action"]
+    assert len(KNOWN_ISSUES) == 12
+    assert len(KNOWN_ISSUES["2025-01-10-15-28-50"]) == 1  # README rows unchanged
+
+
 def test_missing_extracted_video_raises_with_command(tmp_path: Path) -> None:
     shutil.copy(ROOT / f"{EID}.h5", tmp_path / f"{EID}.h5")
     a = ReassembleAdapter(_cfg(tmp_path))

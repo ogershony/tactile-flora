@@ -1,8 +1,15 @@
 import pytest
 
+from tactile_flora.config import ForceConfig, load_config
 from tactile_flora.labels.windows import dense_frame_times, outcome_frame_indices
 from tactile_flora.prompts import templates as T
-from tactile_flora.prompts.flora import build_prompt, mosaic_layout, prompt_diff, to_messages
+from tactile_flora.prompts.flora import (
+    build_prompt,
+    force_sentence_for,
+    mosaic_layout,
+    prompt_diff,
+    to_messages,
+)
 from tactile_flora.schema import Window
 
 
@@ -41,6 +48,24 @@ def test_force_vs_control_differ_only_in_block() -> None:
         assert f.user_text_after_video == "\n" + block + c.user_text_after_video
         assert f.system.endswith("\n" + T.FORCE_SENTENCE)
         assert f.system.replace("\n" + T.FORCE_SENTENCE, "") == c.system
+
+
+def test_code_sentence_and_prompt_diff_with_block() -> None:
+    dec = load_config("configs/force.yaml", ForceConfig).render
+    code = load_config("configs/force.code.yaml", ForceConfig).render
+    assert force_sentence_for(dec) == T.FORCE_SENTENCE
+    assert force_sentence_for(code) == T.FORCE_SENTENCE_CODE
+    assert T.FORCE_SENTENCE_CODE != T.FORCE_SENTENCE and "\n" not in T.FORCE_SENTENCE_CODE
+    for w in (_dense(), _outcome()):
+        block = "\n".join([code.header_code, "Summary L: no contact. R: none.", *w.force_lines])
+        assert prompt_diff(w, block=block, force_sentence=T.FORCE_SENTENCE_CODE, task="t")
+        f = build_prompt(w, block, force_sentence=T.FORCE_SENTENCE_CODE, task="t")
+        c = build_prompt(w, None, force_sentence=T.FORCE_SENTENCE_CODE, task="t")
+        assert f.system == c.system + "\n" + T.FORCE_SENTENCE_CODE
+        assert T.FORCE_SENTENCE not in f.system
+        assert f.user_text_after_video == "\n" + block + c.user_text_after_video
+        # the default sentence is the decimal one, so a code block without the kwarg differs
+        assert build_prompt(w, block, task="t").system == c.system + "\n" + T.FORCE_SENTENCE
 
 
 def test_outcome_modes_and_blank() -> None:

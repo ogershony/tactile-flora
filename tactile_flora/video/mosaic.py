@@ -5,8 +5,17 @@ video_metadata, visual_token_estimate and the mosaic constants.
 Must never: decode video (video/readers.py does) or build prompts.
 
 Rules (FLORA collage): 1 view as is; 2 or 3 side by side (left, center, right); 4 as 2x2 in the
-order top, front/bottom, left, right. The scene view is always first, i.e. upper left. Each view
-is fitted (aspect kept, black padding) into a square cell whose side is a multiple of 32 px.
+order top, front/bottom, left, right. The scene view is always first, i.e. upper left. Two cell
+geometries (``Collage``):
+
+- ``cell`` (legacy, every run before 2026-10-23): each view is fitted (aspect kept, black
+  padding) into a square ``cell_px`` cell, 96 px by default. A 4:3 camera reaches the model as
+  96x72 pixels, about 1/19 of what the released model was trained on.
+- ``flora``: the released input geometry (video/collage.py): each view resized bilinearly, with
+  no crop or padding, to its planned cell of about 100k pixels (384x288 for a 4:3 camera), all
+  inside 14,336 visual tokens for 64 frames. Views are planned from their source sizes
+  (``VideoRef.width``/``height`` when known, else the decoded frame size).
+
 Episode boundaries repeat the nearest available frame.
 """
 
@@ -14,12 +23,15 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
-from typing import TypedDict
+from typing import Literal, TypedDict
 
 import numpy as np
 from PIL import Image
 
 from tactile_flora.schema import Episode, FrameReader
+from tactile_flora.video.collage import plan_flora_collage
+
+Collage = Literal["cell", "flora"]
 
 MOSAIC_CELL_PX = 96  # multiple of 32 nearest the paper's ~105 px per view
 MAX_VIEWS = 4
@@ -96,6 +108,55 @@ def frame_indices(episode: Episode, role: str, frame_times: Sequence[float]) -> 
     ]
 
 
+def _flora_sources(episode: Episode, roles: Sequence[str]) -> tuple[tuple[int, int], ...] | None:
+    sizes = []
+    for r in roles:
+        ref = episode.cameras[r]
+        if ref.width is None or ref.height is None:
+            return None
+        sizes.append((int(ref.width), int(ref.height)))
+    return tuple(sizes)
+
+
+def flora_clip_frames(
+    episode: Episode,
+    reader: FrameReader,
+    frame_times: Sequence[float],
+    roles: Sequence[str],
+    *,
+    blank: bool = False,
+) -> list[np.ndarray]:
+    """Return the released collage (module docstring, ``flora``) at each of ``frame_times``."""
+    _, ordered = mosaic_layout(roles)
+    per_view = (
+        None
+        if blank
+        else [reader.read_many(episode, r, frame_indices(episode, r, frame_times)) for r in ordered]
+    )
+    sources = _flora_sources(episode, ordered)
+    if sources is None:
+        # sizes from decoded frames; a blank clip (sizes not stored, e.g. REASSEMBLE) decodes the
+        # first frame of each view, so its canvas matches the real clip's exactly
+        views = per_view or [
+            reader.read_many(episode, r, frame_indices(episode, r, frame_times[:1])) for r in ordered
+        ]
+        sources = tuple((int(v[0].shape[1]), int(v[0].shape[0])) for v in views)
+    rects, width, height = plan_flora_collage(sources)
+    if per_view is None:
+        return [np.full((height, width, 3), BLANK_GRAY, dtype=np.uint8) for _ in frame_times]
+    out: list[np.ndarray] = []
+    for t in range(len(frame_times)):
+        canvas = np.zeros((height, width, 3), dtype=np.uint8)
+        for frames, (x, y, w, h) in zip(per_view, rects, strict=True):
+            f = np.asarray(frames[t], dtype=np.uint8)
+            if f.shape[:2] != (h, w):
+                img = Image.fromarray(f).resize((w, h), resample=Image.Resampling.BILINEAR)
+                f = np.asarray(img)
+            canvas[y : y + h, x : x + w] = f
+        out.append(canvas)
+    return out
+
+
 def clip_frames(
     episode: Episode,
     reader: FrameReader,
@@ -104,12 +165,15 @@ def clip_frames(
     *,
     blank: bool = False,
     cell_px: int = MOSAIC_CELL_PX,
+    collage: Collage = "cell",
 ) -> list[np.ndarray]:
     """One mosaic frame per time in ``frame_times`` (64 for a dense clip, m for outcome).
 
     Times outside [0, duration] repeat the nearest available frame. ``blank`` skips decoding and
-    returns mid-gray frames of the same shape.
+    returns mid-gray frames of the same shape. ``collage`` picks the geometry (module docstring).
     """
+    if collage == "flora":
+        return flora_clip_frames(episode, reader, frame_times, roles, blank=blank)
     layout, ordered = mosaic_layout(roles)
     shape = (layout[0] * cell_px, layout[1] * cell_px, 3)
     _check_cell(cell_px)

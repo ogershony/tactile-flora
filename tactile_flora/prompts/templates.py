@@ -1,14 +1,17 @@
 # ruff: noqa: E501
 """FLORA-Rewarder prompt text as string constants.
 
-Owns: system prompts and user-prompt templates for the dense and outcome tasks and the single
-force sentence. Must never: build prompts (see flora.py) or hold the answer grammar (parse.py).
+Owns: system prompts and user-prompt templates for the dense and outcome tasks and the force
+sentences (one per force text format). Must never: build prompts (see flora.py) or hold the
+answer grammar (parse.py).
 
 Source: the dense and outcome prompts below are the verbatim text published in the FLORA paper
 (Appendix G) and shipped in the released ``batch_utils/core.py``; the dense system prompt is
 the released f-string rendered with 64 frames, 4 FPS and 32 groups. User templates carry a
 ``<video>`` marker: text before it goes before the video item, text after it goes after.
-``FORCE_SENTENCE`` is this project's own addition (not part of FLORA).
+``FORCE_SENTENCE`` (decimal format), ``FORCE_SENTENCE_CODE`` (code format) and
+``FORCE_SENTENCE_COMPACT`` (code format without frame lines, v4) are this project's own additions
+(not part of FLORA); ``flora.force_sentence_for`` picks one from the render config.
 """
 
 from __future__ import annotations
@@ -19,6 +22,19 @@ FORCE_SENTENCE = (
     "A normalized fingertip or wrist force block follows the clip; each line gives per-arm grip "
     "force F, pad asymmetry D, its rate dF, gripper closure g, and contact flag c at the frame "
     "time."
+)
+
+FORCE_SENTENCE_CODE = (
+    "A coded fingertip or wrist force block follows the clip; its header is a legend, and each "
+    "line gives per-arm force level F (0 none to 4 crush-level), pad asymmetry A, trend T, "
+    "contact flag C, and gripper closure G at the frame time."
+)
+
+FORCE_SENTENCE_COMPACT = (
+    "A force summary from the robot's fingertip or wrist force sensors follows the clip: first "
+    "contact, peak force level (F0 none to F4 crush-level, relative to this object's typical "
+    "grasp), any contact loss, sharp force drops and the final level, and a force-only "
+    "classifier's probability of success when one is available."
 )
 
 VIDEO_MARKER = "<video>"

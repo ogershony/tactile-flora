@@ -14,8 +14,11 @@ from the current full git hash. ``allow_stale_manifest`` (CLI ``--allow-stale-ma
 only the second check and is DEV-ONLY: a committed-then-edited repo never produces a publishable
 run with it.
 
-Loss: cross-entropy over answer tokens only (labels != -100), mean per micro-batch, divided by
-the accumulation count; gradient clip, AdamW, cosine schedule with linear warmup. Samples are
+Loss: cross-entropy over answer tokens only (labels != -100), mean per micro-batch, multiplied
+by the sample's class-balance weight (``Sample.weight``: ``cfg.failure_weight`` on failed outcome
+windows, ``cfg.dense_failure_weight`` on non-normal dense windows, 1.0 otherwise; an unnormalized
+weighted mean) and divided by the accumulation count;
+gradient clip, AdamW, cosine schedule with linear warmup. Samples are
 length-sorted by dataset.py, grouped into global batches of ``effective_batch`` (similar lengths
 per step), the groups shuffled with ``cfg.seed``, and each rank takes a stride of its group.
 
@@ -28,6 +31,7 @@ from __future__ import annotations
 
 import copy
 import csv
+import datetime
 import importlib
 import itertools
 import json
@@ -47,6 +51,8 @@ import yaml
 from tactile_flora.config import ForceConfig, TrainConfig
 from tactile_flora.schema import FrameReader
 from tactile_flora.train.dataset import (
+    DENSE_FAILURE_MAX,
+    FAILURE_SCORE_MAX,
     IGNORE_INDEX,
     QwenTokenizerAdapter,
     Sample,
@@ -54,9 +60,12 @@ from tactile_flora.train.dataset import (
     WindowsSource,
     build_samples,
     estimate_wallclock,
+    is_dense_failure_target,
+    is_failure_target,
     token_histogram,
 )
 from tactile_flora.verify import full_git_hash, holdout_path, manifest
+from tactile_flora.video.collage import VIDEO_SIZE
 from tactile_flora.video.mosaic import clip_frames, source_frame_count, video_metadata
 from tactile_flora.video.readers import SourceRootReader
 
@@ -261,12 +270,60 @@ def _batches(
         for g in groups:
             padded = math.ceil(len(g) / backend.world_size) * backend.world_size
             for pos in range(backend.rank, padded, backend.world_size):
-                batch = backend.make_batch(g[pos % len(g)])
+                sample = g[pos % len(g)]
+                batch = backend.make_batch(sample)
                 # Every rank must run the same collectives, even for an uneven final group.
                 # Zero-weight padding contributes no gradient; scaling preserves the true mean.
-                batch["loss_weight"] = padded / len(g) if pos < len(g) else 0.0
+                # sample.weight is the class-balance factor (dataset.build_samples).
+                weight = float(getattr(sample, "weight", 1.0))
+                batch["loss_weight"] = weight * padded / len(g) if pos < len(g) else 0.0
                 batch["accumulation_end"] = pos + backend.world_size >= padded
                 yield batch
+
+
+def _prefetched(items: Iterator[dict[str, Any]], depth: int) -> Iterator[dict[str, Any]]:
+    """Yield ``items`` unchanged and in order while a thread builds up to ``depth`` ahead.
+
+    ``make_batch`` (clip decode and the processor, twice) is CPU work that otherwise alternates
+    with the GPU; with ``depth`` >= the accumulation count the next optimizer step's micro-batches
+    are built during this one. A producer exception is raised here, in the consumer.
+    """
+    import queue
+    import threading
+
+    q: queue.Queue[Any] = queue.Queue(maxsize=max(1, depth))
+    end = object()
+    stop = threading.Event()
+
+    def put(x: Any) -> bool:
+        while not stop.is_set():
+            try:
+                q.put(x, timeout=1.0)
+                return True
+            except queue.Full:
+                continue
+        return False
+
+    def work() -> None:
+        try:
+            for item in items:
+                if not put(item):
+                    return
+            put(end)
+        except BaseException as e:  # noqa: BLE001  (re-raised in the consumer)
+            put(e)
+
+    threading.Thread(target=work, name="batch-prefetch", daemon=True).start()
+    try:
+        while True:
+            x = q.get()
+            if x is end:
+                return
+            if isinstance(x, BaseException):
+                raise x
+            yield x
+    finally:
+        stop.set()
 
 
 def _check_preconditions(
@@ -311,21 +368,46 @@ def train(
     run_dir.mkdir(parents=True, exist_ok=True)
     rank = int(os.environ.get("RANK", "0"))
     tok = tokenizer or QwenTokenizerAdapter(cfg.base_model)
+    if eval_only_sources is None and cfg.trainable_eval_sources:
+        from tactile_flora.train.dataset import _eval_only_sources
+
+        eval_only_sources = _eval_only_sources() - set(cfg.trainable_eval_sources)
     samples = build_samples(
         mp, cfg.force_mode, force_cfg, data_root, tokenizer=tok, windows_source=windows_source,
-        seed=cfg.seed, eval_only_sources=eval_only_sources,
+        seed=cfg.seed, eval_only_sources=eval_only_sources, failure_weight=cfg.failure_weight,
+        dense_failure_weight=cfg.dense_failure_weight,
+        collage=cfg.collage, score_only=cfg.score_only,
     )  # fmt: skip
     hist = token_histogram(samples)
     eta_s = estimate_wallclock(samples, s_per_window) * cfg.epochs
+    n_failure = sum(is_failure_target(s.target) for s in samples)
+    n_dense_failure = sum(is_dense_failure_target(s.target) for s in samples)
     if rank == 0:
         print(f"samples: {len(samples)}  force_mode: {cfg.force_mode}")
         print("tokens: " + "  ".join(f"{k}={v:.0f}" for k, v in hist.items()))
         print(f"estimated wall-clock: {eta_s / 3600:.2f} h at {s_per_window:g} s/window")
+        print(
+            f"failure_weight {cfg.failure_weight:g} on {n_failure} failed outcome samples "
+            f"(score <= {FAILURE_SCORE_MAX}) of {len(samples)}"
+        )
+        print(
+            f"dense_failure_weight {cfg.dense_failure_weight:g} on {n_dense_failure} dense samples "
+            f"with Worst <= {DENSE_FAILURE_MAX}"
+        )
     if dry_run:
         if rank == 0:
             (run_dir / "dry_run.json").write_text(
                 json.dumps(
-                    {"n_samples": len(samples), "histogram": hist, "eta_s": eta_s}, indent=2
+                    {
+                        "n_samples": len(samples),
+                        "histogram": hist,
+                        "eta_s": eta_s,
+                        "failure_weight": cfg.failure_weight,
+                        "n_failure_samples": n_failure,
+                        "dense_failure_weight": cfg.dense_failure_weight,
+                        "n_dense_failure_samples": n_dense_failure,
+                    },
+                    indent=2,
                 ),
                 encoding="utf-8",
             )
@@ -351,9 +433,11 @@ def train(
     accum = max(1, math.ceil(cfg.effective_batch / backend.world_size))
     total_steps = len(groups) * cfg.epochs
     scheduler = make_scheduler(optimizer, total_steps, cfg.warmup_frac)
+    batches = _batches(groups, backend, cfg.epochs)
+    depth = int(os.environ.get("TF_TRAIN_PREFETCH", str(accum + 2)))  # 0: build in the loop
     train_steps(
         backend.model,
-        _batches(groups, backend, cfg.epochs),
+        _prefetched(batches, depth) if depth > 0 else batches,
         optimizer,
         scheduler,
         accum=accum,
@@ -402,16 +486,43 @@ class HFBackend:
         local_rank = int(os.environ.get("LOCAL_RANK", "0"))
         if int(os.environ.get("WORLD_SIZE", "1")) > 1 and not torch.distributed.is_initialized():
             torch.cuda.set_device(local_rank)
-            torch.distributed.init_process_group("nccl")
+            # Rank 0 alone reads the 27B checkpoint (minutes on a network filesystem) while the
+            # other ranks wait in FSDP's first collective; the default 10 min timeout is too short.
+            timeout_min = float(os.environ.get("TF_DIST_TIMEOUT_MIN", "60"))
+            torch.distributed.init_process_group(
+                "nccl", timeout=datetime.timedelta(minutes=timeout_min)
+            )
         self.rank = int(torch.distributed.get_rank()) if torch.distributed.is_initialized() else 0
         self.world_size = (
             int(torch.distributed.get_world_size()) if torch.distributed.is_initialized() else 1
         )
         self.device = torch.device("cuda", local_rank) if torch.cuda.is_available() else "cpu"
         self.processor = transformers.AutoProcessor.from_pretrained(cfg.base_model)
-        model = transformers.AutoModelForImageTextToText.from_pretrained(
-            cfg.base_model, dtype=torch.bfloat16
+        # Under FSDP only rank 0 reads the checkpoint into host RAM (about 66 GB after the fp32
+        # DeltaNet cast). The other ranks build the same module tree on the meta device, cast
+        # the DeltaNet parameters there, then allocate uninitialized CPU storage with to_empty:
+        # those pages are only committed when written, and FSDP's sync_module_states replaces
+        # every parameter and buffer with rank 0's values on the GPU. One host copy of the model
+        # instead of one per rank. TF_FSDP_META_INIT=0 restores the load-everywhere behaviour.
+        lazy_init = (
+            self.world_size > 1
+            and self.rank != 0
+            and os.environ.get("TF_FSDP_META_INIT", "1") != "0"
         )
+        if lazy_init:
+            config = transformers.AutoConfig.from_pretrained(cfg.base_model)
+            with torch.device("meta"):
+                model = transformers.AutoModelForImageTextToText.from_config(
+                    config, dtype=torch.bfloat16
+                )
+            for name, p in model.named_parameters():
+                if "linear_attn" in name:
+                    p.data = p.data.float()
+            model.to_empty(device="cpu")
+        else:
+            model = transformers.AutoModelForImageTextToText.from_pretrained(
+                cfg.base_model, dtype=torch.bfloat16
+            )
         model.config.use_cache = False
         for name, p in model.named_parameters():
             p.requires_grad = False
@@ -461,7 +572,13 @@ class HFBackend:
             raise ValueError(f"{sample.window_id}: sample has no episode to read video from")
         v = sample.video
         frames = clip_frames(
-            sample.episode, self.reader, v.frame_times, v.roles, blank=v.blank, cell_px=v.cell_px
+            sample.episode,
+            self.reader,
+            v.frame_times,
+            v.roles,
+            blank=v.blank,
+            cell_px=v.cell_px,
+            collage=v.collage,
         )
         return np.stack(frames)
 
@@ -478,7 +595,11 @@ class HFBackend:
             meta = video_metadata(
                 sample.video.frame_indices, sample.video.fps, source_frame_count(sample.episode)
             )
-            kw["videos_kwargs"] = {"video_metadata": [meta], "do_sample_frames": False}
+            kw["videos_kwargs"] = {
+                "video_metadata": [meta],
+                "do_sample_frames": False,
+                "size": VIDEO_SIZE,  # the released budget, as in inference (video/collage.py)
+            }
         enc = self.processor(text=[full], **kw)
         prefix = self.processor(text=[prompt], **kw)["input_ids"]
         n_prompt = int(prefix.size(1))

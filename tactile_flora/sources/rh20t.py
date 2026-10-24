@@ -16,9 +16,13 @@ Resolved open questions (verified 2026-10-21, docs/research/datasets.md):
 - Gripper: ``observation.state.gripper`` (1), divided by the per-config max taken from
   meta/stats.json (episode max if stats are absent) and clipped to 0..1, arm "R". Whether larger
   means closed is unverified.
-- Cameras: every ``observation.images.cam_<serial>`` video feature (9-10 per config, 360x640).
-  The first in declaration order is role ``scene``; the others are ``extra_<serial>``. v3 mp4
-  files are concatenated: in-file start of each camera is ``meta["video_from_s"][role]``.
+- Cameras: every ``observation.images.cam_<serial>`` video feature (9-10 per config, 360x640),
+  or only ``cfg.cameras`` (in that order) when the config sets it, because a partial download
+  (data/colab/fetch_rh20t.py: one external and one in-hand camera per config) would otherwise
+  reference 8 missing mp4 streams per episode and fail integrity everywhere. The first camera
+  kept is role ``scene``; the others are ``extra_<serial>``. A config restriction that leaves a
+  port without any camera raises ValueError at load. v3 mp4 files are concatenated: in-file
+  start of each camera is ``meta["video_from_s"][role]``.
 - Rating: ``meta.rating`` (int64 per frame, range -1..9, -1 presumably unrated, semantics
   undocumented) is read from the first frame into ``meta["rating"]``. No Label is produced here.
 - Scene and license: ``meta/rh20t_episodes.json`` gives ``folder`` per episode (list of dicts or
@@ -119,6 +123,14 @@ class Rh20tAdapter:
                 entry = data[idx]
         return str(entry.get("folder", "")) if isinstance(entry, dict) else ""
 
+    def _cameras(self, ds: LeRobotV3) -> list[str]:
+        """Camera feature keys in role order: ``cfg.cameras`` (those this port has) or all."""
+        keys = [k for k in ds.video_keys() if k.startswith(CAMERA_PREFIX)]
+        if self.cfg.cameras is None:
+            return keys
+        have = set(keys)
+        return [k for k in self.cfg.cameras if k in have]
+
     def load(self, episode_id: str) -> Episode:
         """Load one episode on the episode clock (zero at the first scene frame)."""
         self._ensure()
@@ -156,7 +168,9 @@ class Rh20tAdapter:
 
         cameras: dict[str, VideoRef] = {}
         video_from: dict[str, float] = {}
-        cams = [k for k in ds.video_keys() if k.startswith(CAMERA_PREFIX)]
+        cams = self._cameras(ds)
+        if not cams:
+            raise ValueError(f"{d.name}: none of cfg.cameras {self.cfg.cameras} is a video feature")
         for i, key in enumerate(cams):
             role = "scene" if i == 0 else f"extra_{key.removeprefix(CAMERA_PREFIX)}"
             path, from_ts = ds.video(idx, key)

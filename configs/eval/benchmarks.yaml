@@ -8,6 +8,21 @@ benchmarks:
     manifest: data/manifest/reassemble_test.parquet
     prompts: [dense, outcome]
     metrics: [mae, failure_recall, bad_action_f1]
+  # Segment-level REASSEMBLE judge set: the E0b clip set (399 test segments, 133 failures), one
+  # outcome prompt per segment, built by tf manifest merge --out reassemble_seg_test --split test
+  # reassemble_seg (added 2026-10-22; docs/deviations.md 7).
+  reassemble_seg_test:
+    manifest: data/manifest/reassemble_seg_test.parquet
+    prompts: [outcome]
+    metrics: [balanced_acc, failure_recall, macro_f1, bad_action_f1, mae]
+  # Held-out PHANTOM failures: the outcome rows of 20 failure + 20 success train-split episodes
+  # removed from the judge training set (train_judge_pf), split "test", built by
+  # scripts/make_phantom_fail_split.py with seed 0, stratified by object (added 2026-10-22;
+  # docs/deviations.md 8). HapticWAM's own split holds no failure outside train.
+  phantom_fail_test:
+    manifest: data/manifest/phantom_fail_test.parquet
+    prompts: [outcome]
+    metrics: [balanced_acc, failure_recall, macro_f1, bad_action_f1, mae]
   hrdexdb:
     manifest: data/manifest/hrdexdb.parquet
     prompts: [outcome]

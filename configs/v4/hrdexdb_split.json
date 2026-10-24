@@ -1,0 +1,7647 @@
+{
+ "camera_study_train_subset": [
+  "inspire_dftp/apple/2",
+  "inspire_dftp/baby_beaker/0",
+  "inspire_dftp/baby_beaker/10",
+  "inspire_dftp/baby_beaker/11",
+  "inspire_dftp/baby_beaker/12",
+  "inspire_dftp/baby_beaker/2",
+  "inspire_dftp/baby_beaker/4",
+  "inspire_dftp/baby_beaker/5",
+  "inspire_dftp/baby_beaker/6",
+  "inspire_dftp/bamboo_box/1",
+  "inspire_dftp/bamboo_box/2",
+  "inspire_dftp/bamboo_box/4",
+  "inspire_dftp/bamboo_box/5",
+  "inspire_dftp/banana/0",
+  "inspire_dftp/baseball/0",
+  "inspire_dftp/baseball/2",
+  "inspire_dftp/baseball/3",
+  "inspire_dftp/black_holder_with_handle/0",
+  "inspire_dftp/black_holder_with_handle/3",
+  "inspire_dftp/black_kitchen_roll_holder/11",
+  "inspire_dftp/black_kitchen_roll_holder/3",
+  "inspire_dftp/blue_alarm/2",
+  "inspire_dftp/blue_alarm/3",
+  "inspire_dftp/blue_vase/0",
+  "inspire_dftp/blue_vase/2",
+  "inspire_dftp/blue_vase/7",
+  "inspire_dftp/book/3",
+  "inspire_dftp/book/4",
+  "inspire_dftp/book/6",
+  "inspire_dftp/book/7",
+  "inspire_dftp/brass_pot/5",
+  "inspire_dftp/brass_pot/6",
+  "inspire_dftp/cactus/1",
+  "inspire_dftp/cactus/3",
+  "inspire_dftp/cactus/4",
+  "inspire_dftp/colander_green/2",
+  "inspire_dftp/colander_green/3",
+  "inspire_dftp/frame_oak/1",
+  "inspire_dftp/frame_oak/2",
+  "inspire_dftp/frame_oak/3",
+  "inspire_dftp/frame_oak/4",
+  "inspire_dftp/frame_oak/5",
+  "inspire_dftp/frame_oak/6",
+  "inspire_dftp/frame_oak/7",
+  "inspire_dftp/frame_red/1",
+  "inspire_dftp/frame_red/2",
+  "inspire_dftp/french_mustard/1",
+  "inspire_dftp/french_mustard/5",
+  "inspire_dftp/green_attached_container/6",
+  "inspire_dftp/green_attached_container/7",
+  "inspire_dftp/green_attached_container/8",
+  "inspire_dftp/green_soap_dispenser/1",
+  "inspire_dftp/green_soap_dispenser/2",
+  "inspire_dftp/green_soap_dispenser/4",
+  "inspire_dftp/grid_desktop_organizer/1",
+  "inspire_dftp/grid_desktop_organizer/4",
+  "inspire_dftp/grid_desktop_organizer/5",
+  "inspire_dftp/hammer/0",
+  "inspire_dftp/hammer/1",
+  "inspire_dftp/hammer/13",
+  "inspire_dftp/hammer/15",
+  "inspire_dftp/hammer/4",
+  "inspire_dftp/hammer/7",
+  "inspire_dftp/hammer/8",
+  "inspire_dftp/hammer/9",
+  "inspire_dftp/icecream_scoop/1",
+  "inspire_dftp/icecream_scoop/4",
+  "inspire_dftp/icecream_scoop/6",
+  "inspire_dftp/icecream_scoop/8",
+  "inspire_dftp/jja_ramen/4",
+  "inspire_dftp/knife_sharpener/1",
+  "inspire_dftp/knife_sharpener/2",
+  "inspire_dftp/knife_sharpener/3",
+  "inspire_dftp/lemon/0",
+  "inspire_dftp/lemon/4",
+  "inspire_dftp/lemon/5",
+  "inspire_dftp/lotion/3",
+  "inspire_dftp/lotion/7",
+  "inspire_dftp/lotion/9",
+  "inspire_dftp/metal_measuring_flask/1",
+  "inspire_dftp/metal_measuring_flask/5",
+  "inspire_dftp/metal_measuring_flask/6",
+  "inspire_dftp/metal_measuring_flask/9",
+  "inspire_dftp/metal_scoop_big/0",
+  "inspire_dftp/metal_scoop_big/1",
+  "inspire_dftp/metal_scoop_big/3",
+  "inspire_dftp/mug_holder/4",
+  "inspire_dftp/mug_holder/8",
+  "inspire_dftp/mug_holder/9",
+  "inspire_dftp/orange/1",
+  "inspire_dftp/orange/3",
+  "inspire_dftp/organizer_beige/0",
+  "inspire_dftp/organizer_beige/11",
+  "inspire_dftp/organizer_beige/12",
+  "inspire_dftp/organizer_beige/14",
+  "inspire_dftp/organizer_beige/3",
+  "inspire_dftp/organizer_beige/5",
+  "inspire_dftp/organizer_beige/6",
+  "inspire_dftp/organizer_beige/9",
+  "inspire_dftp/pepper_tuna/0",
+  "inspire_dftp/pepper_tuna/2",
+  "inspire_dftp/pink_clock/1",
+  "inspire_dftp/pink_clock/2",
+  "inspire_dftp/pink_clock/3",
+  "inspire_dftp/pink_clock/5",
+  "inspire_dftp/pink_clock/7",
+  "inspire_dftp/pink_clock/8",
+  "inspire_dftp/potato_masher/0",
+  "inspire_dftp/potato_masher/1",
+  "inspire_dftp/potato_masher/10",
+  "inspire_dftp/potato_masher/11",
+  "inspire_dftp/potato_masher/13",
+  "inspire_dftp/potato_masher/2",
+  "inspire_dftp/potato_masher/5",
+  "inspire_dftp/pringles/2",
+  "inspire_dftp/pringles/5",
+  "inspire_dftp/pringles/7",
+  "inspire_dftp/pringles/8",
+  "inspire_dftp/screwdriver/1",
+  "inspire_dftp/spicemill/0",
+  "inspire_dftp/spicemill/1",
+  "inspire_dftp/spicemill/2",
+  "inspire_dftp/spicemill/6",
+  "inspire_dftp/spicemill/7",
+  "inspire_dftp/spicemill/8",
+  "inspire_dftp/standing_frame/0",
+  "inspire_dftp/standing_frame/1",
+  "inspire_dftp/standing_frame/2",
+  "inspire_dftp/standing_frame/3",
+  "inspire_dftp/standing_frame/4",
+  "inspire_dftp/washing_brush/4",
+  "inspire_dftp/washing_brush/5",
+  "inspire_dftp/washing_brush/7",
+  "inspire_dftp/washing_brush/8",
+  "inspire_dftp/washing_brush2/0",
+  "inspire_dftp/washing_brush2/1",
+  "inspire_dftp/washing_brush2/4",
+  "inspire_dftp/washing_brush2/6",
+  "inspire_dftp/washing_brush2/7",
+  "inspire_dftp/wateringcan/1",
+  "inspire_dftp/wateringcan/2",
+  "inspire_dftp/wateringcan/6",
+  "inspire_dftp/white_candle_holder/3",
+  "inspire_dftp/white_candle_holder/6",
+  "inspire_dftp/white_wood_handle_watering_can/0",
+  "inspire_dftp/white_wood_handle_watering_can/1",
+  "inspire_dftp/white_wood_handle_watering_can/11",
+  "inspire_dftp/white_wood_handle_watering_can/4",
+  "inspire_dftp/white_wood_handle_watering_can/6",
+  "inspire_dftp/white_wood_handle_watering_can/7",
+  "inspire_dftp/white_wood_handle_watering_can/8",
+  "inspire_dftp/white_wood_handle_watering_can/9",
+  "inspire_dftp/wipe/0",
+  "inspire_dftp/wipe/1",
+  "inspire_dftp/wipe/6",
+  "inspire_dftp/work_lamp/2",
+  "inspire_dftp/work_lamp/4",
+  "inspire_dftp/work_lamp/8",
+  "inspire_dftp/work_lamp/9",
+  "inspire_dftp/yellow_wash_tub/3",
+  "inspire_dftp/yellow_wash_tub/5",
+  "inspire_f1/apple/0",
+  "inspire_f1/apple/3",
+  "inspire_f1/apple/5",
+  "inspire_f1/baby_beaker/2",
+  "inspire_f1/baby_beaker/7",
+  "inspire_f1/bamboo_box/0",
+  "inspire_f1/bamboo_box/1",
+  "inspire_f1/bamboo_box/2",
+  "inspire_f1/bamboo_box/3",
+  "inspire_f1/banana/3",
+  "inspire_f1/baseball/3",
+  "inspire_f1/baseball/4",
+  "inspire_f1/baseball/6",
+  "inspire_f1/baseball/9",
+  "inspire_f1/black_holder_with_handle/5",
+  "inspire_f1/black_kitchen_roll_holder/0",
+  "inspire_f1/black_kitchen_roll_holder/6",
+  "inspire_f1/blue_alarm/3",
+  "inspire_f1/blue_alarm/4",
+  "inspire_f1/blue_alarm/7",
+  "inspire_f1/blue_alarm/8",
+  "inspire_f1/blue_alarm/9",
+  "inspire_f1/blue_vase/0",
+  "inspire_f1/blue_vase/2",
+  "inspire_f1/blue_vase/3",
+  "inspire_f1/blue_vase/4",
+  "inspire_f1/blue_vase/6",
+  "inspire_f1/book/1",
+  "inspire_f1/book/2",
+  "inspire_f1/book/3",
+  "inspire_f1/brass_pot/1",
+  "inspire_f1/brass_pot/2",
+  "inspire_f1/brass_pot/3",
+  "inspire_f1/brass_pot/5",
+  "inspire_f1/brass_pot/7",
+  "inspire_f1/brass_pot/9",
+  "inspire_f1/cactus/0",
+  "inspire_f1/cactus/4",
+  "inspire_f1/colander_green/2",
+  "inspire_f1/colander_green/4",
+  "inspire_f1/colander_green/5",
+  "inspire_f1/colander_green/7",
+  "inspire_f1/frame_oak/1",
+  "inspire_f1/frame_oak/2",
+  "inspire_f1/frame_oak/4",
+  "inspire_f1/frame_red/2",
+  "inspire_f1/french_mustard/3",
+  "inspire_f1/french_mustard/5",
+  "inspire_f1/green_attached_container/0",
+  "inspire_f1/green_attached_container/1",
+  "inspire_f1/green_attached_container/3",
+  "inspire_f1/green_attached_container/6",
+  "inspire_f1/green_soap_dispenser/1",
+  "inspire_f1/green_soap_dispenser/3",
+  "inspire_f1/green_soap_dispenser/6",
+  "inspire_f1/hammer/0",
+  "inspire_f1/hammer/3",
+  "inspire_f1/hammer/5",
+  "inspire_f1/hammer/7",
+  "inspire_f1/icecream_scoop/3",
+  "inspire_f1/icecream_scoop/4",
+  "inspire_f1/icecream_scoop/5",
+  "inspire_f1/jja_ramen/0",
+  "inspire_f1/jja_ramen/2",
+  "inspire_f1/jja_ramen/4",
+  "inspire_f1/jja_ramen/6",
+  "inspire_f1/knife_sharpener/0",
+  "inspire_f1/knife_sharpener/1",
+  "inspire_f1/knife_sharpener/2",
+  "inspire_f1/large_peg/0",
+  "inspire_f1/lemon/0",
+  "inspire_f1/lemon/1",
+  "inspire_f1/lemon/4",
+  "inspire_f1/light_green_basket/0",
+  "inspire_f1/light_green_basket/1",
+  "inspire_f1/lotion/1",
+  "inspire_f1/lotion/4",
+  "inspire_f1/metal_measuring_flask/0",
+  "inspire_f1/metal_measuring_flask/1",
+  "inspire_f1/metal_measuring_flask/3",
+  "inspire_f1/metal_measuring_flask/4",
+  "inspire_f1/metal_measuring_flask/5",
+  "inspire_f1/metal_measuring_flask/6",
+  "inspire_f1/metal_measuring_flask/7",
+  "inspire_f1/metal_scoop_big/5",
+  "inspire_f1/metal_scoop_big/6",
+  "inspire_f1/metal_scoop_big/7",
+  "inspire_f1/mug_holder/1",
+  "inspire_f1/mug_holder/2",
+  "inspire_f1/mug_holder/3",
+  "inspire_f1/orange/1",
+  "inspire_f1/orange/2",
+  "inspire_f1/orange/3",
+  "inspire_f1/orange/4",
+  "inspire_f1/orange/5",
+  "inspire_f1/organizer_beige/0",
+  "inspire_f1/organizer_beige/1",
+  "inspire_f1/organizer_beige/3",
+  "inspire_f1/pepper_tuna/3",
+  "inspire_f1/pepper_tuna/5",
+  "inspire_f1/pink_clock/2",
+  "inspire_f1/pink_clock/5",
+  "inspire_f1/pink_clock/6",
+  "inspire_f1/pink_clock/7",
+  "inspire_f1/rectangular_frying_pan/5",
+  "inspire_f1/screwdriver/0",
+  "inspire_f1/soaptray/2",
+  "inspire_f1/soaptray/3",
+  "inspire_f1/soaptray/4",
+  "inspire_f1/spicemill/0",
+  "inspire_f1/spicemill/1",
+  "inspire_f1/spicemill/2",
+  "inspire_f1/spicemill/3",
+  "inspire_f1/spicemill/4",
+  "inspire_f1/standing_frame/1",
+  "inspire_f1/standing_frame/2",
+  "inspire_f1/standing_frame/3",
+  "inspire_f1/standing_frame/4",
+  "inspire_f1/standing_frame/5",
+  "inspire_f1/thermo_clock/0",
+  "inspire_f1/thermo_clock/2",
+  "inspire_f1/thermo_clock/3",
+  "inspire_f1/thermo_clock/4",
+  "inspire_f1/thermo_clock/5",
+  "inspire_f1/thermo_clock/7",
+  "inspire_f1/washing_brush/1",
+  "inspire_f1/washing_brush/5",
+  "inspire_f1/washing_brush/6",
+  "inspire_f1/washing_brush2/1",
+  "inspire_f1/washing_brush2/5",
+  "inspire_f1/white_candle_holder/0",
+  "inspire_f1/white_candle_holder/4",
+  "inspire_f1/white_wood_handle_watering_can/2",
+  "inspire_f1/white_wood_handle_watering_can/5",
+  "inspire_f1/white_wood_handle_watering_can/7",
+  "inspire_f1/wipe/0",
+  "inspire_f1/work_lamp/12",
+  "inspire_f1/work_lamp/13",
+  "inspire_f1/work_lamp/14"
+ ],
+ "episodes": {
+  "inspire_dftp/apple/0": {
+   "hand": "inspire_dftp",
+   "object_id": "apple",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/apple/1": {
+   "hand": "inspire_dftp",
+   "object_id": "apple",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/apple/2": {
+   "hand": "inspire_dftp",
+   "object_id": "apple",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/apple/3": {
+   "hand": "inspire_dftp",
+   "object_id": "apple",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/apple/5": {
+   "hand": "inspire_dftp",
+   "object_id": "apple",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/attached_container/0": {
+   "hand": "inspire_dftp",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/attached_container/1": {
+   "hand": "inspire_dftp",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/attached_container/2": {
+   "hand": "inspire_dftp",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/attached_container/3": {
+   "hand": "inspire_dftp",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/attached_container/4": {
+   "hand": "inspire_dftp",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/attached_container/5": {
+   "hand": "inspire_dftp",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/attached_container/7": {
+   "hand": "inspire_dftp",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/attached_container/8": {
+   "hand": "inspire_dftp",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/baby_beaker/0": {
+   "hand": "inspire_dftp",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/baby_beaker/10": {
+   "hand": "inspire_dftp",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/baby_beaker/11": {
+   "hand": "inspire_dftp",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/baby_beaker/12": {
+   "hand": "inspire_dftp",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/baby_beaker/2": {
+   "hand": "inspire_dftp",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/baby_beaker/4": {
+   "hand": "inspire_dftp",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/baby_beaker/5": {
+   "hand": "inspire_dftp",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/baby_beaker/6": {
+   "hand": "inspire_dftp",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/baby_beaker/9": {
+   "hand": "inspire_dftp",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/balloon_whisk/0": {
+   "hand": "inspire_dftp",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/balloon_whisk/1": {
+   "hand": "inspire_dftp",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/balloon_whisk/2": {
+   "hand": "inspire_dftp",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/balloon_whisk/3": {
+   "hand": "inspire_dftp",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/balloon_whisk/4": {
+   "hand": "inspire_dftp",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/balloon_whisk/5": {
+   "hand": "inspire_dftp",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/balloon_whisk/6": {
+   "hand": "inspire_dftp",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/balloon_whisk/7": {
+   "hand": "inspire_dftp",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/bamboo_basket/0": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/bamboo_basket/1": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/bamboo_basket/2": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/bamboo_basket/3": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/bamboo_basket/4": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/bamboo_basket/5": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/bamboo_basket/6": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/bamboo_basket/7": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/bamboo_box/0": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_box",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/bamboo_box/1": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_box",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/bamboo_box/2": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_box",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/bamboo_box/3": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_box",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/bamboo_box/4": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_box",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/bamboo_box/5": {
+   "hand": "inspire_dftp",
+   "object_id": "bamboo_box",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/banana/0": {
+   "hand": "inspire_dftp",
+   "object_id": "banana",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/banana/1": {
+   "hand": "inspire_dftp",
+   "object_id": "banana",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/banana/2": {
+   "hand": "inspire_dftp",
+   "object_id": "banana",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/banana/3": {
+   "hand": "inspire_dftp",
+   "object_id": "banana",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/banana/4": {
+   "hand": "inspire_dftp",
+   "object_id": "banana",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/baseball/0": {
+   "hand": "inspire_dftp",
+   "object_id": "baseball",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/baseball/1": {
+   "hand": "inspire_dftp",
+   "object_id": "baseball",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/baseball/2": {
+   "hand": "inspire_dftp",
+   "object_id": "baseball",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/baseball/3": {
+   "hand": "inspire_dftp",
+   "object_id": "baseball",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/baseball/4": {
+   "hand": "inspire_dftp",
+   "object_id": "baseball",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/black_holder_with_handle/0": {
+   "hand": "inspire_dftp",
+   "object_id": "black_holder_with_handle",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/black_holder_with_handle/1": {
+   "hand": "inspire_dftp",
+   "object_id": "black_holder_with_handle",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/black_holder_with_handle/2": {
+   "hand": "inspire_dftp",
+   "object_id": "black_holder_with_handle",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/black_holder_with_handle/3": {
+   "hand": "inspire_dftp",
+   "object_id": "black_holder_with_handle",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/black_holder_with_handle/4": {
+   "hand": "inspire_dftp",
+   "object_id": "black_holder_with_handle",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/black_kitchen_roll_holder/0": {
+   "hand": "inspire_dftp",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/black_kitchen_roll_holder/1": {
+   "hand": "inspire_dftp",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/black_kitchen_roll_holder/11": {
+   "hand": "inspire_dftp",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/black_kitchen_roll_holder/2": {
+   "hand": "inspire_dftp",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/black_kitchen_roll_holder/3": {
+   "hand": "inspire_dftp",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/black_kitchen_roll_holder/4": {
+   "hand": "inspire_dftp",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/black_kitchen_roll_holder/5": {
+   "hand": "inspire_dftp",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/black_kitchen_roll_holder/6": {
+   "hand": "inspire_dftp",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/black_kitchen_roll_holder/8": {
+   "hand": "inspire_dftp",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/black_kitchen_roll_holder/9": {
+   "hand": "inspire_dftp",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/blue_alarm/0": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/blue_alarm/1": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/blue_alarm/2": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/blue_alarm/3": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/blue_alarm/4": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/blue_alarm/5": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/blue_vase/0": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/blue_vase/1": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/blue_vase/2": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/blue_vase/3": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/blue_vase/4": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/blue_vase/5": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/blue_vase/6": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/blue_vase/7": {
+   "hand": "inspire_dftp",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/book/1": {
+   "hand": "inspire_dftp",
+   "object_id": "book",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/book/2": {
+   "hand": "inspire_dftp",
+   "object_id": "book",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/book/3": {
+   "hand": "inspire_dftp",
+   "object_id": "book",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/book/4": {
+   "hand": "inspire_dftp",
+   "object_id": "book",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/book/5": {
+   "hand": "inspire_dftp",
+   "object_id": "book",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/book/6": {
+   "hand": "inspire_dftp",
+   "object_id": "book",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/book/7": {
+   "hand": "inspire_dftp",
+   "object_id": "book",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/box_pink/0": {
+   "hand": "inspire_dftp",
+   "object_id": "box_pink",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/box_pink/1": {
+   "hand": "inspire_dftp",
+   "object_id": "box_pink",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/box_pink/2": {
+   "hand": "inspire_dftp",
+   "object_id": "box_pink",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/box_pink/3": {
+   "hand": "inspire_dftp",
+   "object_id": "box_pink",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/box_pink/4": {
+   "hand": "inspire_dftp",
+   "object_id": "box_pink",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/box_pink/5": {
+   "hand": "inspire_dftp",
+   "object_id": "box_pink",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/brass_pot/0": {
+   "hand": "inspire_dftp",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/brass_pot/1": {
+   "hand": "inspire_dftp",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/brass_pot/2": {
+   "hand": "inspire_dftp",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/brass_pot/3": {
+   "hand": "inspire_dftp",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/brass_pot/4": {
+   "hand": "inspire_dftp",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/brass_pot/5": {
+   "hand": "inspire_dftp",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/brass_pot/6": {
+   "hand": "inspire_dftp",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/brass_pot/7": {
+   "hand": "inspire_dftp",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/cactus/0": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/cactus/1": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/cactus/10": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/cactus/2": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/cactus/3": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/cactus/4": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/cactus/5": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/cactus/6": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/cactus/7": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/cactus/8": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/cactus/9": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/cactus2/0": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/cactus2/1": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/cactus2/10": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/cactus2/11": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/cactus2/12": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/cactus2/13": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/cactus2/14": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/cactus2/15": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/cactus2/16": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/cactus2/3": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/cactus2/5": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/cactus2/7": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/cactus2/9": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/cactus3/0": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/cactus3/1": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/cactus3/10": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/cactus3/11": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/cactus3/2": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/cactus3/3": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/cactus3/4": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/cactus3/5": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/cactus3/6": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/cactus3/7": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/cactus3/8": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/cactus3/9": {
+   "hand": "inspire_dftp",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/ceramic_elephant_jug/1": {
+   "hand": "inspire_dftp",
+   "object_id": "ceramic_elephant_jug",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/ceramic_elephant_jug/10": {
+   "hand": "inspire_dftp",
+   "object_id": "ceramic_elephant_jug",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/ceramic_elephant_jug/11": {
+   "hand": "inspire_dftp",
+   "object_id": "ceramic_elephant_jug",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/ceramic_elephant_jug/13": {
+   "hand": "inspire_dftp",
+   "object_id": "ceramic_elephant_jug",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/ceramic_elephant_jug/14": {
+   "hand": "inspire_dftp",
+   "object_id": "ceramic_elephant_jug",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/ceramic_elephant_jug/2": {
+   "hand": "inspire_dftp",
+   "object_id": "ceramic_elephant_jug",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/ceramic_elephant_jug/5": {
+   "hand": "inspire_dftp",
+   "object_id": "ceramic_elephant_jug",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/ceramic_elephant_jug/6": {
+   "hand": "inspire_dftp",
+   "object_id": "ceramic_elephant_jug",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/ceramic_elephant_jug/7": {
+   "hand": "inspire_dftp",
+   "object_id": "ceramic_elephant_jug",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/ceramic_elephant_jug/8": {
+   "hand": "inspire_dftp",
+   "object_id": "ceramic_elephant_jug",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/ceramic_elephant_jug/9": {
+   "hand": "inspire_dftp",
+   "object_id": "ceramic_elephant_jug",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/circular_frying_pan/0": {
+   "hand": "inspire_dftp",
+   "object_id": "circular_frying_pan",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/circular_frying_pan/1": {
+   "hand": "inspire_dftp",
+   "object_id": "circular_frying_pan",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/circular_frying_pan/2": {
+   "hand": "inspire_dftp",
+   "object_id": "circular_frying_pan",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/circular_frying_pan/3": {
+   "hand": "inspire_dftp",
+   "object_id": "circular_frying_pan",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/circular_frying_pan/4": {
+   "hand": "inspire_dftp",
+   "object_id": "circular_frying_pan",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/clothes_hanger/1": {
+   "hand": "inspire_dftp",
+   "object_id": "clothes_hanger",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/clothes_hanger/3": {
+   "hand": "inspire_dftp",
+   "object_id": "clothes_hanger",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/clothes_hanger/4": {
+   "hand": "inspire_dftp",
+   "object_id": "clothes_hanger",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/clothes_hanger/5": {
+   "hand": "inspire_dftp",
+   "object_id": "clothes_hanger",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/clothes_hanger/6": {
+   "hand": "inspire_dftp",
+   "object_id": "clothes_hanger",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/coffee_tin/0": {
+   "hand": "inspire_dftp",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/coffee_tin/1": {
+   "hand": "inspire_dftp",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/coffee_tin/2": {
+   "hand": "inspire_dftp",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/coffee_tin/3": {
+   "hand": "inspire_dftp",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/coffee_tin/4": {
+   "hand": "inspire_dftp",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/coffee_tin/5": {
+   "hand": "inspire_dftp",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/coffee_tin/6": {
+   "hand": "inspire_dftp",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/coffee_tin/7": {
+   "hand": "inspire_dftp",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/coffee_tin/8": {
+   "hand": "inspire_dftp",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/colander_green/0": {
+   "hand": "inspire_dftp",
+   "object_id": "colander_green",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/colander_green/1": {
+   "hand": "inspire_dftp",
+   "object_id": "colander_green",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/colander_green/2": {
+   "hand": "inspire_dftp",
+   "object_id": "colander_green",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/colander_green/3": {
+   "hand": "inspire_dftp",
+   "object_id": "colander_green",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/colander_green/4": {
+   "hand": "inspire_dftp",
+   "object_id": "colander_green",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/donut/0": {
+   "hand": "inspire_dftp",
+   "object_id": "donut",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/donut/1": {
+   "hand": "inspire_dftp",
+   "object_id": "donut",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/donut/2": {
+   "hand": "inspire_dftp",
+   "object_id": "donut",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/donut/3": {
+   "hand": "inspire_dftp",
+   "object_id": "donut",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/donut/4": {
+   "hand": "inspire_dftp",
+   "object_id": "donut",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/frame_oak/0": {
+   "hand": "inspire_dftp",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/frame_oak/1": {
+   "hand": "inspire_dftp",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/frame_oak/2": {
+   "hand": "inspire_dftp",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/frame_oak/3": {
+   "hand": "inspire_dftp",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/frame_oak/4": {
+   "hand": "inspire_dftp",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/frame_oak/5": {
+   "hand": "inspire_dftp",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/frame_oak/6": {
+   "hand": "inspire_dftp",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/frame_oak/7": {
+   "hand": "inspire_dftp",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/frame_red/0": {
+   "hand": "inspire_dftp",
+   "object_id": "frame_red",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/frame_red/1": {
+   "hand": "inspire_dftp",
+   "object_id": "frame_red",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/frame_red/2": {
+   "hand": "inspire_dftp",
+   "object_id": "frame_red",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/frame_red/3": {
+   "hand": "inspire_dftp",
+   "object_id": "frame_red",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/frame_red/4": {
+   "hand": "inspire_dftp",
+   "object_id": "frame_red",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/french_mustard/0": {
+   "hand": "inspire_dftp",
+   "object_id": "french_mustard",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/french_mustard/1": {
+   "hand": "inspire_dftp",
+   "object_id": "french_mustard",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/french_mustard/2": {
+   "hand": "inspire_dftp",
+   "object_id": "french_mustard",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/french_mustard/3": {
+   "hand": "inspire_dftp",
+   "object_id": "french_mustard",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/french_mustard/4": {
+   "hand": "inspire_dftp",
+   "object_id": "french_mustard",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/french_mustard/5": {
+   "hand": "inspire_dftp",
+   "object_id": "french_mustard",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/frog_bowl/0": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/frog_bowl/1": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/frog_bowl/2": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/frog_bowl/3": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/frog_bowl/4": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/frog_bowl/5": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/frog_bowl/6": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/frog_bowl/7": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/frog_bowl/8": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/frog_cup/0": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/frog_cup/1": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/frog_cup/2": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/frog_cup/3": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/frog_cup/4": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/frog_cup/5": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/frog_cup/6": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/frog_cup/7": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/frog_cup/8": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/frog_cup/9": {
+   "hand": "inspire_dftp",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/fruit_cutter_base/0": {
+   "hand": "inspire_dftp",
+   "object_id": "fruit_cutter_base",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/fruit_cutter_base/1": {
+   "hand": "inspire_dftp",
+   "object_id": "fruit_cutter_base",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/fruit_cutter_base/2": {
+   "hand": "inspire_dftp",
+   "object_id": "fruit_cutter_base",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/fruit_cutter_base/3": {
+   "hand": "inspire_dftp",
+   "object_id": "fruit_cutter_base",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/fruit_cutter_base/4": {
+   "hand": "inspire_dftp",
+   "object_id": "fruit_cutter_base",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/fruit_cutter_base/5": {
+   "hand": "inspire_dftp",
+   "object_id": "fruit_cutter_base",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/green_attached_container/0": {
+   "hand": "inspire_dftp",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/green_attached_container/1": {
+   "hand": "inspire_dftp",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/green_attached_container/10": {
+   "hand": "inspire_dftp",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/green_attached_container/2": {
+   "hand": "inspire_dftp",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/green_attached_container/3": {
+   "hand": "inspire_dftp",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/green_attached_container/4": {
+   "hand": "inspire_dftp",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/green_attached_container/6": {
+   "hand": "inspire_dftp",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/green_attached_container/7": {
+   "hand": "inspire_dftp",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/green_attached_container/8": {
+   "hand": "inspire_dftp",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/green_cactus_vase/0": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/1": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/green_cactus_vase/11": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/13": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/14": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/15": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/16": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/17": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/19": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/2": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/20": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/21": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/22": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/23": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/24": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/green_cactus_vase/3": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/4": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/green_cactus_vase/5": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/6": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/7": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/green_cactus_vase/8": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_cactus_vase/9": {
+   "hand": "inspire_dftp",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/green_soap_dispenser/0": {
+   "hand": "inspire_dftp",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/green_soap_dispenser/1": {
+   "hand": "inspire_dftp",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/green_soap_dispenser/2": {
+   "hand": "inspire_dftp",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/green_soap_dispenser/3": {
+   "hand": "inspire_dftp",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/green_soap_dispenser/4": {
+   "hand": "inspire_dftp",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/green_soap_dispenser/5": {
+   "hand": "inspire_dftp",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/grey_pot/0": {
+   "hand": "inspire_dftp",
+   "object_id": "grey_pot",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/grey_pot/3": {
+   "hand": "inspire_dftp",
+   "object_id": "grey_pot",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/grey_pot/4": {
+   "hand": "inspire_dftp",
+   "object_id": "grey_pot",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/grey_pot/7": {
+   "hand": "inspire_dftp",
+   "object_id": "grey_pot",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/grid_desktop_organizer/0": {
+   "hand": "inspire_dftp",
+   "object_id": "grid_desktop_organizer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/grid_desktop_organizer/1": {
+   "hand": "inspire_dftp",
+   "object_id": "grid_desktop_organizer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/grid_desktop_organizer/2": {
+   "hand": "inspire_dftp",
+   "object_id": "grid_desktop_organizer",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/grid_desktop_organizer/3": {
+   "hand": "inspire_dftp",
+   "object_id": "grid_desktop_organizer",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/grid_desktop_organizer/4": {
+   "hand": "inspire_dftp",
+   "object_id": "grid_desktop_organizer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/grid_desktop_organizer/5": {
+   "hand": "inspire_dftp",
+   "object_id": "grid_desktop_organizer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/grid_desktop_organizer/6": {
+   "hand": "inspire_dftp",
+   "object_id": "grid_desktop_organizer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/hammer/0": {
+   "hand": "inspire_dftp",
+   "object_id": "hammer",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/hammer/1": {
+   "hand": "inspire_dftp",
+   "object_id": "hammer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/hammer/11": {
+   "hand": "inspire_dftp",
+   "object_id": "hammer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/hammer/13": {
+   "hand": "inspire_dftp",
+   "object_id": "hammer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/hammer/15": {
+   "hand": "inspire_dftp",
+   "object_id": "hammer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/hammer/2": {
+   "hand": "inspire_dftp",
+   "object_id": "hammer",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/hammer/3": {
+   "hand": "inspire_dftp",
+   "object_id": "hammer",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/hammer/4": {
+   "hand": "inspire_dftp",
+   "object_id": "hammer",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/hammer/5": {
+   "hand": "inspire_dftp",
+   "object_id": "hammer",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/hammer/6": {
+   "hand": "inspire_dftp",
+   "object_id": "hammer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/hammer/7": {
+   "hand": "inspire_dftp",
+   "object_id": "hammer",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/hammer/8": {
+   "hand": "inspire_dftp",
+   "object_id": "hammer",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/hammer/9": {
+   "hand": "inspire_dftp",
+   "object_id": "hammer",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/icecream_scoop/0": {
+   "hand": "inspire_dftp",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/icecream_scoop/1": {
+   "hand": "inspire_dftp",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/icecream_scoop/2": {
+   "hand": "inspire_dftp",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/icecream_scoop/3": {
+   "hand": "inspire_dftp",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/icecream_scoop/4": {
+   "hand": "inspire_dftp",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/icecream_scoop/5": {
+   "hand": "inspire_dftp",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/icecream_scoop/6": {
+   "hand": "inspire_dftp",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/icecream_scoop/7": {
+   "hand": "inspire_dftp",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/icecream_scoop/8": {
+   "hand": "inspire_dftp",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/jja_ramen/0": {
+   "hand": "inspire_dftp",
+   "object_id": "jja_ramen",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/jja_ramen/1": {
+   "hand": "inspire_dftp",
+   "object_id": "jja_ramen",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/jja_ramen/2": {
+   "hand": "inspire_dftp",
+   "object_id": "jja_ramen",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/jja_ramen/3": {
+   "hand": "inspire_dftp",
+   "object_id": "jja_ramen",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/jja_ramen/4": {
+   "hand": "inspire_dftp",
+   "object_id": "jja_ramen",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/knife_sharpener/0": {
+   "hand": "inspire_dftp",
+   "object_id": "knife_sharpener",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/knife_sharpener/1": {
+   "hand": "inspire_dftp",
+   "object_id": "knife_sharpener",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/knife_sharpener/2": {
+   "hand": "inspire_dftp",
+   "object_id": "knife_sharpener",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/knife_sharpener/3": {
+   "hand": "inspire_dftp",
+   "object_id": "knife_sharpener",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/knife_sharpener/4": {
+   "hand": "inspire_dftp",
+   "object_id": "knife_sharpener",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/knife_sharpener/5": {
+   "hand": "inspire_dftp",
+   "object_id": "knife_sharpener",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/lemon/0": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/lemon/1": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/lemon/2": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/lemon/3": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/lemon/4": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/lemon/5": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/lemon_squeezer/0": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/lemon_squeezer/1": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/lemon_squeezer/2": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/lemon_squeezer/3": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/lemon_squeezer/4": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/lemon_squeezer/6": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/lemon_squeezer/7": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/lemon_squeezer/8": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/lemon_squeezer/9": {
+   "hand": "inspire_dftp",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/lilac_food_container/0": {
+   "hand": "inspire_dftp",
+   "object_id": "lilac_food_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/lilac_food_container/1": {
+   "hand": "inspire_dftp",
+   "object_id": "lilac_food_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/lilac_food_container/2": {
+   "hand": "inspire_dftp",
+   "object_id": "lilac_food_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/lilac_food_container/3": {
+   "hand": "inspire_dftp",
+   "object_id": "lilac_food_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/lilac_food_container/4": {
+   "hand": "inspire_dftp",
+   "object_id": "lilac_food_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/lotion/1": {
+   "hand": "inspire_dftp",
+   "object_id": "lotion",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/lotion/10": {
+   "hand": "inspire_dftp",
+   "object_id": "lotion",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/lotion/3": {
+   "hand": "inspire_dftp",
+   "object_id": "lotion",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/lotion/7": {
+   "hand": "inspire_dftp",
+   "object_id": "lotion",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/lotion/8": {
+   "hand": "inspire_dftp",
+   "object_id": "lotion",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/lotion/9": {
+   "hand": "inspire_dftp",
+   "object_id": "lotion",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/meat_thermometer/0": {
+   "hand": "inspire_dftp",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/meat_thermometer/2": {
+   "hand": "inspire_dftp",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/meat_thermometer/4": {
+   "hand": "inspire_dftp",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/metal_measuring_flask/0": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/metal_measuring_flask/1": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/metal_measuring_flask/2": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/metal_measuring_flask/3": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/metal_measuring_flask/4": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/metal_measuring_flask/5": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/metal_measuring_flask/6": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/metal_measuring_flask/9": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/metal_scoop_big/0": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/metal_scoop_big/1": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/metal_scoop_big/2": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/metal_scoop_big/3": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/metal_scoop_big/4": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/metal_scoop_big/5": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/metal_scoop_big/6": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/metal_scoop_big/7": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/metal_scoop_small/0": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/metal_scoop_small/1": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/metal_scoop_small/10": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/metal_scoop_small/11": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/metal_scoop_small/12": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/metal_scoop_small/13": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/metal_scoop_small/2": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/metal_scoop_small/3": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/metal_scoop_small/4": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/metal_scoop_small/5": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/metal_scoop_small/6": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/metal_scoop_small/8": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/metal_scoop_small/9": {
+   "hand": "inspire_dftp",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/mug_holder/0": {
+   "hand": "inspire_dftp",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/mug_holder/1": {
+   "hand": "inspire_dftp",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/mug_holder/10": {
+   "hand": "inspire_dftp",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/mug_holder/11": {
+   "hand": "inspire_dftp",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/mug_holder/2": {
+   "hand": "inspire_dftp",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/mug_holder/3": {
+   "hand": "inspire_dftp",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/mug_holder/4": {
+   "hand": "inspire_dftp",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/mug_holder/5": {
+   "hand": "inspire_dftp",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/mug_holder/6": {
+   "hand": "inspire_dftp",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/mug_holder/7": {
+   "hand": "inspire_dftp",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/mug_holder/8": {
+   "hand": "inspire_dftp",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/mug_holder/9": {
+   "hand": "inspire_dftp",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/orange/0": {
+   "hand": "inspire_dftp",
+   "object_id": "orange",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/orange/1": {
+   "hand": "inspire_dftp",
+   "object_id": "orange",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/orange/2": {
+   "hand": "inspire_dftp",
+   "object_id": "orange",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/orange/3": {
+   "hand": "inspire_dftp",
+   "object_id": "orange",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/orange/4": {
+   "hand": "inspire_dftp",
+   "object_id": "orange",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/orange/5": {
+   "hand": "inspire_dftp",
+   "object_id": "orange",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/organizer_beige/0": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/organizer_beige/1": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/organizer_beige/10": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/organizer_beige/11": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/organizer_beige/12": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/organizer_beige/13": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/organizer_beige/14": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/organizer_beige/2": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/organizer_beige/3": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/organizer_beige/4": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/organizer_beige/5": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/organizer_beige/6": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/organizer_beige/7": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/organizer_beige/8": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/organizer_beige/9": {
+   "hand": "inspire_dftp",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pastel_blue_cup/0": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/pastel_blue_cup/1": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/pastel_blue_cup/2": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/pastel_blue_cup/3": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/pastel_blue_cup/4": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/pastel_blue_cup/5": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/pastel_blue_cup/6": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/pastel_light_green_bowl/0": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/pastel_light_green_bowl/1": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/pastel_light_green_bowl/2": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/pastel_light_green_bowl/3": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/pastel_light_green_bowl/4": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/pastel_light_green_bowl/5": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/pastel_light_green_bowl/6": {
+   "hand": "inspire_dftp",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/pepper_tuna/0": {
+   "hand": "inspire_dftp",
+   "object_id": "pepper_tuna",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/pepper_tuna/1": {
+   "hand": "inspire_dftp",
+   "object_id": "pepper_tuna",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pepper_tuna/2": {
+   "hand": "inspire_dftp",
+   "object_id": "pepper_tuna",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pepper_tuna/3": {
+   "hand": "inspire_dftp",
+   "object_id": "pepper_tuna",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pepper_tuna/4": {
+   "hand": "inspire_dftp",
+   "object_id": "pepper_tuna",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pepper_tuna/5": {
+   "hand": "inspire_dftp",
+   "object_id": "pepper_tuna",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pingpong/0": {
+   "hand": "inspire_dftp",
+   "object_id": "pingpong",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/pingpong/1": {
+   "hand": "inspire_dftp",
+   "object_id": "pingpong",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/pingpong/2": {
+   "hand": "inspire_dftp",
+   "object_id": "pingpong",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/pingpong/3": {
+   "hand": "inspire_dftp",
+   "object_id": "pingpong",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/pingpong/4": {
+   "hand": "inspire_dftp",
+   "object_id": "pingpong",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/pingpong/5": {
+   "hand": "inspire_dftp",
+   "object_id": "pingpong",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/pink_clock/0": {
+   "hand": "inspire_dftp",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/pink_clock/1": {
+   "hand": "inspire_dftp",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pink_clock/2": {
+   "hand": "inspire_dftp",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/pink_clock/3": {
+   "hand": "inspire_dftp",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/pink_clock/4": {
+   "hand": "inspire_dftp",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pink_clock/5": {
+   "hand": "inspire_dftp",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/pink_clock/6": {
+   "hand": "inspire_dftp",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pink_clock/7": {
+   "hand": "inspire_dftp",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pink_clock/8": {
+   "hand": "inspire_dftp",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/plant_pot/0": {
+   "hand": "inspire_dftp",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/plant_pot/1": {
+   "hand": "inspire_dftp",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/plant_pot/2": {
+   "hand": "inspire_dftp",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/plant_pot/3": {
+   "hand": "inspire_dftp",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/plant_pot/4": {
+   "hand": "inspire_dftp",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/plant_pot/5": {
+   "hand": "inspire_dftp",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/plant_pot/6": {
+   "hand": "inspire_dftp",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/plant_pot/7": {
+   "hand": "inspire_dftp",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/plastic_elephant_jug/0": {
+   "hand": "inspire_dftp",
+   "object_id": "plastic_elephant_jug",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/plastic_elephant_jug/2": {
+   "hand": "inspire_dftp",
+   "object_id": "plastic_elephant_jug",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/plastic_elephant_jug/3": {
+   "hand": "inspire_dftp",
+   "object_id": "plastic_elephant_jug",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/plastic_elephant_jug/4": {
+   "hand": "inspire_dftp",
+   "object_id": "plastic_elephant_jug",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/plastic_elephant_jug/5": {
+   "hand": "inspire_dftp",
+   "object_id": "plastic_elephant_jug",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/plastic_elephant_jug/6": {
+   "hand": "inspire_dftp",
+   "object_id": "plastic_elephant_jug",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/plastic_elephant_jug/7": {
+   "hand": "inspire_dftp",
+   "object_id": "plastic_elephant_jug",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/potato_masher/0": {
+   "hand": "inspire_dftp",
+   "object_id": "potato_masher",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/potato_masher/1": {
+   "hand": "inspire_dftp",
+   "object_id": "potato_masher",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/potato_masher/10": {
+   "hand": "inspire_dftp",
+   "object_id": "potato_masher",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/potato_masher/11": {
+   "hand": "inspire_dftp",
+   "object_id": "potato_masher",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/potato_masher/13": {
+   "hand": "inspire_dftp",
+   "object_id": "potato_masher",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/potato_masher/2": {
+   "hand": "inspire_dftp",
+   "object_id": "potato_masher",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/potato_masher/3": {
+   "hand": "inspire_dftp",
+   "object_id": "potato_masher",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/potato_masher/5": {
+   "hand": "inspire_dftp",
+   "object_id": "potato_masher",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/potato_masher/6": {
+   "hand": "inspire_dftp",
+   "object_id": "potato_masher",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/potato_masher/8": {
+   "hand": "inspire_dftp",
+   "object_id": "potato_masher",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/potato_masher/9": {
+   "hand": "inspire_dftp",
+   "object_id": "potato_masher",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/pringles/2": {
+   "hand": "inspire_dftp",
+   "object_id": "pringles",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pringles/3": {
+   "hand": "inspire_dftp",
+   "object_id": "pringles",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/pringles/5": {
+   "hand": "inspire_dftp",
+   "object_id": "pringles",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pringles/6": {
+   "hand": "inspire_dftp",
+   "object_id": "pringles",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/pringles/7": {
+   "hand": "inspire_dftp",
+   "object_id": "pringles",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pringles/8": {
+   "hand": "inspire_dftp",
+   "object_id": "pringles",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/pringles_small/2": {
+   "hand": "inspire_dftp",
+   "object_id": "pringles_small",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/pringles_small/4": {
+   "hand": "inspire_dftp",
+   "object_id": "pringles_small",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/rectangular_frying_pan/3": {
+   "hand": "inspire_dftp",
+   "object_id": "rectangular_frying_pan",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/rectangular_frying_pan/4": {
+   "hand": "inspire_dftp",
+   "object_id": "rectangular_frying_pan",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/scotch_tape/0": {
+   "hand": "inspire_dftp",
+   "object_id": "scotch_tape",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/scotch_tape/1": {
+   "hand": "inspire_dftp",
+   "object_id": "scotch_tape",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/scotch_tape/2": {
+   "hand": "inspire_dftp",
+   "object_id": "scotch_tape",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/scotch_tape/3": {
+   "hand": "inspire_dftp",
+   "object_id": "scotch_tape",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/scotch_tape/4": {
+   "hand": "inspire_dftp",
+   "object_id": "scotch_tape",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/screwdriver/0": {
+   "hand": "inspire_dftp",
+   "object_id": "screwdriver",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/screwdriver/1": {
+   "hand": "inspire_dftp",
+   "object_id": "screwdriver",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/screwdriver/2": {
+   "hand": "inspire_dftp",
+   "object_id": "screwdriver",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/screwdriver/3": {
+   "hand": "inspire_dftp",
+   "object_id": "screwdriver",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/servingbowl_small/0": {
+   "hand": "inspire_dftp",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/servingbowl_small/1": {
+   "hand": "inspire_dftp",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/servingbowl_small/2": {
+   "hand": "inspire_dftp",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/servingbowl_small/3": {
+   "hand": "inspire_dftp",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/servingbowl_small/4": {
+   "hand": "inspire_dftp",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/servingbowl_small/5": {
+   "hand": "inspire_dftp",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/servingbowl_small/6": {
+   "hand": "inspire_dftp",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/servingbowl_small/7": {
+   "hand": "inspire_dftp",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/servingbowl_small/8": {
+   "hand": "inspire_dftp",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/smallbowl/0": {
+   "hand": "inspire_dftp",
+   "object_id": "smallbowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/smallbowl/1": {
+   "hand": "inspire_dftp",
+   "object_id": "smallbowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/smallbowl/2": {
+   "hand": "inspire_dftp",
+   "object_id": "smallbowl",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/smallbowl/3": {
+   "hand": "inspire_dftp",
+   "object_id": "smallbowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/smallbowl/4": {
+   "hand": "inspire_dftp",
+   "object_id": "smallbowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/smallbowl/5": {
+   "hand": "inspire_dftp",
+   "object_id": "smallbowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/spam_can/0": {
+   "hand": "inspire_dftp",
+   "object_id": "spam_can",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/spam_can/1": {
+   "hand": "inspire_dftp",
+   "object_id": "spam_can",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/spam_can/2": {
+   "hand": "inspire_dftp",
+   "object_id": "spam_can",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/spam_can/3": {
+   "hand": "inspire_dftp",
+   "object_id": "spam_can",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/spam_can/4": {
+   "hand": "inspire_dftp",
+   "object_id": "spam_can",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/spam_can/5": {
+   "hand": "inspire_dftp",
+   "object_id": "spam_can",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/spam_can/6": {
+   "hand": "inspire_dftp",
+   "object_id": "spam_can",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/spam_can/7": {
+   "hand": "inspire_dftp",
+   "object_id": "spam_can",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/spicemill/0": {
+   "hand": "inspire_dftp",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/spicemill/1": {
+   "hand": "inspire_dftp",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/spicemill/2": {
+   "hand": "inspire_dftp",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/spicemill/3": {
+   "hand": "inspire_dftp",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/spicemill/4": {
+   "hand": "inspire_dftp",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/spicemill/5": {
+   "hand": "inspire_dftp",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/spicemill/6": {
+   "hand": "inspire_dftp",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/spicemill/7": {
+   "hand": "inspire_dftp",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/spicemill/8": {
+   "hand": "inspire_dftp",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/spray_bottle/1": {
+   "hand": "inspire_dftp",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/spray_bottle/2": {
+   "hand": "inspire_dftp",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/spray_bottle/3": {
+   "hand": "inspire_dftp",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/spray_bottle/4": {
+   "hand": "inspire_dftp",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/spray_bottle/5": {
+   "hand": "inspire_dftp",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/spray_bottle/6": {
+   "hand": "inspire_dftp",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/spray_bottle/7": {
+   "hand": "inspire_dftp",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/spray_bottle/8": {
+   "hand": "inspire_dftp",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/spray_bottle/9": {
+   "hand": "inspire_dftp",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/standing_frame/0": {
+   "hand": "inspire_dftp",
+   "object_id": "standing_frame",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/standing_frame/1": {
+   "hand": "inspire_dftp",
+   "object_id": "standing_frame",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/standing_frame/2": {
+   "hand": "inspire_dftp",
+   "object_id": "standing_frame",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/standing_frame/3": {
+   "hand": "inspire_dftp",
+   "object_id": "standing_frame",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/standing_frame/4": {
+   "hand": "inspire_dftp",
+   "object_id": "standing_frame",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/tea_case/0": {
+   "hand": "inspire_dftp",
+   "object_id": "tea_case",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/tea_case/1": {
+   "hand": "inspire_dftp",
+   "object_id": "tea_case",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/tea_case/2": {
+   "hand": "inspire_dftp",
+   "object_id": "tea_case",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/tea_case/3": {
+   "hand": "inspire_dftp",
+   "object_id": "tea_case",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/tea_case/4": {
+   "hand": "inspire_dftp",
+   "object_id": "tea_case",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/tennis_ball/0": {
+   "hand": "inspire_dftp",
+   "object_id": "tennis_ball",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/tennis_ball/1": {
+   "hand": "inspire_dftp",
+   "object_id": "tennis_ball",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/tennis_ball/2": {
+   "hand": "inspire_dftp",
+   "object_id": "tennis_ball",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/tennis_ball/3": {
+   "hand": "inspire_dftp",
+   "object_id": "tennis_ball",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/tennis_ball/4": {
+   "hand": "inspire_dftp",
+   "object_id": "tennis_ball",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/tennis_ball/5": {
+   "hand": "inspire_dftp",
+   "object_id": "tennis_ball",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/toothbrush_holder/1": {
+   "hand": "inspire_dftp",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/toothbrush_holder/10": {
+   "hand": "inspire_dftp",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/toothbrush_holder/11": {
+   "hand": "inspire_dftp",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/toothbrush_holder/2": {
+   "hand": "inspire_dftp",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/washing_brush/0": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/washing_brush/1": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/washing_brush/2": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/washing_brush/3": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/washing_brush/4": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/washing_brush/5": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/washing_brush/6": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/washing_brush/7": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/washing_brush/8": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/washing_brush2/0": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/washing_brush2/1": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/washing_brush2/3": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/washing_brush2/4": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/washing_brush2/5": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/washing_brush2/6": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/washing_brush2/7": {
+   "hand": "inspire_dftp",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/wateringcan/0": {
+   "hand": "inspire_dftp",
+   "object_id": "wateringcan",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/wateringcan/1": {
+   "hand": "inspire_dftp",
+   "object_id": "wateringcan",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/wateringcan/2": {
+   "hand": "inspire_dftp",
+   "object_id": "wateringcan",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/wateringcan/6": {
+   "hand": "inspire_dftp",
+   "object_id": "wateringcan",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/wateringcan/8": {
+   "hand": "inspire_dftp",
+   "object_id": "wateringcan",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/white_candle_holder/0": {
+   "hand": "inspire_dftp",
+   "object_id": "white_candle_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/white_candle_holder/2": {
+   "hand": "inspire_dftp",
+   "object_id": "white_candle_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/white_candle_holder/3": {
+   "hand": "inspire_dftp",
+   "object_id": "white_candle_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/white_candle_holder/4": {
+   "hand": "inspire_dftp",
+   "object_id": "white_candle_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/white_candle_holder/6": {
+   "hand": "inspire_dftp",
+   "object_id": "white_candle_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/white_pen_cup/1": {
+   "hand": "inspire_dftp",
+   "object_id": "white_pen_cup",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/white_pen_cup/2": {
+   "hand": "inspire_dftp",
+   "object_id": "white_pen_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/white_pen_cup/3": {
+   "hand": "inspire_dftp",
+   "object_id": "white_pen_cup",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/white_pen_cup/4": {
+   "hand": "inspire_dftp",
+   "object_id": "white_pen_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/white_pen_cup/6": {
+   "hand": "inspire_dftp",
+   "object_id": "white_pen_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/white_soap_dish/0": {
+   "hand": "inspire_dftp",
+   "object_id": "white_soap_dish",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/white_soap_dish/1": {
+   "hand": "inspire_dftp",
+   "object_id": "white_soap_dish",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/white_soap_dish/2": {
+   "hand": "inspire_dftp",
+   "object_id": "white_soap_dish",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/white_soap_dish/3": {
+   "hand": "inspire_dftp",
+   "object_id": "white_soap_dish",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/white_soap_dish/4": {
+   "hand": "inspire_dftp",
+   "object_id": "white_soap_dish",
+   "split": "test",
+   "success": false
+  },
+  "inspire_dftp/white_soap_dish/6": {
+   "hand": "inspire_dftp",
+   "object_id": "white_soap_dish",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/white_wood_handle_watering_can/0": {
+   "hand": "inspire_dftp",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/white_wood_handle_watering_can/1": {
+   "hand": "inspire_dftp",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/white_wood_handle_watering_can/10": {
+   "hand": "inspire_dftp",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/white_wood_handle_watering_can/11": {
+   "hand": "inspire_dftp",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/white_wood_handle_watering_can/2": {
+   "hand": "inspire_dftp",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/white_wood_handle_watering_can/3": {
+   "hand": "inspire_dftp",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/white_wood_handle_watering_can/4": {
+   "hand": "inspire_dftp",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/white_wood_handle_watering_can/5": {
+   "hand": "inspire_dftp",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/white_wood_handle_watering_can/6": {
+   "hand": "inspire_dftp",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/white_wood_handle_watering_can/7": {
+   "hand": "inspire_dftp",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/white_wood_handle_watering_can/8": {
+   "hand": "inspire_dftp",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/white_wood_handle_watering_can/9": {
+   "hand": "inspire_dftp",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/wipe/0": {
+   "hand": "inspire_dftp",
+   "object_id": "wipe",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/wipe/1": {
+   "hand": "inspire_dftp",
+   "object_id": "wipe",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/wipe/6": {
+   "hand": "inspire_dftp",
+   "object_id": "wipe",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/wood_organizer/0": {
+   "hand": "inspire_dftp",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/wood_organizer/1": {
+   "hand": "inspire_dftp",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/wood_organizer/2": {
+   "hand": "inspire_dftp",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/wood_organizer/3": {
+   "hand": "inspire_dftp",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/wood_organizer/4": {
+   "hand": "inspire_dftp",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/wood_organizer/5": {
+   "hand": "inspire_dftp",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_dftp/wood_organizer/6": {
+   "hand": "inspire_dftp",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_dftp/work_lamp/0": {
+   "hand": "inspire_dftp",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/work_lamp/13": {
+   "hand": "inspire_dftp",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/work_lamp/15": {
+   "hand": "inspire_dftp",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/work_lamp/2": {
+   "hand": "inspire_dftp",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/work_lamp/3": {
+   "hand": "inspire_dftp",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/work_lamp/4": {
+   "hand": "inspire_dftp",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/work_lamp/5": {
+   "hand": "inspire_dftp",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/work_lamp/6": {
+   "hand": "inspire_dftp",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/work_lamp/7": {
+   "hand": "inspire_dftp",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/work_lamp/8": {
+   "hand": "inspire_dftp",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/work_lamp/9": {
+   "hand": "inspire_dftp",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/yellow_funnel/0": {
+   "hand": "inspire_dftp",
+   "object_id": "yellow_funnel",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/yellow_funnel/1": {
+   "hand": "inspire_dftp",
+   "object_id": "yellow_funnel",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/yellow_funnel/2": {
+   "hand": "inspire_dftp",
+   "object_id": "yellow_funnel",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/yellow_funnel/3": {
+   "hand": "inspire_dftp",
+   "object_id": "yellow_funnel",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/yellow_funnel/4": {
+   "hand": "inspire_dftp",
+   "object_id": "yellow_funnel",
+   "split": "test",
+   "success": true
+  },
+  "inspire_dftp/yellow_wash_tub/0": {
+   "hand": "inspire_dftp",
+   "object_id": "yellow_wash_tub",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/yellow_wash_tub/1": {
+   "hand": "inspire_dftp",
+   "object_id": "yellow_wash_tub",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/yellow_wash_tub/2": {
+   "hand": "inspire_dftp",
+   "object_id": "yellow_wash_tub",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/yellow_wash_tub/3": {
+   "hand": "inspire_dftp",
+   "object_id": "yellow_wash_tub",
+   "split": "train",
+   "success": false
+  },
+  "inspire_dftp/yellow_wash_tub/4": {
+   "hand": "inspire_dftp",
+   "object_id": "yellow_wash_tub",
+   "split": "train",
+   "success": true
+  },
+  "inspire_dftp/yellow_wash_tub/5": {
+   "hand": "inspire_dftp",
+   "object_id": "yellow_wash_tub",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/apple/0": {
+   "hand": "inspire_f1",
+   "object_id": "apple",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/apple/1": {
+   "hand": "inspire_f1",
+   "object_id": "apple",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/apple/2": {
+   "hand": "inspire_f1",
+   "object_id": "apple",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/apple/3": {
+   "hand": "inspire_f1",
+   "object_id": "apple",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/apple/4": {
+   "hand": "inspire_f1",
+   "object_id": "apple",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/apple/5": {
+   "hand": "inspire_f1",
+   "object_id": "apple",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/attached_container/0": {
+   "hand": "inspire_f1",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/attached_container/2": {
+   "hand": "inspire_f1",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/attached_container/3": {
+   "hand": "inspire_f1",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/attached_container/4": {
+   "hand": "inspire_f1",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/attached_container/5": {
+   "hand": "inspire_f1",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/attached_container/6": {
+   "hand": "inspire_f1",
+   "object_id": "attached_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/baby_beaker/0": {
+   "hand": "inspire_f1",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/baby_beaker/1": {
+   "hand": "inspire_f1",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/baby_beaker/2": {
+   "hand": "inspire_f1",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/baby_beaker/4": {
+   "hand": "inspire_f1",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/baby_beaker/7": {
+   "hand": "inspire_f1",
+   "object_id": "baby_beaker",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/balloon_whisk/0": {
+   "hand": "inspire_f1",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/balloon_whisk/1": {
+   "hand": "inspire_f1",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/balloon_whisk/2": {
+   "hand": "inspire_f1",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/balloon_whisk/3": {
+   "hand": "inspire_f1",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/balloon_whisk/5": {
+   "hand": "inspire_f1",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/balloon_whisk/6": {
+   "hand": "inspire_f1",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/balloon_whisk/7": {
+   "hand": "inspire_f1",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/balloon_whisk/8": {
+   "hand": "inspire_f1",
+   "object_id": "balloon_whisk",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/bamboo_basket/0": {
+   "hand": "inspire_f1",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/bamboo_basket/1": {
+   "hand": "inspire_f1",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/bamboo_basket/2": {
+   "hand": "inspire_f1",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/bamboo_basket/3": {
+   "hand": "inspire_f1",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/bamboo_basket/4": {
+   "hand": "inspire_f1",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/bamboo_basket/5": {
+   "hand": "inspire_f1",
+   "object_id": "bamboo_basket",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/bamboo_box/0": {
+   "hand": "inspire_f1",
+   "object_id": "bamboo_box",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/bamboo_box/1": {
+   "hand": "inspire_f1",
+   "object_id": "bamboo_box",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/bamboo_box/2": {
+   "hand": "inspire_f1",
+   "object_id": "bamboo_box",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/bamboo_box/3": {
+   "hand": "inspire_f1",
+   "object_id": "bamboo_box",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/bamboo_box/4": {
+   "hand": "inspire_f1",
+   "object_id": "bamboo_box",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/banana/0": {
+   "hand": "inspire_f1",
+   "object_id": "banana",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/banana/1": {
+   "hand": "inspire_f1",
+   "object_id": "banana",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/banana/2": {
+   "hand": "inspire_f1",
+   "object_id": "banana",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/banana/3": {
+   "hand": "inspire_f1",
+   "object_id": "banana",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/banana/4": {
+   "hand": "inspire_f1",
+   "object_id": "banana",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/banana/5": {
+   "hand": "inspire_f1",
+   "object_id": "banana",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/baseball/0": {
+   "hand": "inspire_f1",
+   "object_id": "baseball",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/baseball/1": {
+   "hand": "inspire_f1",
+   "object_id": "baseball",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/baseball/10": {
+   "hand": "inspire_f1",
+   "object_id": "baseball",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/baseball/3": {
+   "hand": "inspire_f1",
+   "object_id": "baseball",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/baseball/4": {
+   "hand": "inspire_f1",
+   "object_id": "baseball",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/baseball/5": {
+   "hand": "inspire_f1",
+   "object_id": "baseball",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/baseball/6": {
+   "hand": "inspire_f1",
+   "object_id": "baseball",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/baseball/9": {
+   "hand": "inspire_f1",
+   "object_id": "baseball",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/beige_brush/2": {
+   "hand": "inspire_f1",
+   "object_id": "beige_brush",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/beige_brush/3": {
+   "hand": "inspire_f1",
+   "object_id": "beige_brush",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/beige_brush/4": {
+   "hand": "inspire_f1",
+   "object_id": "beige_brush",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/beige_brush/5": {
+   "hand": "inspire_f1",
+   "object_id": "beige_brush",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/beige_brush/6": {
+   "hand": "inspire_f1",
+   "object_id": "beige_brush",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/black_holder_with_handle/2": {
+   "hand": "inspire_f1",
+   "object_id": "black_holder_with_handle",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/black_holder_with_handle/3": {
+   "hand": "inspire_f1",
+   "object_id": "black_holder_with_handle",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/black_holder_with_handle/4": {
+   "hand": "inspire_f1",
+   "object_id": "black_holder_with_handle",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/black_holder_with_handle/5": {
+   "hand": "inspire_f1",
+   "object_id": "black_holder_with_handle",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/black_holder_with_handle/6": {
+   "hand": "inspire_f1",
+   "object_id": "black_holder_with_handle",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/black_holder_with_handle/7": {
+   "hand": "inspire_f1",
+   "object_id": "black_holder_with_handle",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/black_holder_with_handle/9": {
+   "hand": "inspire_f1",
+   "object_id": "black_holder_with_handle",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/black_kitchen_roll_holder/0": {
+   "hand": "inspire_f1",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/black_kitchen_roll_holder/1": {
+   "hand": "inspire_f1",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/black_kitchen_roll_holder/2": {
+   "hand": "inspire_f1",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/black_kitchen_roll_holder/3": {
+   "hand": "inspire_f1",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/black_kitchen_roll_holder/4": {
+   "hand": "inspire_f1",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/black_kitchen_roll_holder/5": {
+   "hand": "inspire_f1",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/black_kitchen_roll_holder/6": {
+   "hand": "inspire_f1",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/black_kitchen_roll_holder/7": {
+   "hand": "inspire_f1",
+   "object_id": "black_kitchen_roll_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/blue_alarm/0": {
+   "hand": "inspire_f1",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/blue_alarm/1": {
+   "hand": "inspire_f1",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/blue_alarm/2": {
+   "hand": "inspire_f1",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/blue_alarm/3": {
+   "hand": "inspire_f1",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/blue_alarm/4": {
+   "hand": "inspire_f1",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/blue_alarm/5": {
+   "hand": "inspire_f1",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/blue_alarm/7": {
+   "hand": "inspire_f1",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/blue_alarm/8": {
+   "hand": "inspire_f1",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/blue_alarm/9": {
+   "hand": "inspire_f1",
+   "object_id": "blue_alarm",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/blue_plastic_box/0": {
+   "hand": "inspire_f1",
+   "object_id": "blue_plastic_box",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/blue_plastic_box/1": {
+   "hand": "inspire_f1",
+   "object_id": "blue_plastic_box",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/blue_plastic_box/2": {
+   "hand": "inspire_f1",
+   "object_id": "blue_plastic_box",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/blue_plastic_box/3": {
+   "hand": "inspire_f1",
+   "object_id": "blue_plastic_box",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/blue_vase/0": {
+   "hand": "inspire_f1",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/blue_vase/1": {
+   "hand": "inspire_f1",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/blue_vase/2": {
+   "hand": "inspire_f1",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/blue_vase/3": {
+   "hand": "inspire_f1",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/blue_vase/4": {
+   "hand": "inspire_f1",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/blue_vase/5": {
+   "hand": "inspire_f1",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/blue_vase/6": {
+   "hand": "inspire_f1",
+   "object_id": "blue_vase",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/book/0": {
+   "hand": "inspire_f1",
+   "object_id": "book",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/book/1": {
+   "hand": "inspire_f1",
+   "object_id": "book",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/book/2": {
+   "hand": "inspire_f1",
+   "object_id": "book",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/book/3": {
+   "hand": "inspire_f1",
+   "object_id": "book",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/book/4": {
+   "hand": "inspire_f1",
+   "object_id": "book",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/box_pink/0": {
+   "hand": "inspire_f1",
+   "object_id": "box_pink",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/box_pink/1": {
+   "hand": "inspire_f1",
+   "object_id": "box_pink",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/box_pink/2": {
+   "hand": "inspire_f1",
+   "object_id": "box_pink",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/box_pink/3": {
+   "hand": "inspire_f1",
+   "object_id": "box_pink",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/box_pink/4": {
+   "hand": "inspire_f1",
+   "object_id": "box_pink",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/brass_pot/0": {
+   "hand": "inspire_f1",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/brass_pot/1": {
+   "hand": "inspire_f1",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/brass_pot/2": {
+   "hand": "inspire_f1",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/brass_pot/3": {
+   "hand": "inspire_f1",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/brass_pot/4": {
+   "hand": "inspire_f1",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/brass_pot/5": {
+   "hand": "inspire_f1",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/brass_pot/6": {
+   "hand": "inspire_f1",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/brass_pot/7": {
+   "hand": "inspire_f1",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/brass_pot/9": {
+   "hand": "inspire_f1",
+   "object_id": "brass_pot",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/brown_ramen/0": {
+   "hand": "inspire_f1",
+   "object_id": "brown_ramen",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/brown_ramen/1": {
+   "hand": "inspire_f1",
+   "object_id": "brown_ramen",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/brown_ramen/10": {
+   "hand": "inspire_f1",
+   "object_id": "brown_ramen",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/brown_ramen/11": {
+   "hand": "inspire_f1",
+   "object_id": "brown_ramen",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/brown_ramen/2": {
+   "hand": "inspire_f1",
+   "object_id": "brown_ramen",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/brown_ramen/3": {
+   "hand": "inspire_f1",
+   "object_id": "brown_ramen",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/brown_ramen/4": {
+   "hand": "inspire_f1",
+   "object_id": "brown_ramen",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/brown_ramen/5": {
+   "hand": "inspire_f1",
+   "object_id": "brown_ramen",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/brown_ramen/6": {
+   "hand": "inspire_f1",
+   "object_id": "brown_ramen",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/brown_ramen/7": {
+   "hand": "inspire_f1",
+   "object_id": "brown_ramen",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/brown_ramen/8": {
+   "hand": "inspire_f1",
+   "object_id": "brown_ramen",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/brown_ramen/9": {
+   "hand": "inspire_f1",
+   "object_id": "brown_ramen",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/cactus/0": {
+   "hand": "inspire_f1",
+   "object_id": "cactus",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/cactus/1": {
+   "hand": "inspire_f1",
+   "object_id": "cactus",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/cactus/2": {
+   "hand": "inspire_f1",
+   "object_id": "cactus",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/cactus/3": {
+   "hand": "inspire_f1",
+   "object_id": "cactus",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/cactus/4": {
+   "hand": "inspire_f1",
+   "object_id": "cactus",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/cactus2/0": {
+   "hand": "inspire_f1",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/cactus2/1": {
+   "hand": "inspire_f1",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/cactus2/2": {
+   "hand": "inspire_f1",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/cactus2/3": {
+   "hand": "inspire_f1",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/cactus2/4": {
+   "hand": "inspire_f1",
+   "object_id": "cactus2",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/cactus3/0": {
+   "hand": "inspire_f1",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/cactus3/1": {
+   "hand": "inspire_f1",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/cactus3/2": {
+   "hand": "inspire_f1",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/cactus3/3": {
+   "hand": "inspire_f1",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/cactus3/4": {
+   "hand": "inspire_f1",
+   "object_id": "cactus3",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/circular_frying_pan/1": {
+   "hand": "inspire_f1",
+   "object_id": "circular_frying_pan",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/circular_frying_pan/2": {
+   "hand": "inspire_f1",
+   "object_id": "circular_frying_pan",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/circular_frying_pan/3": {
+   "hand": "inspire_f1",
+   "object_id": "circular_frying_pan",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/circular_frying_pan/4": {
+   "hand": "inspire_f1",
+   "object_id": "circular_frying_pan",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/circular_frying_pan/5": {
+   "hand": "inspire_f1",
+   "object_id": "circular_frying_pan",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/circular_frying_pan/6": {
+   "hand": "inspire_f1",
+   "object_id": "circular_frying_pan",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/circular_frying_pan/7": {
+   "hand": "inspire_f1",
+   "object_id": "circular_frying_pan",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/clothes_hanger/0": {
+   "hand": "inspire_f1",
+   "object_id": "clothes_hanger",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/clothes_hanger/1": {
+   "hand": "inspire_f1",
+   "object_id": "clothes_hanger",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/clothes_hanger/2": {
+   "hand": "inspire_f1",
+   "object_id": "clothes_hanger",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/clothes_hanger/3": {
+   "hand": "inspire_f1",
+   "object_id": "clothes_hanger",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/clothes_hanger/4": {
+   "hand": "inspire_f1",
+   "object_id": "clothes_hanger",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/coffee_tin/0": {
+   "hand": "inspire_f1",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/coffee_tin/2": {
+   "hand": "inspire_f1",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/coffee_tin/3": {
+   "hand": "inspire_f1",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/coffee_tin/4": {
+   "hand": "inspire_f1",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/coffee_tin/5": {
+   "hand": "inspire_f1",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/coffee_tin/6": {
+   "hand": "inspire_f1",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/coffee_tin/7": {
+   "hand": "inspire_f1",
+   "object_id": "coffee_tin",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/colander_green/2": {
+   "hand": "inspire_f1",
+   "object_id": "colander_green",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/colander_green/3": {
+   "hand": "inspire_f1",
+   "object_id": "colander_green",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/colander_green/4": {
+   "hand": "inspire_f1",
+   "object_id": "colander_green",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/colander_green/5": {
+   "hand": "inspire_f1",
+   "object_id": "colander_green",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/colander_green/6": {
+   "hand": "inspire_f1",
+   "object_id": "colander_green",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/colander_green/7": {
+   "hand": "inspire_f1",
+   "object_id": "colander_green",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/container_pink/0": {
+   "hand": "inspire_f1",
+   "object_id": "container_pink",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/container_pink/1": {
+   "hand": "inspire_f1",
+   "object_id": "container_pink",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/donut/0": {
+   "hand": "inspire_f1",
+   "object_id": "donut",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/donut/1": {
+   "hand": "inspire_f1",
+   "object_id": "donut",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/donut/2": {
+   "hand": "inspire_f1",
+   "object_id": "donut",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/donut/3": {
+   "hand": "inspire_f1",
+   "object_id": "donut",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/donut/4": {
+   "hand": "inspire_f1",
+   "object_id": "donut",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/donut/5": {
+   "hand": "inspire_f1",
+   "object_id": "donut",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/frame_oak/0": {
+   "hand": "inspire_f1",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/frame_oak/1": {
+   "hand": "inspire_f1",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/frame_oak/2": {
+   "hand": "inspire_f1",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/frame_oak/3": {
+   "hand": "inspire_f1",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/frame_oak/4": {
+   "hand": "inspire_f1",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/frame_oak/5": {
+   "hand": "inspire_f1",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/frame_oak/6": {
+   "hand": "inspire_f1",
+   "object_id": "frame_oak",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/frame_red/0": {
+   "hand": "inspire_f1",
+   "object_id": "frame_red",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/frame_red/1": {
+   "hand": "inspire_f1",
+   "object_id": "frame_red",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/frame_red/2": {
+   "hand": "inspire_f1",
+   "object_id": "frame_red",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/frame_red/3": {
+   "hand": "inspire_f1",
+   "object_id": "frame_red",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/frame_red/4": {
+   "hand": "inspire_f1",
+   "object_id": "frame_red",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/french_mustard/2": {
+   "hand": "inspire_f1",
+   "object_id": "french_mustard",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/french_mustard/3": {
+   "hand": "inspire_f1",
+   "object_id": "french_mustard",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/french_mustard/4": {
+   "hand": "inspire_f1",
+   "object_id": "french_mustard",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/french_mustard/5": {
+   "hand": "inspire_f1",
+   "object_id": "french_mustard",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/frog_bowl/0": {
+   "hand": "inspire_f1",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/frog_bowl/1": {
+   "hand": "inspire_f1",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/frog_bowl/2": {
+   "hand": "inspire_f1",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/frog_bowl/3": {
+   "hand": "inspire_f1",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/frog_bowl/4": {
+   "hand": "inspire_f1",
+   "object_id": "frog_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/frog_cup/0": {
+   "hand": "inspire_f1",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/frog_cup/1": {
+   "hand": "inspire_f1",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/frog_cup/2": {
+   "hand": "inspire_f1",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/frog_cup/4": {
+   "hand": "inspire_f1",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/frog_cup/5": {
+   "hand": "inspire_f1",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/frog_cup/6": {
+   "hand": "inspire_f1",
+   "object_id": "frog_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/fruit_cutter_base/0": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_base",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/fruit_cutter_base/1": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_base",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/fruit_cutter_base/2": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_base",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/fruit_cutter_base/3": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_base",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/fruit_cutter_base/4": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_base",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/fruit_cutter_base/5": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_base",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/fruit_cutter_base/6": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_base",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/fruit_cutter_green/0": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_green",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/fruit_cutter_green/1": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_green",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/fruit_cutter_green/10": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_green",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/fruit_cutter_green/2": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_green",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/fruit_cutter_green/3": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_green",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/fruit_cutter_green/4": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_green",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/fruit_cutter_green/5": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_green",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/fruit_cutter_green/6": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_green",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/fruit_cutter_green/7": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_green",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/fruit_cutter_green/8": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_green",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/fruit_cutter_green/9": {
+   "hand": "inspire_f1",
+   "object_id": "fruit_cutter_green",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/green_attached_container/0": {
+   "hand": "inspire_f1",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/green_attached_container/1": {
+   "hand": "inspire_f1",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/green_attached_container/2": {
+   "hand": "inspire_f1",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/green_attached_container/3": {
+   "hand": "inspire_f1",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/green_attached_container/6": {
+   "hand": "inspire_f1",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/green_attached_container/7": {
+   "hand": "inspire_f1",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/green_attached_container/8": {
+   "hand": "inspire_f1",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/green_attached_container/9": {
+   "hand": "inspire_f1",
+   "object_id": "green_attached_container",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/green_cactus_vase/0": {
+   "hand": "inspire_f1",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/green_cactus_vase/1": {
+   "hand": "inspire_f1",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/green_cactus_vase/2": {
+   "hand": "inspire_f1",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/green_cactus_vase/3": {
+   "hand": "inspire_f1",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/green_cactus_vase/4": {
+   "hand": "inspire_f1",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/green_cactus_vase/5": {
+   "hand": "inspire_f1",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/green_cactus_vase/6": {
+   "hand": "inspire_f1",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/green_cactus_vase/7": {
+   "hand": "inspire_f1",
+   "object_id": "green_cactus_vase",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/green_soap_dispenser/0": {
+   "hand": "inspire_f1",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/green_soap_dispenser/1": {
+   "hand": "inspire_f1",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/green_soap_dispenser/2": {
+   "hand": "inspire_f1",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/green_soap_dispenser/3": {
+   "hand": "inspire_f1",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/green_soap_dispenser/4": {
+   "hand": "inspire_f1",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/green_soap_dispenser/5": {
+   "hand": "inspire_f1",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/green_soap_dispenser/6": {
+   "hand": "inspire_f1",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/green_soap_dispenser/7": {
+   "hand": "inspire_f1",
+   "object_id": "green_soap_dispenser",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/grey_pot/0": {
+   "hand": "inspire_f1",
+   "object_id": "grey_pot",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/grey_pot/1": {
+   "hand": "inspire_f1",
+   "object_id": "grey_pot",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/grey_pot/2": {
+   "hand": "inspire_f1",
+   "object_id": "grey_pot",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/grey_pot/3": {
+   "hand": "inspire_f1",
+   "object_id": "grey_pot",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/grey_pot/4": {
+   "hand": "inspire_f1",
+   "object_id": "grey_pot",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/grey_pot/5": {
+   "hand": "inspire_f1",
+   "object_id": "grey_pot",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/grey_pot/6": {
+   "hand": "inspire_f1",
+   "object_id": "grey_pot",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/grey_pot/7": {
+   "hand": "inspire_f1",
+   "object_id": "grey_pot",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/grey_pot/8": {
+   "hand": "inspire_f1",
+   "object_id": "grey_pot",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/hammer/0": {
+   "hand": "inspire_f1",
+   "object_id": "hammer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/hammer/1": {
+   "hand": "inspire_f1",
+   "object_id": "hammer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/hammer/2": {
+   "hand": "inspire_f1",
+   "object_id": "hammer",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/hammer/3": {
+   "hand": "inspire_f1",
+   "object_id": "hammer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/hammer/4": {
+   "hand": "inspire_f1",
+   "object_id": "hammer",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/hammer/5": {
+   "hand": "inspire_f1",
+   "object_id": "hammer",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/hammer/6": {
+   "hand": "inspire_f1",
+   "object_id": "hammer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/hammer/7": {
+   "hand": "inspire_f1",
+   "object_id": "hammer",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/icecream_scoop/0": {
+   "hand": "inspire_f1",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/icecream_scoop/1": {
+   "hand": "inspire_f1",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/icecream_scoop/2": {
+   "hand": "inspire_f1",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/icecream_scoop/3": {
+   "hand": "inspire_f1",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/icecream_scoop/4": {
+   "hand": "inspire_f1",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/icecream_scoop/5": {
+   "hand": "inspire_f1",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/icecream_scoop/6": {
+   "hand": "inspire_f1",
+   "object_id": "icecream_scoop",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/instant_rice/1": {
+   "hand": "inspire_f1",
+   "object_id": "instant_rice",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/instant_rice/2": {
+   "hand": "inspire_f1",
+   "object_id": "instant_rice",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/instant_rice/6": {
+   "hand": "inspire_f1",
+   "object_id": "instant_rice",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/jja_ramen/0": {
+   "hand": "inspire_f1",
+   "object_id": "jja_ramen",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/jja_ramen/1": {
+   "hand": "inspire_f1",
+   "object_id": "jja_ramen",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/jja_ramen/2": {
+   "hand": "inspire_f1",
+   "object_id": "jja_ramen",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/jja_ramen/4": {
+   "hand": "inspire_f1",
+   "object_id": "jja_ramen",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/jja_ramen/5": {
+   "hand": "inspire_f1",
+   "object_id": "jja_ramen",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/jja_ramen/6": {
+   "hand": "inspire_f1",
+   "object_id": "jja_ramen",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/knife_sharpener/0": {
+   "hand": "inspire_f1",
+   "object_id": "knife_sharpener",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/knife_sharpener/1": {
+   "hand": "inspire_f1",
+   "object_id": "knife_sharpener",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/knife_sharpener/2": {
+   "hand": "inspire_f1",
+   "object_id": "knife_sharpener",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/knife_sharpener/3": {
+   "hand": "inspire_f1",
+   "object_id": "knife_sharpener",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/knife_sharpener/4": {
+   "hand": "inspire_f1",
+   "object_id": "knife_sharpener",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/knife_sharpener/5": {
+   "hand": "inspire_f1",
+   "object_id": "knife_sharpener",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/knife_sharpener/6": {
+   "hand": "inspire_f1",
+   "object_id": "knife_sharpener",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/large_peg/0": {
+   "hand": "inspire_f1",
+   "object_id": "large_peg",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/lemon/0": {
+   "hand": "inspire_f1",
+   "object_id": "lemon",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/lemon/1": {
+   "hand": "inspire_f1",
+   "object_id": "lemon",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/lemon/2": {
+   "hand": "inspire_f1",
+   "object_id": "lemon",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/lemon/3": {
+   "hand": "inspire_f1",
+   "object_id": "lemon",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/lemon/4": {
+   "hand": "inspire_f1",
+   "object_id": "lemon",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/lemon_squeezer/11": {
+   "hand": "inspire_f1",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/lemon_squeezer/12": {
+   "hand": "inspire_f1",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/lemon_squeezer/13": {
+   "hand": "inspire_f1",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/lemon_squeezer/14": {
+   "hand": "inspire_f1",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/lemon_squeezer/15": {
+   "hand": "inspire_f1",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/lemon_squeezer/2": {
+   "hand": "inspire_f1",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/lemon_squeezer/3": {
+   "hand": "inspire_f1",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/lemon_squeezer/4": {
+   "hand": "inspire_f1",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/lemon_squeezer/5": {
+   "hand": "inspire_f1",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/lemon_squeezer/6": {
+   "hand": "inspire_f1",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/lemon_squeezer/7": {
+   "hand": "inspire_f1",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/lemon_squeezer/8": {
+   "hand": "inspire_f1",
+   "object_id": "lemon_squeezer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/light_green_basket/0": {
+   "hand": "inspire_f1",
+   "object_id": "light_green_basket",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/light_green_basket/1": {
+   "hand": "inspire_f1",
+   "object_id": "light_green_basket",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/light_green_basket/2": {
+   "hand": "inspire_f1",
+   "object_id": "light_green_basket",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/light_green_basket/3": {
+   "hand": "inspire_f1",
+   "object_id": "light_green_basket",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/light_green_basket/4": {
+   "hand": "inspire_f1",
+   "object_id": "light_green_basket",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/lilac_food_container/0": {
+   "hand": "inspire_f1",
+   "object_id": "lilac_food_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/lilac_food_container/1": {
+   "hand": "inspire_f1",
+   "object_id": "lilac_food_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/lilac_food_container/2": {
+   "hand": "inspire_f1",
+   "object_id": "lilac_food_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/lilac_food_container/3": {
+   "hand": "inspire_f1",
+   "object_id": "lilac_food_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/lilac_food_container/4": {
+   "hand": "inspire_f1",
+   "object_id": "lilac_food_container",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/lotion/0": {
+   "hand": "inspire_f1",
+   "object_id": "lotion",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/lotion/1": {
+   "hand": "inspire_f1",
+   "object_id": "lotion",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/lotion/2": {
+   "hand": "inspire_f1",
+   "object_id": "lotion",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/lotion/3": {
+   "hand": "inspire_f1",
+   "object_id": "lotion",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/lotion/4": {
+   "hand": "inspire_f1",
+   "object_id": "lotion",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/meat_thermometer/0": {
+   "hand": "inspire_f1",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/meat_thermometer/1": {
+   "hand": "inspire_f1",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/meat_thermometer/10": {
+   "hand": "inspire_f1",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/meat_thermometer/2": {
+   "hand": "inspire_f1",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/meat_thermometer/3": {
+   "hand": "inspire_f1",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/meat_thermometer/4": {
+   "hand": "inspire_f1",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/meat_thermometer/5": {
+   "hand": "inspire_f1",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/meat_thermometer/6": {
+   "hand": "inspire_f1",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/meat_thermometer/7": {
+   "hand": "inspire_f1",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/meat_thermometer/8": {
+   "hand": "inspire_f1",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/meat_thermometer/9": {
+   "hand": "inspire_f1",
+   "object_id": "meat_thermometer",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/metal_measuring_flask/0": {
+   "hand": "inspire_f1",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/metal_measuring_flask/1": {
+   "hand": "inspire_f1",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/metal_measuring_flask/2": {
+   "hand": "inspire_f1",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/metal_measuring_flask/3": {
+   "hand": "inspire_f1",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/metal_measuring_flask/4": {
+   "hand": "inspire_f1",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/metal_measuring_flask/5": {
+   "hand": "inspire_f1",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/metal_measuring_flask/6": {
+   "hand": "inspire_f1",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/metal_measuring_flask/7": {
+   "hand": "inspire_f1",
+   "object_id": "metal_measuring_flask",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/metal_scoop_big/0": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/metal_scoop_big/1": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/metal_scoop_big/2": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/metal_scoop_big/3": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/metal_scoop_big/5": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/metal_scoop_big/6": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/metal_scoop_big/7": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_big",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/metal_scoop_small/0": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/metal_scoop_small/1": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/metal_scoop_small/2": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/metal_scoop_small/3": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/metal_scoop_small/4": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/metal_scoop_small/5": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/metal_scoop_small/6": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/metal_scoop_small/7": {
+   "hand": "inspire_f1",
+   "object_id": "metal_scoop_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/mug_holder/0": {
+   "hand": "inspire_f1",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/mug_holder/1": {
+   "hand": "inspire_f1",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/mug_holder/2": {
+   "hand": "inspire_f1",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/mug_holder/3": {
+   "hand": "inspire_f1",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/mug_holder/4": {
+   "hand": "inspire_f1",
+   "object_id": "mug_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/orange/0": {
+   "hand": "inspire_f1",
+   "object_id": "orange",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/orange/1": {
+   "hand": "inspire_f1",
+   "object_id": "orange",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/orange/2": {
+   "hand": "inspire_f1",
+   "object_id": "orange",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/orange/3": {
+   "hand": "inspire_f1",
+   "object_id": "orange",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/orange/4": {
+   "hand": "inspire_f1",
+   "object_id": "orange",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/orange/5": {
+   "hand": "inspire_f1",
+   "object_id": "orange",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/organizer_beige/0": {
+   "hand": "inspire_f1",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/organizer_beige/1": {
+   "hand": "inspire_f1",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/organizer_beige/2": {
+   "hand": "inspire_f1",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/organizer_beige/3": {
+   "hand": "inspire_f1",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/organizer_beige/6": {
+   "hand": "inspire_f1",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/organizer_beige/7": {
+   "hand": "inspire_f1",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/organizer_beige/8": {
+   "hand": "inspire_f1",
+   "object_id": "organizer_beige",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/pastel_blue_cup/0": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/pastel_blue_cup/1": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/pastel_blue_cup/2": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/pastel_blue_cup/3": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/pastel_blue_cup/4": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/pastel_blue_cup/5": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/pastel_blue_cup/6": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/pastel_blue_cup/7": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_blue_cup",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/pastel_light_green_bowl/0": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/pastel_light_green_bowl/1": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/pastel_light_green_bowl/2": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/pastel_light_green_bowl/3": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/pastel_light_green_bowl/4": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/pastel_light_green_bowl/5": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/pastel_light_green_bowl/6": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/pastel_light_green_bowl/7": {
+   "hand": "inspire_f1",
+   "object_id": "pastel_light_green_bowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/pepper_tuna/0": {
+   "hand": "inspire_f1",
+   "object_id": "pepper_tuna",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/pepper_tuna/1": {
+   "hand": "inspire_f1",
+   "object_id": "pepper_tuna",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/pepper_tuna/2": {
+   "hand": "inspire_f1",
+   "object_id": "pepper_tuna",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/pepper_tuna/3": {
+   "hand": "inspire_f1",
+   "object_id": "pepper_tuna",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/pepper_tuna/4": {
+   "hand": "inspire_f1",
+   "object_id": "pepper_tuna",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/pepper_tuna/5": {
+   "hand": "inspire_f1",
+   "object_id": "pepper_tuna",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/pepper_tuna/6": {
+   "hand": "inspire_f1",
+   "object_id": "pepper_tuna",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/pingpong/0": {
+   "hand": "inspire_f1",
+   "object_id": "pingpong",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/pingpong/1": {
+   "hand": "inspire_f1",
+   "object_id": "pingpong",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/pingpong/2": {
+   "hand": "inspire_f1",
+   "object_id": "pingpong",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/pingpong/3": {
+   "hand": "inspire_f1",
+   "object_id": "pingpong",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/pingpong/4": {
+   "hand": "inspire_f1",
+   "object_id": "pingpong",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/pingpong/5": {
+   "hand": "inspire_f1",
+   "object_id": "pingpong",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/pingpong/6": {
+   "hand": "inspire_f1",
+   "object_id": "pingpong",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/pink_clock/1": {
+   "hand": "inspire_f1",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/pink_clock/2": {
+   "hand": "inspire_f1",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/pink_clock/3": {
+   "hand": "inspire_f1",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/pink_clock/5": {
+   "hand": "inspire_f1",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/pink_clock/6": {
+   "hand": "inspire_f1",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/pink_clock/7": {
+   "hand": "inspire_f1",
+   "object_id": "pink_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/plant_pot/0": {
+   "hand": "inspire_f1",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/plant_pot/1": {
+   "hand": "inspire_f1",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/plant_pot/2": {
+   "hand": "inspire_f1",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/plant_pot/3": {
+   "hand": "inspire_f1",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/plant_pot/4": {
+   "hand": "inspire_f1",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/plant_pot/5": {
+   "hand": "inspire_f1",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/plant_pot/6": {
+   "hand": "inspire_f1",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/plant_pot/7": {
+   "hand": "inspire_f1",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/plant_pot/8": {
+   "hand": "inspire_f1",
+   "object_id": "plant_pot",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/plastic_elephant_jug/0": {
+   "hand": "inspire_f1",
+   "object_id": "plastic_elephant_jug",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/plastic_elephant_jug/1": {
+   "hand": "inspire_f1",
+   "object_id": "plastic_elephant_jug",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/plastic_elephant_jug/2": {
+   "hand": "inspire_f1",
+   "object_id": "plastic_elephant_jug",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/plastic_elephant_jug/3": {
+   "hand": "inspire_f1",
+   "object_id": "plastic_elephant_jug",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/plastic_elephant_jug/4": {
+   "hand": "inspire_f1",
+   "object_id": "plastic_elephant_jug",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/rectangular_frying_pan/0": {
+   "hand": "inspire_f1",
+   "object_id": "rectangular_frying_pan",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/rectangular_frying_pan/2": {
+   "hand": "inspire_f1",
+   "object_id": "rectangular_frying_pan",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/rectangular_frying_pan/3": {
+   "hand": "inspire_f1",
+   "object_id": "rectangular_frying_pan",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/rectangular_frying_pan/4": {
+   "hand": "inspire_f1",
+   "object_id": "rectangular_frying_pan",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/rectangular_frying_pan/5": {
+   "hand": "inspire_f1",
+   "object_id": "rectangular_frying_pan",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/redcar/2": {
+   "hand": "inspire_f1",
+   "object_id": "redcar",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/redcar/3": {
+   "hand": "inspire_f1",
+   "object_id": "redcar",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/saucepan/0": {
+   "hand": "inspire_f1",
+   "object_id": "saucepan",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/saucepan/1": {
+   "hand": "inspire_f1",
+   "object_id": "saucepan",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/scotch_tape/0": {
+   "hand": "inspire_f1",
+   "object_id": "scotch_tape",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/scotch_tape/1": {
+   "hand": "inspire_f1",
+   "object_id": "scotch_tape",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/scotch_tape/2": {
+   "hand": "inspire_f1",
+   "object_id": "scotch_tape",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/scotch_tape/3": {
+   "hand": "inspire_f1",
+   "object_id": "scotch_tape",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/scotch_tape/4": {
+   "hand": "inspire_f1",
+   "object_id": "scotch_tape",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/scotch_tape/5": {
+   "hand": "inspire_f1",
+   "object_id": "scotch_tape",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/scotch_tape/6": {
+   "hand": "inspire_f1",
+   "object_id": "scotch_tape",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/screwdriver/0": {
+   "hand": "inspire_f1",
+   "object_id": "screwdriver",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/screwdriver/1": {
+   "hand": "inspire_f1",
+   "object_id": "screwdriver",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/screwdriver/2": {
+   "hand": "inspire_f1",
+   "object_id": "screwdriver",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/screwdriver/3": {
+   "hand": "inspire_f1",
+   "object_id": "screwdriver",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/screwdriver/4": {
+   "hand": "inspire_f1",
+   "object_id": "screwdriver",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/servingbowl_small/0": {
+   "hand": "inspire_f1",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/servingbowl_small/1": {
+   "hand": "inspire_f1",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/servingbowl_small/2": {
+   "hand": "inspire_f1",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/servingbowl_small/3": {
+   "hand": "inspire_f1",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/servingbowl_small/4": {
+   "hand": "inspire_f1",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/servingbowl_small/5": {
+   "hand": "inspire_f1",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/servingbowl_small/6": {
+   "hand": "inspire_f1",
+   "object_id": "servingbowl_small",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/smallbowl/0": {
+   "hand": "inspire_f1",
+   "object_id": "smallbowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/smallbowl/1": {
+   "hand": "inspire_f1",
+   "object_id": "smallbowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/smallbowl/2": {
+   "hand": "inspire_f1",
+   "object_id": "smallbowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/smallbowl/3": {
+   "hand": "inspire_f1",
+   "object_id": "smallbowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/smallbowl/4": {
+   "hand": "inspire_f1",
+   "object_id": "smallbowl",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/soaptray/0": {
+   "hand": "inspire_f1",
+   "object_id": "soaptray",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/soaptray/1": {
+   "hand": "inspire_f1",
+   "object_id": "soaptray",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/soaptray/2": {
+   "hand": "inspire_f1",
+   "object_id": "soaptray",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/soaptray/3": {
+   "hand": "inspire_f1",
+   "object_id": "soaptray",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/soaptray/4": {
+   "hand": "inspire_f1",
+   "object_id": "soaptray",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/spam_can/0": {
+   "hand": "inspire_f1",
+   "object_id": "spam_can",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/spam_can/1": {
+   "hand": "inspire_f1",
+   "object_id": "spam_can",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/spam_can/2": {
+   "hand": "inspire_f1",
+   "object_id": "spam_can",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/spam_can/3": {
+   "hand": "inspire_f1",
+   "object_id": "spam_can",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/spam_can/4": {
+   "hand": "inspire_f1",
+   "object_id": "spam_can",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/spicemill/0": {
+   "hand": "inspire_f1",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/spicemill/1": {
+   "hand": "inspire_f1",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/spicemill/2": {
+   "hand": "inspire_f1",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/spicemill/3": {
+   "hand": "inspire_f1",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/spicemill/4": {
+   "hand": "inspire_f1",
+   "object_id": "spicemill",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/spray_bottle/0": {
+   "hand": "inspire_f1",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/spray_bottle/1": {
+   "hand": "inspire_f1",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/spray_bottle/2": {
+   "hand": "inspire_f1",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/spray_bottle/3": {
+   "hand": "inspire_f1",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/spray_bottle/4": {
+   "hand": "inspire_f1",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/spray_bottle/5": {
+   "hand": "inspire_f1",
+   "object_id": "spray_bottle",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/standing_frame/0": {
+   "hand": "inspire_f1",
+   "object_id": "standing_frame",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/standing_frame/1": {
+   "hand": "inspire_f1",
+   "object_id": "standing_frame",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/standing_frame/2": {
+   "hand": "inspire_f1",
+   "object_id": "standing_frame",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/standing_frame/3": {
+   "hand": "inspire_f1",
+   "object_id": "standing_frame",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/standing_frame/4": {
+   "hand": "inspire_f1",
+   "object_id": "standing_frame",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/standing_frame/5": {
+   "hand": "inspire_f1",
+   "object_id": "standing_frame",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/standing_frame/6": {
+   "hand": "inspire_f1",
+   "object_id": "standing_frame",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/standing_frame/7": {
+   "hand": "inspire_f1",
+   "object_id": "standing_frame",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/tea_case/0": {
+   "hand": "inspire_f1",
+   "object_id": "tea_case",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/tea_case/1": {
+   "hand": "inspire_f1",
+   "object_id": "tea_case",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/tea_case/2": {
+   "hand": "inspire_f1",
+   "object_id": "tea_case",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/tea_case/3": {
+   "hand": "inspire_f1",
+   "object_id": "tea_case",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/tea_case/4": {
+   "hand": "inspire_f1",
+   "object_id": "tea_case",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/tennis_ball/0": {
+   "hand": "inspire_f1",
+   "object_id": "tennis_ball",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/tennis_ball/1": {
+   "hand": "inspire_f1",
+   "object_id": "tennis_ball",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/tennis_ball/2": {
+   "hand": "inspire_f1",
+   "object_id": "tennis_ball",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/tennis_ball/3": {
+   "hand": "inspire_f1",
+   "object_id": "tennis_ball",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/tennis_ball/4": {
+   "hand": "inspire_f1",
+   "object_id": "tennis_ball",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/tennis_ball/5": {
+   "hand": "inspire_f1",
+   "object_id": "tennis_ball",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/tennis_ball/6": {
+   "hand": "inspire_f1",
+   "object_id": "tennis_ball",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/thermo_clock/0": {
+   "hand": "inspire_f1",
+   "object_id": "thermo_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/thermo_clock/1": {
+   "hand": "inspire_f1",
+   "object_id": "thermo_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/thermo_clock/2": {
+   "hand": "inspire_f1",
+   "object_id": "thermo_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/thermo_clock/3": {
+   "hand": "inspire_f1",
+   "object_id": "thermo_clock",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/thermo_clock/4": {
+   "hand": "inspire_f1",
+   "object_id": "thermo_clock",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/thermo_clock/5": {
+   "hand": "inspire_f1",
+   "object_id": "thermo_clock",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/thermo_clock/6": {
+   "hand": "inspire_f1",
+   "object_id": "thermo_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/thermo_clock/7": {
+   "hand": "inspire_f1",
+   "object_id": "thermo_clock",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/toothbrush_holder/0": {
+   "hand": "inspire_f1",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/toothbrush_holder/1": {
+   "hand": "inspire_f1",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/toothbrush_holder/10": {
+   "hand": "inspire_f1",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/toothbrush_holder/11": {
+   "hand": "inspire_f1",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/toothbrush_holder/12": {
+   "hand": "inspire_f1",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/toothbrush_holder/2": {
+   "hand": "inspire_f1",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/toothbrush_holder/3": {
+   "hand": "inspire_f1",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/toothbrush_holder/4": {
+   "hand": "inspire_f1",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/toothbrush_holder/5": {
+   "hand": "inspire_f1",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/toothbrush_holder/6": {
+   "hand": "inspire_f1",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/toothbrush_holder/7": {
+   "hand": "inspire_f1",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/toothbrush_holder/8": {
+   "hand": "inspire_f1",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/toothbrush_holder/9": {
+   "hand": "inspire_f1",
+   "object_id": "toothbrush_holder",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/washing_brush/0": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/washing_brush/1": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/washing_brush/2": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/washing_brush/3": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/washing_brush/4": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/washing_brush/5": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/washing_brush/6": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/washing_brush2/0": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/washing_brush2/1": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/washing_brush2/2": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/washing_brush2/3": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/washing_brush2/4": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/washing_brush2/5": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/washing_brush2/6": {
+   "hand": "inspire_f1",
+   "object_id": "washing_brush2",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/white_candle_holder/0": {
+   "hand": "inspire_f1",
+   "object_id": "white_candle_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/white_candle_holder/1": {
+   "hand": "inspire_f1",
+   "object_id": "white_candle_holder",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/white_candle_holder/2": {
+   "hand": "inspire_f1",
+   "object_id": "white_candle_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/white_candle_holder/3": {
+   "hand": "inspire_f1",
+   "object_id": "white_candle_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/white_candle_holder/4": {
+   "hand": "inspire_f1",
+   "object_id": "white_candle_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/white_candle_holder/5": {
+   "hand": "inspire_f1",
+   "object_id": "white_candle_holder",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/white_hand_shower/0": {
+   "hand": "inspire_f1",
+   "object_id": "white_hand_shower",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/white_hand_shower/1": {
+   "hand": "inspire_f1",
+   "object_id": "white_hand_shower",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/white_hand_shower/2": {
+   "hand": "inspire_f1",
+   "object_id": "white_hand_shower",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/white_hand_shower/3": {
+   "hand": "inspire_f1",
+   "object_id": "white_hand_shower",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/white_hand_shower/4": {
+   "hand": "inspire_f1",
+   "object_id": "white_hand_shower",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/white_soap_dish/0": {
+   "hand": "inspire_f1",
+   "object_id": "white_soap_dish",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/white_soap_dish/1": {
+   "hand": "inspire_f1",
+   "object_id": "white_soap_dish",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/white_soap_dish/3": {
+   "hand": "inspire_f1",
+   "object_id": "white_soap_dish",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/white_soap_dish/4": {
+   "hand": "inspire_f1",
+   "object_id": "white_soap_dish",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/white_wood_handle_watering_can/2": {
+   "hand": "inspire_f1",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/white_wood_handle_watering_can/4": {
+   "hand": "inspire_f1",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/white_wood_handle_watering_can/5": {
+   "hand": "inspire_f1",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/white_wood_handle_watering_can/7": {
+   "hand": "inspire_f1",
+   "object_id": "white_wood_handle_watering_can",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/wipe/0": {
+   "hand": "inspire_f1",
+   "object_id": "wipe",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/wipe/1": {
+   "hand": "inspire_f1",
+   "object_id": "wipe",
+   "split": "train",
+   "success": false
+  },
+  "inspire_f1/wipe/2": {
+   "hand": "inspire_f1",
+   "object_id": "wipe",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/wipe/4": {
+   "hand": "inspire_f1",
+   "object_id": "wipe",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/wipe/6": {
+   "hand": "inspire_f1",
+   "object_id": "wipe",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/wood_dish_rack/0": {
+   "hand": "inspire_f1",
+   "object_id": "wood_dish_rack",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/wood_dish_rack/1": {
+   "hand": "inspire_f1",
+   "object_id": "wood_dish_rack",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/wood_dish_rack/2": {
+   "hand": "inspire_f1",
+   "object_id": "wood_dish_rack",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/wood_dish_rack/3": {
+   "hand": "inspire_f1",
+   "object_id": "wood_dish_rack",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/wood_dish_rack/4": {
+   "hand": "inspire_f1",
+   "object_id": "wood_dish_rack",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/wood_dish_rack/5": {
+   "hand": "inspire_f1",
+   "object_id": "wood_dish_rack",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/wood_dish_rack/6": {
+   "hand": "inspire_f1",
+   "object_id": "wood_dish_rack",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/wood_organizer/0": {
+   "hand": "inspire_f1",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/wood_organizer/1": {
+   "hand": "inspire_f1",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/wood_organizer/2": {
+   "hand": "inspire_f1",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/wood_organizer/3": {
+   "hand": "inspire_f1",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/wood_organizer/4": {
+   "hand": "inspire_f1",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/wood_organizer/5": {
+   "hand": "inspire_f1",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/wood_organizer/6": {
+   "hand": "inspire_f1",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/wood_organizer/7": {
+   "hand": "inspire_f1",
+   "object_id": "wood_organizer",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/work_lamp/0": {
+   "hand": "inspire_f1",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/work_lamp/12": {
+   "hand": "inspire_f1",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/work_lamp/13": {
+   "hand": "inspire_f1",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/work_lamp/14": {
+   "hand": "inspire_f1",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/work_lamp/3": {
+   "hand": "inspire_f1",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/work_lamp/7": {
+   "hand": "inspire_f1",
+   "object_id": "work_lamp",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/yellow_funnel/0": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_funnel",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/yellow_funnel/1": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_funnel",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/yellow_funnel/2": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_funnel",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/yellow_funnel/3": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_funnel",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/yellow_funnel/4": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_funnel",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/yellow_funnel/5": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_funnel",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/yellow_funnel/6": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_funnel",
+   "split": "test",
+   "success": false
+  },
+  "inspire_f1/yellow_funnel/7": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_funnel",
+   "split": "test",
+   "success": true
+  },
+  "inspire_f1/yellow_plastic_glass/0": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_plastic_glass",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/yellow_plastic_glass/1": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_plastic_glass",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/yellow_plastic_glass/2": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_plastic_glass",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/yellow_plastic_glass/3": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_plastic_glass",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/yellow_plastic_glass/4": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_plastic_glass",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/yellow_plastic_glass/5": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_plastic_glass",
+   "split": "dev",
+   "success": false
+  },
+  "inspire_f1/yellow_plastic_glass/6": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_plastic_glass",
+   "split": "dev",
+   "success": true
+  },
+  "inspire_f1/yellow_wash_tub/0": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_wash_tub",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/yellow_wash_tub/1": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_wash_tub",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/yellow_wash_tub/2": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_wash_tub",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/yellow_wash_tub/3": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_wash_tub",
+   "split": "train",
+   "success": true
+  },
+  "inspire_f1/yellow_wash_tub/4": {
+   "hand": "inspire_f1",
+   "object_id": "yellow_wash_tub",
+   "split": "train",
+   "success": true
+  }
+ },
+ "objects": {
+  "apple": "train",
+  "attached_container": "test",
+  "baby_beaker": "train",
+  "balloon_whisk": "test",
+  "bamboo_basket": "dev",
+  "bamboo_box": "train",
+  "banana": "train",
+  "baseball": "train",
+  "beige_brush": "test",
+  "black_holder_with_handle": "train",
+  "black_kitchen_roll_holder": "train",
+  "blue_alarm": "train",
+  "blue_plastic_box": "test",
+  "blue_vase": "train",
+  "book": "train",
+  "box_pink": "test",
+  "brass_pot": "train",
+  "brown_ramen": "dev",
+  "cactus": "train",
+  "cactus2": "dev",
+  "cactus3": "test",
+  "ceramic_elephant_jug": "test",
+  "circular_frying_pan": "dev",
+  "clothes_hanger": "test",
+  "coffee_tin": "dev",
+  "colander_green": "train",
+  "container_pink": "train",
+  "donut": "test",
+  "frame_oak": "train",
+  "frame_red": "train",
+  "french_mustard": "train",
+  "frog_bowl": "test",
+  "frog_cup": "test",
+  "fruit_cutter_base": "test",
+  "fruit_cutter_green": "test",
+  "green_attached_container": "train",
+  "green_cactus_vase": "test",
+  "green_soap_dispenser": "train",
+  "grey_pot": "dev",
+  "grid_desktop_organizer": "train",
+  "hammer": "train",
+  "icecream_scoop": "train",
+  "instant_rice": "train",
+  "jja_ramen": "train",
+  "knife_sharpener": "train",
+  "large_peg": "train",
+  "lemon": "train",
+  "lemon_squeezer": "test",
+  "light_green_basket": "train",
+  "lilac_food_container": "test",
+  "lotion": "train",
+  "meat_thermometer": "test",
+  "metal_measuring_flask": "train",
+  "metal_scoop_big": "train",
+  "metal_scoop_small": "test",
+  "mug_holder": "train",
+  "orange": "train",
+  "organizer_beige": "train",
+  "pastel_blue_cup": "test",
+  "pastel_light_green_bowl": "test",
+  "pepper_tuna": "train",
+  "pingpong": "dev",
+  "pink_clock": "train",
+  "plant_pot": "test",
+  "plastic_elephant_jug": "dev",
+  "potato_masher": "train",
+  "pringles": "train",
+  "pringles_small": "dev",
+  "rectangular_frying_pan": "train",
+  "redcar": "train",
+  "saucepan": "dev",
+  "scotch_tape": "test",
+  "screwdriver": "train",
+  "servingbowl_small": "test",
+  "smallbowl": "test",
+  "soaptray": "train",
+  "spam_can": "test",
+  "spicemill": "train",
+  "spray_bottle": "test",
+  "standing_frame": "train",
+  "tea_case": "test",
+  "tennis_ball": "dev",
+  "thermo_clock": "train",
+  "toothbrush_holder": "test",
+  "washing_brush": "train",
+  "washing_brush2": "train",
+  "wateringcan": "train",
+  "white_candle_holder": "train",
+  "white_hand_shower": "test",
+  "white_pen_cup": "test",
+  "white_soap_dish": "test",
+  "white_wood_handle_watering_can": "train",
+  "wipe": "train",
+  "wood_dish_rack": "test",
+  "wood_organizer": "dev",
+  "work_lamp": "train",
+  "yellow_funnel": "test",
+  "yellow_plastic_glass": "dev",
+  "yellow_wash_tub": "train"
+ },
+ "rule": [
+  "Rule (fixed 2026-10-23 before any v4 evaluation): every object that has a labelled inspire_dftp",
+  "or inspire_f1 trial is ordered by sha256(\"tactile-flora-v4:20261023:\" + object_id); objects are",
+  "taken in that order into TEST until it holds at least 35% of the labelled Inspire trials, then",
+  "into DEV until it holds at least 12%, and the rest are TRAIN. An object's trials of both hands",
+  "always share a split, so no test object is seen in training through the other hand. allegro_v5",
+  "(every trial a success) and human (no robot, no label) are not used. TEST is locked: it is scored",
+  "once per final model; DEV is used only to set operating thresholds and stacking weights."
+ ],
+ "salt": "tactile-flora-v4:20261023:"
+}

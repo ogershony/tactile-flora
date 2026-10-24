@@ -11,15 +11,33 @@ from pathlib import Path
 from typing import Any, Literal, TypeVar
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 ForceMode = Literal["real", "omitted", "zero", "shuffled", "video_blank"]
+ForceFormat = Literal["decimal", "code"]
 
 
 class _Strict(BaseModel):
     """Base for config models: unknown keys are errors."""
 
     model_config = ConfigDict(extra="forbid")
+
+
+class SegmentSelect(_Strict):
+    """Which segments become episodes in ``episode_unit: segment`` and how they are sampled.
+
+    A segment qualifies when its task is not idle and its last frame is at least
+    ``min_duration_s`` after its first. Per split, every failed segment is kept plus up to
+    ``success_multiple`` times as many successes, drawn after a ``random.Random(seed)`` shuffle
+    of the successes in recording-then-segment order; ``max_total`` caps the split's total
+    (successes are what gets cut; 0 or absent = no cap). This is the protocol of
+    data/colab/e0b_reassemble_force.py (seed 0, multiple 2, total 450 on the test split).
+    """
+
+    min_duration_s: float = Field(default=1.0, ge=0)
+    success_multiple: float = Field(default=2.0, ge=0)
+    max_total: dict[str, int] = Field(default_factory=lambda: dict[str, int]())
+    seed: int = 0
 
 
 class SourceConfig(_Strict):
@@ -45,7 +63,49 @@ class SourceConfig(_Strict):
     # and inspire_dftp closure sign-corrected (Inspire angles are 1000 open, 0 closed).
     hrdexdb_force_representation: Literal["legacy", "tared"] = "legacy"
     hrdexdb_tare_s: float = Field(default=1.0, gt=0)
+    # v4 (2026-10-23): cameras (serials, collage order, first = "scene") read from a pre-rendered
+    # frame cache ``<hrdexdb_frames_root>/<episode_id>/<serial>/`` with video.json beside it
+    # (scripts/v4/hrdexdb_fetch_render.py). Empty: the legacy single camera, first mp4 in vid/.
+    hrdexdb_cameras: list[str] = Field(default_factory=lambda: list[str]())
+    hrdexdb_frames_root: str | None = None
+    # Task text with an ``{object}`` field; None keeps "grasp and lift the <object>".
+    hrdexdb_task_template: str | None = None
     seed: int
+    # source-level median |sync lag| gate in seconds; None = VerifyThresholds default (0.1)
+    sync_median_s: float | None = Field(default=None, gt=0)
+    # source-level bound on the pooled 99th percentile of F'; None = VerifyThresholds default (3)
+    norm_p99_max: float | None = Field(default=None, gt=0)
+    # source-level band for the pooled (median over episodes) grasp median of F'; None = the
+    # spec's [0.8, 1.2] (verify.report.NORM_GRASP_RANGE). Must contain 1.0.
+    norm_grasp_range: tuple[float, float] | None = None
+    # camera restriction for multi-camera LeRobot ports: the video feature keys to keep, in role
+    # order (the first key a port has becomes its scene camera); None = every camera the adapter
+    # finds. Honored by rh20t, whose partial downloads carry 2 of the 9-10 cameras per config.
+    cameras: list[str] | None = None
+    # Episode unit for sources whose recordings carry labelled segments (reassemble_lerobot):
+    # "recording" (default) yields one Episode per recording, "segment" one Episode per
+    # qualifying segment (see ``SegmentSelect`` and sources/reassemble_lerobot.py).
+    episode_unit: Literal["recording", "segment"] = "recording"
+    # Segment-mode sampling (ignored in recording mode).
+    segment_select: SegmentSelect = Field(default_factory=lambda: SegmentSelect())
+    # Name of an already verified source whose recording-level checks and normalization
+    # constants this source reuses (data/verified/<verify_from>/): a segment source reads the
+    # integrity, sensor-health, sync, normalization and overlap results of its parent recording
+    # instead of decoding every mp4 again. Only cheap per-episode checks are re-run.
+    verify_from: str | None = None
+    # With verify_from: "apply" (default) lets the parent's per-episode drop_episode /
+    # drop_channel results drop the child episode too; "record" keeps the child and stores the
+    # parent's failure with action "keep" (visible in checks.parquet and report.md, the force
+    # then rendered without a sync shift). reassemble_seg uses "record" so that its test split
+    # is the complete E0b clip set; see docs/deviations.md section 7.
+    inherited_drops: Literal["apply", "record"] = "apply"
+
+    @field_validator("norm_grasp_range")
+    @classmethod
+    def _band_contains_one(cls, v: tuple[float, float] | None) -> tuple[float, float] | None:
+        if v is not None and not (0 < v[0] <= 1.0 <= v[1]):
+            raise ValueError(f"norm_grasp_range {v} must satisfy 0 < low <= 1 <= high")
+        return v
 
 
 class ResampleConfig(_Strict):
@@ -63,19 +123,66 @@ class ResampleConfig(_Strict):
 
 
 class RenderConfig(_Strict):
-    """Text rendering of the force block."""
+    """Text rendering of the force block.
+
+    ``format`` selects the line grammar (force/render.py): ``decimal`` is the byte-exact spec
+    format (``header``, ``decimals``), ``code`` the token-cheap single-character format
+    (``header_code`` and the thresholds below, all in normalized units: ``levels`` are the F'
+    cut points between levels 1/2, 2/3 and 3/4; ``asym_frac`` the |delta'| / F' ratio above which
+    a pad dominates; ``trend_up`` / ``trend_down`` / ``sharp_drop`` the dF' per second cut points
+    for +, - and !; ``closure`` the gripper g cut points between open/mid and mid/closed).
+    ``summary`` adds the per-arm summary line after the code header.
+    """
 
     header: str
     decimals: int
     max_tokens: int
     clip_max: float
     tokenizer_json: str | None = None
-    # Prepend one label-free summary line per arm (contact segments, longest contact, peak,
-    # hold duration, hold force, late/early hold ratio, low-force hold fraction) to the block.
+    format: ForceFormat = "decimal"
+    header_code: str = (
+        "Force code per frame (F force level: 0 none, 1 light, 2 median grasp, 3 firm, "
+        "4 crush-level; levels are relative to this object's typical grasp (F2 = this object's "
+        "median grasp); A pad asymmetry a/b/=; T trend +/0/-/! sharp drop; C contact 0/1; "
+        "G gripper o open/m mid/c closed):"
+    )
+    # One label-free summary line per block: decimal format = per-arm hold statistics
+    # (render.summary_lines); code format = the code summary (render.code_summary). Off by default
+    # so earlier runs stay reproducible; force.code.yaml and the HRDexDB v3 config turn it on.
     summary: bool = False
-    # Optional force-only outcome classifier (force/classifier.py JSON) whose success
-    # probability is appended to each summary line; training episodes get out-of-fold scores.
+    levels: list[float] = Field(default_factory=lambda: [0.5, 1.5, 2.5])
+    asym_frac: float = Field(default=0.3, ge=0)
+    trend_up: float = 1.0
+    trend_down: float = -1.0
+    sharp_drop: float = -2.0
+    closure: list[float] = Field(default_factory=lambda: [0.3, 0.6])
+    # Optional force-only outcome classifier (force/classifier.py JSON). Decimal format: its
+    # success probability is appended to the scorer arm's summary line (HRDexDB v3). Code format:
+    # render.classifier_line writes it as its own line under the summary, only for episodes of the
+    # scorer's source (several scorers may be listed, comma-separated, one per source); training
+    # episodes get out-of-fold scores in both.
     classifier_json: str | None = None
+    # Code format only: false renders the compact block (header_compact + summary + classifier
+    # line, no per-frame lines; render.render_block). Needs ``summary``.
+    frame_lines: bool = True
+    header_compact: str = (
+        "Force summary (F force level: 0 none, 1 light, 2 median grasp, 3 firm, 4 crush-level, "
+        "relative to this object's typical grasp; times in seconds from the clip start):"
+    )
+
+    @model_validator(mode="after")
+    def _compact_needs_summary(self) -> RenderConfig:
+        if not self.frame_lines and (self.format != "code" or not self.summary):
+            raise ValueError("frame_lines: false needs format: code and summary: true")
+        return self
+
+    @field_validator("levels", "closure")
+    @classmethod
+    def _ascending(cls, v: list[float], info: Any) -> list[float]:
+        n = 3 if info.field_name == "levels" else 2
+        if len(v) != n or any(b <= a for a, b in zip(v, v[1:], strict=False)):
+            raise ValueError(f"{info.field_name} must be {n} strictly ascending values, got {v}")
+        return v
 
 
 class EventsConfig(_Strict):
@@ -93,12 +200,26 @@ class EventsConfig(_Strict):
     off_axis_delta: float
 
 
+class NormalizeConfig(_Strict):
+    """Normalization fit settings (force/normalize.py).
+
+    ``grasp_g`` is the gripper closure above which a frame counts as a grasp frame when the
+    constants are fitted; a group in which fewer than ``min_group_frac`` of the fitted episodes
+    have such a frame falls back to its 75th percentile of g (recorded in the constants as
+    ``grasp_rule``).
+    """
+
+    grasp_g: float = Field(default=0.6, ge=0.0, le=1.0)
+    min_group_frac: float = Field(default=0.25, ge=0.0, le=1.0)
+
+
 class ForceConfig(_Strict):
     """Force channel configuration (configs/force.yaml)."""
 
     resample: ResampleConfig
     render: RenderConfig
     events: EventsConfig
+    normalize: NormalizeConfig = Field(default_factory=NormalizeConfig)
 
 
 class LoraConfig(_Strict):
@@ -123,6 +244,25 @@ class TrainConfig(_Strict):
     effective_batch: int
     lora: LoraConfig
     output_dir: str
+    # Class-balance weight for the failure judge: the loss weight of an OUTCOME sample whose
+    # target score is <= train.dataset.FAILURE_SCORE_MAX (2) is multiplied by this; dense samples
+    # and successful outcomes keep 1.0. judge*.yaml set 2.2 (2026-10-22; the dry run on
+    # train_judge.parquet counts 808 successes / 425 failures); force.yaml / control.yaml keep 1.0.
+    failure_weight: float = Field(default=1.0, gt=0)
+    # The same for the reward model: the loss weight of a DENSE sample whose Worst digit is <= 2
+    # (a window with at least one failure or suboptimal group) is multiplied by this.
+    # force_v2.yaml / control_v2.yaml set 3.58 (2026-10-22: train.parquet holds 279 all-normal and
+    # 78 non-normal dense windows; v1 at 1.0 collapsed to all-normal).
+    dense_failure_weight: float = Field(default=1.0, gt=0)
+    # Video geometry (video/mosaic.py): "cell" = legacy 96 px black-padded cells, "flora" = the
+    # released ~100k-pixel collage cells (v4, 2026-10-23).
+    collage: Literal["cell", "flora"] = "cell"
+    # Eval-only sources (labels.mapping.EVAL_ONLY_SOURCES, eval_only source configs) whose rows
+    # may still train because their manifest carries a frozen object-disjoint split (HRDexDB v4).
+    trainable_eval_sources: list[str] = Field(default_factory=lambda: list[str]())
+    # Outcome targets and prompt without the rationale: "Score: N" under the released score-only
+    # system prompt, the format the evaluation reads (v4). False keeps "Rationale: ...\n\nScore: N".
+    score_only: bool = False
 
 
 class BenchmarkSpec(_Strict):
@@ -132,6 +272,7 @@ class BenchmarkSpec(_Strict):
     prompts: list[Literal["dense", "outcome"]]
     metrics: list[str]
     score_only: bool = False
+    collage: Literal["cell", "flora"] = "cell"
 
 
 class EvalConfig(_Strict):

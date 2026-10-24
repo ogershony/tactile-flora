@@ -1,0 +1,20 @@
+# Failure judge: outcome-only train set (phantom train outcome + reassemble_seg train segments),
+# real force block. 1 epoch tonight (3.1 h per epoch on an A100) (data/manifest/train_judge.parquet).
+manifest: data/manifest/train_judge.parquet
+base_model: nvidia/Flora-Rewarder
+force_mode: real
+seed: 0
+epochs: 1
+learning_rate: 1.0e-4
+warmup_frac: 0.03
+grad_clip: 1.0
+effective_batch: 16
+lora:
+  rank: 32
+  alpha: 64
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+output_dir: data/runs
+# class-balance for the loss: 2.2 = 851/382 as requested on 2026-10-22 after the weight-1.0 judge
+# predicted failure on only 41 of 399 balanced-test clips. The dry run counts 425 failures
+# (score <= 2: 382 reassemble_seg + 43 phantom) and 808 successes, ratio 1.90.
+failure_weight: 2.2

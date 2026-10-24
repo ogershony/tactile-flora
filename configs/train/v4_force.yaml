@@ -1,0 +1,23 @@
+# v4 (2026-10-23; docs/v4/plan.md): one adapter for HRDexDB (both Inspire hands, object split),
+# REASSEMBLE segments and PHANTOM, FLORA-native collage, score-only targets under the released
+# score-only prompt, compact force block (configs/force.v4.yaml). force and control differ in
+# force_mode only. failure_weight = successes / failures of v4_train.parquet, set by
+# scripts/v4/build_v4_manifests.py before launch.
+manifest: data/manifest/v4_train.parquet
+base_model: nvidia/Flora-Rewarder
+seed: 0
+epochs: 1
+learning_rate: 1.0e-4
+warmup_frac: 0.03
+grad_clip: 1.0
+effective_batch: 16
+lora:
+  rank: 16
+  alpha: 32
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+output_dir: data/runs
+collage: flora
+score_only: true
+trainable_eval_sources: [hrdexdb]
+force_mode: real
+failure_weight: 2.0

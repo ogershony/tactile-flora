@@ -127,3 +127,10 @@ def test_zarr_suffix_and_legacy_vlen_bytes_fill_metadata(tmp_path: Path) -> None
     assert abs(int(frames[-1][..., 0].mean()) - 180) <= 12
     # The adapter's compatibility layer adjusts metadata only in memory.
     assert json.loads(zarray_path.read_text())["fill_value"] == 0
+
+
+def test_failure_demos_are_excluded_from_the_norm_fit() -> None:
+    a = PhantomAdapter(_cfg())
+    a.discover(ROOT)
+    ep = a.load(EID)
+    assert ep.meta["failure_demo"] is True and ep.meta["exclude_from_norm_fit"] is True

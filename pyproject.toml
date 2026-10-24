@@ -14,7 +14,7 @@ dependencies = [
     "rich",
     "av>=15,<16",
     "pillow>=13.0.0",
-    "zarr>=3.1.6",
+    "zarr>=3.1.6,<3.4",  # zarr 3.4 cannot decode the PHANTOM JPEG chunks (PIL UnidentifiedImageError)
     "h5py>=3.16.0",
     "tokenizers>=0.22,<0.24",
 ]

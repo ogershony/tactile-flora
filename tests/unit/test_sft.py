@@ -4,9 +4,12 @@ from types import SimpleNamespace
 from typing import Any
 
 import pytest
+import yaml
 
 from tactile_flora.config import LoraConfig, TrainConfig
+from tactile_flora.schema import ManifestRow
 from tactile_flora.train import sft
+from tactile_flora.train.dataset import WindowItem
 from tactile_flora.verify import manifest
 from tests.fixtures.train_data import VOCAB, StubTokenizer, windows_source, write_manifest
 from tests.fixtures.verify_ctx import FORCE_CFG
@@ -35,15 +38,8 @@ def _freeze(tmp_path: Path, mp: Path) -> None:
 
 
 def _run(tmp_path: Path, cfg: TrainConfig, **kw: Any) -> Path:
-    return sft.train(
-        cfg,
-        FORCE_CFG,
-        tmp_path,
-        tokenizer=StubTokenizer(),
-        windows_source=windows_source,
-        report_version="rv",
-        **kw,
-    )
+    kw.setdefault("windows_source", windows_source)
+    return sft.train(cfg, FORCE_CFG, tmp_path, tokenizer=StubTokenizer(), report_version="rv", **kw)
 
 
 def test_refuses_without_holdout(tmp_path: Path) -> None:
@@ -86,14 +82,46 @@ def test_make_scheduler_and_groups() -> None:
     assert lrs[0] < lrs[2] <= 1.0 and lrs[-1] < 0.01 and max(lrs) == pytest.approx(1.0, abs=0.01)
 
 
+def _one_failure(row: ManifestRow) -> WindowItem:
+    """The fixture windows with pad-0 relabelled as a failure (score 1)."""
+    item = windows_source(row)
+    if row.episode_id != "pad-0":
+        return item
+    return item.model_copy(update={"window": item.window.model_copy(update={"target": "Score: 1"})})
+
+
+def test_dry_run_reports_the_failure_weight_and_count(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    mp = write_manifest(tmp_path / "manifest" / "train.parquet")
+    _freeze(tmp_path, mp)
+    run = _run(
+        tmp_path, _cfg(tmp_path, mp, failure_weight=2.2), dry_run=True, run_name="judge",
+        windows_source=_one_failure,
+    )  # fmt: skip
+    out = capsys.readouterr().out
+    assert "failure_weight 2.2 on 1 failed outcome samples (score <= 2) of 3" in out
+    doc = json.loads((run / "dry_run.json").read_text())
+    assert doc["failure_weight"] == 2.2 and doc["n_failure_samples"] == 1
+    # the default config still reports the class count, with the weight at 1
+    _run(tmp_path, _cfg(tmp_path, mp), dry_run=True, run_name="flat", windows_source=_one_failure)
+    assert (
+        "failure_weight 1 on 1 failed outcome samples (score <= 2) of 3" in capsys.readouterr().out
+    )
+
+
+def _weighted(values: list[int], weights: list[float]) -> list[Any]:
+    return [SimpleNamespace(value=v, weight=w) for v, w in zip(values, weights, strict=True)]
+
+
 def test_distributed_batches_pad_with_zero_weight_and_preserve_the_true_mean() -> None:
-    samples: list[Any] = list(range(5))
+    samples: list[Any] = _weighted(list(range(5)), [1.0] * 5)
     groups = sft.ordered_groups(samples, 3, seed=0)
     assert [len(g) for g in groups] == [3, 2]
     per_rank = []
     for rank in range(2):
         backend: Any = SimpleNamespace(
-            rank=rank, world_size=2, make_batch=lambda sample: {"value": sample}
+            rank=rank, world_size=2, make_batch=lambda sample: {"value": sample.value}
         )
         per_rank.append(list(sft._batches(groups, backend, 1)))
     assert len(per_rank[0]) == len(per_rank[1]) == 3
@@ -103,6 +131,32 @@ def test_distributed_batches_pad_with_zero_weight_and_preserve_the_true_mean() -
         ) / (2 * (stop - start))
         assert actual == pytest.approx(expected)
     assert per_rank[1][1]["loss_weight"] == 0
+
+
+def test_batches_multiply_the_sample_weight_into_loss_weight() -> None:
+    weights = [1.0, 2.2, 1.0, 2.2, 1.0]
+    samples: list[Any] = _weighted(list(range(5)), weights)
+    groups = sft.ordered_groups(samples, 3, seed=0)
+    assert [len(g) for g in groups] == [3, 2]
+    # single rank: loss_weight is exactly the sample weight (padding factor 1)
+    single: Any = SimpleNamespace(rank=0, world_size=1, make_batch=lambda s: {"value": s.value})
+    got = {b["value"]: b["loss_weight"] for b in sft._batches(groups, single, 1)}
+    assert got == {i: w for i, w in enumerate(weights)}
+    # two ranks: the padding factor padded / len(g) still multiplies in, padding stays at 0
+    per_rank = []
+    for rank in range(2):
+        backend: Any = SimpleNamespace(
+            rank=rank, world_size=2, make_batch=lambda s: {"value": s.value}
+        )
+        per_rank.append(list(sft._batches(groups, backend, 1)))
+    for g, start, stop in ((groups[0], 0, 2), (groups[1], 2, 3)):
+        padded = -(-len(g) // 2) * 2
+        seen = [b for rank in per_rank for b in rank[start:stop]]
+        real = [b for b in seen if b["loss_weight"] > 0]
+        assert len(real) == len(g) and len(seen) == padded
+        for b in real:
+            assert b["loss_weight"] == pytest.approx(weights[b["value"]] * padded / len(g))
+    assert per_rank[1][1]["loss_weight"] == 0  # the padded copy of the 2-sample group
 
 
 def test_partial_global_batch_stays_last_after_shuffle() -> None:
@@ -226,8 +280,28 @@ def test_full_train_with_backend_factory(tmp_path: Path) -> None:
             path.mkdir(parents=True)
             torch.save(model.state_dict(), path / "adapter.pt")
 
-    run = _run(tmp_path, _cfg(tmp_path, mp), dry_run=False, backend_factory=_Backend, run_name="r")
+    cfg = _cfg(tmp_path, mp, failure_weight=2.2)
+    run = _run(tmp_path, cfg, dry_run=False, backend_factory=_Backend, run_name="r")
     for name in ("config.yaml", "manifest_hash.txt", "git_hash.txt", "loss.csv", "adapter"):
         assert (run / name).exists(), name
     assert (run / "git_hash.txt").read_text().strip() == "rv"
+    assert yaml.safe_load((run / "config.yaml").read_text())["failure_weight"] == 2.2
     assert (run / "loss.csv").read_text().count("\n") == 3  # header + 2 steps (3 samples, batch 2)
+
+
+def test_prefetched_keeps_order_and_raises_producer_errors() -> None:
+    from tactile_flora.train.sft import _prefetched
+
+    items = [{"i": k} for k in range(40)]
+    assert list(_prefetched(iter(items), 18)) == items
+    assert list(_prefetched(iter(items), 1)) == items
+
+    def broken():
+        yield {"i": 0}
+        raise RuntimeError("decode failed")
+
+    got = []
+    with pytest.raises(RuntimeError, match="decode failed"):
+        for x in _prefetched(broken(), 4):
+            got.append(x)
+    assert got == [{"i": 0}]

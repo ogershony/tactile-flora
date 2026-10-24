@@ -27,6 +27,9 @@ class VideoRef(BaseModel):
     path: str
     fps: float = Field(gt=0)
     n_frames: int = Field(ge=0)
+    # Source frame size in pixels; None when unknown (the collage then uses the decoded size).
+    width: int | None = None
+    height: int | None = None
 
 
 class PadArmForce(BaseModel):
@@ -219,6 +222,8 @@ class ManifestRow(BaseModel):
     report_version: str
     # clock correction added to the force timestamps (force sampled at t - shift_s); 0 = none
     shift_s: float = 0.0
+    # normalization group whose constants rendered the row (force.normalize.norm_group)
+    norm_group: str = "all"
 
 
 class CheckResult(BaseModel):

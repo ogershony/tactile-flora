@@ -1,12 +1,16 @@
 """FLORA dense and outcome prompt builders with the force block inserted in one place.
 
-Owns: PromptBundle, VideoSpec, build_prompt, to_messages, prompt_diff, and the single function
-(_assemble) that decides where the force block and force sentence go.
+Owns: PromptBundle, VideoSpec, build_prompt, to_messages, prompt_diff, force_sentence_for, and
+the single function (_assemble) that decides where the force block and force sentence go.
 Must never: parse outputs, render force, or load models / tokenizers.
 
 The force block (header + lines, already rendered by force/render.py) goes after the video and
-before the trailing template text. ``answer_prefix`` is "" because the target string already
-starts at the first grammar token (``Worst:`` / ``Rationale:`` / ``Score:``).
+before the trailing template text. The force sentence appended to the system prompt depends on
+the force text format (``RenderConfig.format``): ``force_sentence_for(cfg)`` returns
+``templates.FORCE_SENTENCE`` (decimal) or ``templates.FORCE_SENTENCE_CODE`` (code), and callers
+pass it to ``build_prompt`` / ``prompt_diff``; the default is the decimal sentence.
+``answer_prefix`` is "" because the target string already starts at the first grammar token
+(``Worst:`` / ``Rationale:`` / ``Score:``).
 """
 
 from __future__ import annotations
@@ -16,9 +20,10 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from tactile_flora.config import RenderConfig
 from tactile_flora.prompts import templates as T
 from tactile_flora.schema import Window
-from tactile_flora.video.mosaic import MOSAIC_CELL_PX, mosaic_layout
+from tactile_flora.video.mosaic import MOSAIC_CELL_PX, Collage, mosaic_layout
 
 DENSE_FPS = 4.0
 
@@ -33,6 +38,8 @@ class VideoSpec(BaseModel):
     roles: list[str]  # row-major cell order, scene first (upper left)
     cell_px: int = MOSAIC_CELL_PX
     blank: bool = False
+    # cell: legacy black-padded square cells; flora: the released ~100k-pixel cells (video/mosaic)
+    collage: Collage = "cell"
 
 
 class PromptBundle(BaseModel):
@@ -45,7 +52,16 @@ class PromptBundle(BaseModel):
     answer_prefix: str = ""
 
 
-def _assemble(system: str, clip_line: str, force_block: str | None) -> tuple[str, str]:
+def force_sentence_for(cfg: RenderConfig) -> str:
+    """Return the system-prompt force sentence matching ``cfg.format`` (and frame lines)."""
+    if cfg.format != "code":
+        return T.FORCE_SENTENCE
+    return T.FORCE_SENTENCE_CODE if cfg.frame_lines else T.FORCE_SENTENCE_COMPACT
+
+
+def _assemble(
+    system: str, clip_line: str, force_block: str | None, force_sentence: str
+) -> tuple[str, str]:
     """Place the force block and force sentence; this is the ONLY function that does.
 
     ``clip_line`` is the user-template text after ``<video>``. Returns (system,
@@ -55,7 +71,7 @@ def _assemble(system: str, clip_line: str, force_block: str | None) -> tuple[str
     """
     if force_block is None:
         return system, clip_line
-    return f"{system}\n{T.FORCE_SENTENCE}", f"\n{force_block}{clip_line}"
+    return f"{system}\n{force_sentence}", f"\n{force_block}{clip_line}"
 
 
 def build_prompt(
@@ -68,11 +84,15 @@ def build_prompt(
     camera_roles: Sequence[str] = ("scene",),
     fps: float | None = None,
     frame_indices: Sequence[int] | None = None,
+    force_sentence: str = T.FORCE_SENTENCE,
+    collage: Collage = "cell",
 ) -> PromptBundle:
     """Build the prompt for one window; the single source of truth for training and eval.
 
     ``fps`` is the source video fps for the timestamp tokens (default 4.0 for dense). If
-    ``frame_indices`` is omitted they are round(t * fps), floored at 0.
+    ``frame_indices`` is omitted they are round(t * fps), floored at 0. ``force_sentence`` is
+    the system line that announces the block (``force_sentence_for(render_cfg)``); it is only
+    used when ``force_block`` is given.
     """
     layout, roles = mosaic_layout(camera_roles)
     rate = fps if fps is not None else DENSE_FPS
@@ -92,7 +112,7 @@ def build_prompt(
         system = T.OUTCOME_SYSTEM_RATIONALE if with_rationale else T.OUTCOME_SYSTEM_SCORE_ONLY
         user = T.OUTCOME_USER.format(task=task)
     before, _, clip = user.partition(T.VIDEO_MARKER)
-    system, after = _assemble(system, clip, force_block)
+    system, after = _assemble(system, clip, force_block, force_sentence)
     video = VideoSpec(
         frame_times=times,
         frame_indices=idx,
@@ -100,6 +120,7 @@ def build_prompt(
         layout=layout,
         roles=roles,
         blank=video_blank,
+        collage=collage,
     )
     return PromptBundle(
         system=system, user_text_before_video=before, user_text_after_video=after, video=video
@@ -125,24 +146,30 @@ def prompt_diff(
     window: Window,
     *,
     header: str = "Force:",
+    block: str | None = None,
+    force_sentence: str = T.FORCE_SENTENCE,
     with_rationale: bool = True,
     task: str = "",
     camera_roles: Sequence[str] = ("scene",),
 ) -> bool:
     """Assert the force and control prompts differ only by the block and the force sentence.
 
-    The block is ``header`` plus ``window.force_lines``. Returns True; raises AssertionError
-    on any other difference.
+    The block is ``block`` when given (``force.render.render_block(window.force_lines, cfg)``,
+    which for the code format carries the legend header and the summary line), else ``header``
+    plus ``window.force_lines``. ``force_sentence`` is the sentence the block is announced with
+    (``force_sentence_for(cfg)``). Returns True; raises AssertionError on any other difference.
     """
-    block = "\n".join([header, *window.force_lines])
+    if block is None:
+        block = "\n".join([header, *window.force_lines])
     kw: dict[str, Any] = {
         "with_rationale": with_rationale,
         "task": task,
         "camera_roles": camera_roles,
+        "force_sentence": force_sentence,
     }
     force = build_prompt(window, block, **kw)
     control = build_prompt(window, None, **kw)
-    assert force.system == f"{control.system}\n{T.FORCE_SENTENCE}", "system differs beyond sentence"
+    assert force.system == f"{control.system}\n{force_sentence}", "system differs beyond sentence"
     assert force.user_text_after_video == f"\n{block}{control.user_text_after_video}", (
         "user text differs beyond the force block"
     )

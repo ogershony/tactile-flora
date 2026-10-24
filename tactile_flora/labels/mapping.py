@@ -5,8 +5,14 @@ dispatcher ``map_native_labels``. Raw native values are read from ``episode.meta
 
 - phantom: ``success`` (bool), ``task_folder`` (str, ``*_fail`` means failure), ``failure_demo``
   (bool, optional), ``object`` (str) and optionally ``peak_force_p99`` (float). The per-object
-  success-set 99th percentile of F' is COMPUTED by ``phantom_success_p99`` (called once per source
-  by the verify pipeline) and passed in as ``phantom_p99``.
+  success-set statistics of F' are COMPUTED by ``phantom_success_stats`` (called once per source
+  by the verify pipeline) and passed in as ``phantom_p99`` (99th percentile of every success
+  frame) and ``phantom_peak_p5`` (5th percentile of the per-episode peak). A failure demo gets
+  one failure span: the crush rule (first frame of F' above p99 to the end, "excessive force on
+  the <object>") or, when its peak F' is below the success set's peak p5 instead, the
+  under-grasp rule (first contact to the end, "insufficient grip force on the <object>", the
+  too-weak class; the whole episode if it never made contact). The outcome label carries the
+  same span, so the episode-level rationale names the same failure class.
 - rh20t: ``rating`` (int -1..9; -1 means unrated and gives no label) and
   ``object_moved_toward_goal`` (bool). The latter cannot be derived from the recorded data: it is
   an OPERATOR-PROVIDED annotation in meta and defaults to False, so a rating of 1 maps to 2 unless
@@ -79,53 +85,116 @@ def _phantom_failed(m: dict[str, Any]) -> bool:
     )
 
 
-def phantom_success_p99(
+PHANTOM_CRUSH_RATIONALE = "excessive force on the {object}"
+PHANTOM_UNDERGRASP_RATIONALE = "insufficient grip force on the {object}"
+PHANTOM_PEAK_PERCENTILE = 5.0
+
+
+def phantom_success_stats(
     episodes_features: Iterable[tuple[Episode, ResampledForce]],
-) -> dict[str, float]:
-    """Per-object 99th percentile of normalized F' over the SUCCESS-set episodes of a source.
+) -> tuple[dict[str, float], dict[str, float]]:
+    """Per-object (p99 of F', p5 of per-episode peak F') over the SUCCESS-set episodes.
 
     ``episodes_features`` pairs each episode with its NORMALIZED features; failure demos are
-    skipped, every finite F' of every arm is pooled per ``meta["object"]``.
+    skipped. The first mapping pools every finite F' of every arm per ``meta["object"]`` and
+    takes the 99th percentile (the crush threshold); the second takes each success episode's
+    peak F' over its arms and the 5th percentile of those peaks (the under-grasp threshold).
     """
     pooled: dict[str, list[np.ndarray]] = {}
+    peaks: dict[str, list[float]] = {}
     for ep, feats in episodes_features:
         if _phantom_failed(ep.meta):
             continue
         obj = str(ep.meta.get("object", ""))
+        parts = pooled.setdefault(obj, [])
         for af in feats.arms.values():
             f = np.asarray(af.F, dtype=np.float64)
-            pooled.setdefault(obj, []).append(f[np.isfinite(f)])
-    out: dict[str, float] = {}
+            parts.append(f[np.isfinite(f)])
+        peak = _peak(feats)
+        if peak is not None:
+            peaks.setdefault(obj, []).append(peak)
+    p99: dict[str, float] = {}
     for obj, parts in pooled.items():
         allf = np.concatenate(parts) if parts else np.empty(0)
         if allf.size:
-            out[obj] = float(np.percentile(allf, 99))
-    return out
+            p99[obj] = float(np.percentile(allf, 99))
+    peak_p5 = {obj: float(np.percentile(v, PHANTOM_PEAK_PERCENTILE)) for obj, v in peaks.items()}
+    return p99, peak_p5
+
+
+def phantom_success_p99(
+    episodes_features: Iterable[tuple[Episode, ResampledForce]],
+) -> dict[str, float]:
+    """Per-object 99th percentile of normalized F' over the success set (see the stats)."""
+    return phantom_success_stats(episodes_features)[0]
+
+
+def _peak(feats: ResampledForce) -> float | None:
+    """Largest finite F' over every arm and frame, None when there is none."""
+    vals = [
+        float(np.nanmax(f))
+        for af in feats.arms.values()
+        if (f := np.asarray(af.F, dtype=np.float64)).size and np.isfinite(f).any()
+    ]
+    return max(vals) if vals else None
+
+
+def _first_contact(feats: ResampledForce) -> float | None:
+    """Time of the first frame whose contact flag is set on any arm (None without one)."""
+    for i, t in enumerate(feats.frame_times):
+        if any(af.c is not None and af.c[i] == 1 for af in feats.arms.values()):
+            return t
+    return None
+
+
+def _phantom_failure_span(
+    episode: Episode, features: ResampledForce, p99: float | None, peak_p5: float | None
+) -> Span | None:
+    """Return the crush span (first F' over p99 to the end), else the under-grasp span or None."""
+    obj = episode.meta.get("object", "object")
+    if p99 is not None:
+        for i, t in enumerate(features.frame_times):
+            if any(af.F[i] > p99 for af in features.arms.values()):
+                why = PHANTOM_CRUSH_RATIONALE.format(object=obj)
+                return Span(t0=t, t1=episode.duration_s, quality=1, rationale=why)
+    if peak_p5 is not None:
+        peak = _peak(features)
+        if peak is not None and peak < peak_p5:
+            t0 = _first_contact(features)
+            why = PHANTOM_UNDERGRASP_RATIONALE.format(object=obj)
+            t0 = 0.0 if t0 is None else t0
+            return Span(t0=t0, t1=episode.duration_s, quality=1, rationale=why)
+    return None
 
 
 def map_phantom(
-    episode: Episode, *, features: ResampledForce | None, p99: float | None
+    episode: Episode,
+    *,
+    features: ResampledForce | None,
+    p99: float | None,
+    peak_p5: float | None = None,
 ) -> list[Label]:
-    """PHANTOM: success -> 5, failure -> 1; failure demos get a span from the first F' over p99.
+    """PHANTOM: success -> 5, failure -> 1; failure demos get one failure span (module docstring).
 
-    The p99 failure span is only emitted for failure demos (``meta["failure_demo"]``, success
-    False or a ``*_fail`` folder); successful demos get an outcome label only.
+    The span is only emitted for failure demos (``meta["failure_demo"]``, success False or a
+    ``*_fail`` folder): the crush rule first (first F' over ``p99`` to the end), else the
+    under-grasp rule (peak F' below ``peak_p5``: first contact to the end). It is attached to
+    the dense label and, as the rationale, to the outcome label. Successful demos get an outcome
+    label only.
     """
     m = episode.meta
     labels: list[Label] = []
     failed = _phantom_failed(m)
-    if "success" in m or "task_folder" in m or "failure_demo" in m:
-        labels.append(_outcome(1 if failed else 5))
     p99 = p99 if p99 is not None else m.get("peak_force_p99")
-    if failed and features is not None and p99 is not None:
-        hit: float | None = None
-        for i, t in enumerate(features.frame_times):
-            if any(af.F[i] > p99 for af in features.arms.values()):
-                hit = t
-                break
-        if hit is not None:
-            why = f"excessive force on the {m.get('object', 'object')}"
-            labels.append(_dense([Span(t0=hit, t1=episode.duration_s, quality=1, rationale=why)]))
+    span = (
+        _phantom_failure_span(episode, features, p99, peak_p5)
+        if failed and features is not None
+        else None
+    )
+    if "success" in m or "task_folder" in m or "failure_demo" in m:
+        labels.append(_outcome(1 if failed else 5, [span] if span is not None else None))
+    if span is not None:
+        labels.append(_dense([span]))
     return labels
 
 
@@ -183,15 +252,16 @@ def map_native_labels(
     *,
     features: ResampledForce | None = None,
     phantom_p99: float | None = None,
+    phantom_peak_p5: float | None = None,
 ) -> list[Label]:
-    """Dispatch to the per-source mapper (``features`` and ``phantom_p99`` are PHANTOM only).
+    """Dispatch to the per-source mapper (``features`` and ``phantom_*`` stats are PHANTOM only).
 
     Eval-only sources (EVAL_ONLY_SOURCES) are a no-op; an unknown name still raises.
     """
     if source in EVAL_ONLY_SOURCES:
         return []
     if source == "phantom":
-        return map_phantom(episode, features=features, p99=phantom_p99)
+        return map_phantom(episode, features=features, p99=phantom_p99, peak_p5=phantom_peak_p5)
     if source == "rh20t":
         return map_rh20t(episode)
     if source == "reassemble":

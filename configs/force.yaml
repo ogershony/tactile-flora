@@ -5,6 +5,9 @@ resample:
   raw_rate_hz: 100.0
   contact_sigma: 3.0
 render:
+  # Line grammar: "decimal" is the byte-exact spec format (40 / 68 tokens per one- / two-arm pad
+  # line); "code" the token-cheap single-character format (configs/force.code.yaml, 21 / 28).
+  format: decimal
   header: "Force (normalized: 0 free space, 1 median grasp, max 3):"
   decimals: 2
   # Spec asked for 1,500, but with the Qwen3 tokenizer the exact spec line format costs
@@ -15,6 +18,25 @@ render:
   # Real runs set this to the Qwen3.5 tokenizer.json path so budget checks use the real count.
   tokenizer_json: null
   clip_max: 3.0
+  # Code-format settings (unused while format is decimal; see force/render.py). Thresholds are
+  # in normalized units: F' (1.0 = median grasp), dF' per second, gripper g in [0, 1].
+  header_code: "Force code per frame (F force level: 0 none, 1 light, 2 median grasp, 3 firm, 4 crush-level; levels are relative to this object's typical grasp (F2 = this object's median grasp); A pad asymmetry a/b/=; T trend +/0/-/! sharp drop; C contact 0/1; G gripper o open/m mid/c closed):"
+  # Decimal summary lines are opt-in (HRDexDB v3); force.code.yaml turns on the code summary.
+  summary: false
+  levels: [0.5, 1.5, 2.5]
+  asym_frac: 0.3
+  trend_up: 1.0
+  trend_down: -1.0
+  sharp_drop: -2.0
+  closure: [0.3, 0.6]
+normalize:
+  # Gripper closure above which a frame is a grasp frame for the normalization fit. A group
+  # (PHANTOM object family; "all" elsewhere) in which fewer than min_group_frac of the fitted
+  # episodes have such a frame falls back to its 75th percentile of g, recorded in norm.json as
+  # grasp_rule: p75 (force/normalize.py). Episodes with meta.exclude_from_norm_fit (PHANTOM
+  # failure demos) never feed the fit.
+  grasp_g: 0.6
+  min_group_frac: 0.25
 events:
   grasp_g: 0.6
   grasp_f: 0.5

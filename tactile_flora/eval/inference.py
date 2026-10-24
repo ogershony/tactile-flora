@@ -11,7 +11,18 @@ with force omitted and included, on one real PHANTOM episode across two MI210s. 
 torch 2.12.1+rocm7.1, HIP 7.1.52802, transformers 5.8.1, Triton ROCm 3.7.1. DeltaNet used
 the PyTorch fallback; flash-linear-attention and causal-conv1d were not installed. This
 checks loading and output parsing, not model quality, production training or the fast kernels.
-VLLMBackend remains untested. Details and artifacts are in scripts/cluster/README.md.
+VLLMBackend has not run on a GPU yet; on 2026-10-22 its load/generate calls were checked
+against the vLLM v0.24.0 source (entrypoints/llm.py, sampling_params.py, inputs/llm.py,
+model_executor/models/qwen3_vl.py + qwen3_5.py, engine/arg_utils.py, outputs.py, logprobs.py)
+and the released batch_utils/engine.py + terminal_reward.py. Details and artifacts are in
+scripts/cluster/README.md and docs/colab_vllm_eval.md.
+
+Checkpoints: "released" is the base model (``model_id``, or for vLLM the local snapshot in
+``model_dir`` / ``$TACTILE_FLORA_MODEL_DIR`` so Colab never re-downloads 56 GB). A run
+directory ``data/runs/<name>`` holds ``adapter/`` (peft) which HFBackend merges at load time;
+vLLM needs the full weights, so ``tf eval merge-adapter --run data/runs/<name>`` writes
+``data/runs/<name>/merged`` first (eval/merge_adapter.py) and VLLMBackend resolves that
+directory (``merged_model_dir``), raising ``MergedModelMissingError`` when it is absent.
 Released requirements (nvidia/Flora-Rewarder batch_utils/requirements.txt): vllm 0.24.0,
 transformers 5.8.1, qwen-vl-utils 0.0.14 (plus decord 0.6.0, av >= 15, Pillow < 13). The
 released vLLM run uses bf16, ``gdn_prefill_backend="triton"``, prefix caching, structured
@@ -31,14 +42,17 @@ from __future__ import annotations
 import math
 import os
 import time
-from collections.abc import Callable, Mapping, Sequence
-from typing import Any, Protocol, runtime_checkable
+from collections.abc import Callable, Iterator, Mapping, Sequence
+from concurrent.futures import Future, ThreadPoolExecutor
+from pathlib import Path
+from typing import Any, NamedTuple, Protocol, runtime_checkable
 
 import numpy as np
 from pydantic import BaseModel
 
 from tactile_flora.prompts.flora import VideoSpec
 from tactile_flora.schema import Episode, FrameReader
+from tactile_flora.video.collage import VIDEO_SIZE as _COLLAGE_VIDEO_SIZE
 from tactile_flora.video.mosaic import (
     VideoMetadataDict,
     clip_frames,
@@ -53,6 +67,12 @@ RATIONALE_MAX_NEW_TOKENS = 160
 TOP_LOGPROBS = 20
 DIGITS = ("1", "2", "3", "4", "5")
 MODEL_ID = os.environ.get("TACTILE_FLORA_MODEL_ID", "nvidia/Flora-Rewarder")
+# Local snapshot of the released weights for vLLM (e.g. /content/models/Flora-Rewarder).
+MODEL_DIR_ENV = "TACTILE_FLORA_MODEL_DIR"
+MERGED_DIRNAME = "merged"
+# The released engine's per-clip pixel budget (batch_utils/engine.py COLLAGE_VIDEO_SIZE); equal
+# to the video_processor size of processor_config.json, pinned so vLLM cannot pick another.
+VIDEO_SIZE = _COLLAGE_VIDEO_SIZE
 # Substrings of the released system prompts, used by the stub to tell the tasks apart.
 _DENSE_MARK = "dense action-quality reward model"
 _SCORE_ONLY_MARK = "Do not provide a rationale"
@@ -64,6 +84,17 @@ class GenerateResult(BaseModel):
     text: str
     score_token_logprobs: dict[str, float] | None = None
     latency_s: float = 0.0
+
+
+class GenRequest(NamedTuple):
+    """The arguments of one ``Backend.generate`` call, for backends that batch."""
+
+    messages: Sequence[Mapping[str, Any]]
+    video: VideoSpec
+    regex: str | None
+    max_new_tokens: int
+    top_logprobs: int
+    episode: Episode | None
 
 
 @runtime_checkable
@@ -196,12 +227,42 @@ def clip_array(episode: Episode, video: VideoSpec, reader: FrameReader) -> np.nd
         video.roles,
         blank=video.blank,
         cell_px=video.cell_px,
+        collage=video.collage,
     )
     return np.stack(frames)
 
 
 def _video_metadata(video: VideoSpec, episode: Episode) -> VideoMetadataDict:
     return video_metadata(video.frame_indices, video.fps, source_frame_count(episode))
+
+
+class MergedModelMissingError(RuntimeError):
+    """A run checkpoint has no merged full-weight directory for vLLM."""
+
+
+def is_model_dir(path: Path) -> bool:
+    """Return True if ``path`` holds a full transformers checkpoint (config + safetensors)."""
+    return (path / "config.json").is_file() and (
+        (path / "model.safetensors.index.json").is_file() or (path / "model.safetensors").is_file()
+    )
+
+
+def merged_model_dir(checkpoint: str) -> Path:
+    """Return the full-weight directory of a run checkpoint (backends that cannot apply LoRA).
+
+    Accepts ``<run>``, ``<run>/adapter`` or ``<run>/merged`` and returns ``<run>/merged``.
+    Raises MergedModelMissingError (with the command to run) when it does not exist.
+    """
+    p = Path(checkpoint)
+    run = p.parent if p.name in ("adapter", MERGED_DIRNAME) else p
+    merged = run / MERGED_DIRNAME
+    if not is_model_dir(merged):
+        raise MergedModelMissingError(
+            f"{merged} is not a merged model directory; run "
+            f"`tf eval merge-adapter --run {run}` (needs the [train] extra: transformers, "
+            "peft) before evaluating this checkpoint with the vllm backend"
+        )
+    return merged
 
 
 def _merge_digit_logprobs(entries: Sequence[tuple[str, float]]) -> dict[str, float]:
@@ -303,7 +364,7 @@ class HFBackend:
         inputs = self._processor(
             text=[prompt],
             videos=[frames],
-            videos_kwargs={"video_metadata": [meta], "do_sample_frames": False},
+            videos_kwargs={"video_metadata": [meta], "do_sample_frames": False, "size": VIDEO_SIZE},
             return_tensors="pt",
         ).to(self._model.device)
         tok = self._processor.tokenizer
@@ -352,8 +413,13 @@ class HFBackend:
 class VLLMBackend:
     """vLLM backend mirroring the released engine (offline ``LLM`` with regex structured output).
 
-    Untested; milestone 7 was run through HFBackend. vllm is imported inside
-    ``load``; install vllm==0.24.0 alongside transformers==5.8.1 and qwen-vl-utils==0.0.14.
+    Not yet run on a GPU (milestone 7 used HFBackend); the calls below were checked against the
+    vLLM v0.24.0 source and the released batch_utils. vllm is imported inside ``load``; install
+    vllm==0.24.0 with transformers==5.8.1 and qwen-vl-utils==0.0.14 (docs/colab_vllm_eval.md).
+
+    ``model_path`` is what the engine loads: for "released" the local snapshot ``model_dir``
+    (argument, else ``$TACTILE_FLORA_MODEL_DIR``, else the Hub id ``model_id``); for a run
+    checkpoint its ``merged/`` directory, which must exist (``merged_model_dir``).
     """
 
     name = "vllm"
@@ -364,37 +430,77 @@ class VLLMBackend:
         reader: FrameReader | None = None,
         *,
         model_id: str = MODEL_ID,
+        model_dir: str | None = None,
         max_model_len: int = 32768,
         tensor_parallel_size: int = 1,
+        gpu_memory_utilization: float = 0.88,
+        seed: int = 0,
     ) -> None:
         """Remember engine settings; the engine is created on first use."""
         self.checkpoint = checkpoint
         self.reader: FrameReader = reader if reader is not None else AutoReader()
-        self.model_id = model_id if checkpoint == "released" else checkpoint
+        if checkpoint == "released":
+            self.model_path = model_dir or os.environ.get(MODEL_DIR_ENV) or model_id
+        else:
+            self.model_path = str(merged_model_dir(checkpoint))
         self.max_model_len = max_model_len
         self.tensor_parallel_size = tensor_parallel_size
+        self.gpu_memory_utilization = gpu_memory_utilization
+        self.seed = seed
         self._llm: Any = None
         self._processor: Any = None
 
     def load(self) -> None:
-        """Create the vLLM engine (bf16, triton GDN prefill, video-only multimodal limit)."""
+        """Create the vLLM engine (bf16, triton GDN prefill, video-only multimodal limit).
+
+        Engine arguments are those of the released batch_utils/engine.py ``load_llm`` plus
+        ``max_logprobs`` (terminal_reward.py); each is an EngineArgs field in vLLM 0.24.0
+        (``gdn_prefill_backend`` is Literal["flashinfer", "triton", "cutedsl"]).
+        """
         if self._llm is not None:
             return
+        # The 2026-10-21 Colab A100 vLLM 0.24 environment only ran with the FlashInfer sampler
+        # off (data/colab/e0b_reassemble_force.py); setdefault so an explicit setting wins.
+        os.environ.setdefault("VLLM_USE_FLASHINFER_SAMPLER", "0")
+        os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
         from transformers import AutoProcessor  # pyright: ignore[reportMissingImports]
         from vllm import LLM  # type: ignore[import-not-found]
 
-        self._processor = AutoProcessor.from_pretrained(self.model_id)
+        self._processor = AutoProcessor.from_pretrained(self.model_path)
         self._llm = LLM(
-            model=self.model_id,
+            model=self.model_path,
             tensor_parallel_size=self.tensor_parallel_size,
             dtype="bfloat16",
+            gpu_memory_utilization=self.gpu_memory_utilization,
             max_model_len=self.max_model_len,
             limit_mm_per_prompt={"image": 0, "video": 1},
-            mm_processor_kwargs={"do_sample_frames": False},
+            mm_processor_kwargs={"do_sample_frames": False, "size": VIDEO_SIZE},
             gdn_prefill_backend="triton",
             enable_prefix_caching=True,
+            seed=self.seed,
             max_logprobs=TOP_LOGPROBS,
         )
+
+    def close(self) -> None:
+        """Shut the engine down and free the GPU so another checkpoint can be loaded."""
+        llm, self._llm, self._processor = self._llm, None, None
+        if llm is None:
+            return
+        engine = getattr(llm, "llm_engine", None)
+        core = getattr(engine, "engine_core", None)
+        if core is not None and hasattr(core, "shutdown"):  # vllm/v1/engine/core_client.py
+            core.shutdown()
+        del llm, engine, core
+        import gc
+
+        gc.collect()
+        try:
+            import torch  # pyright: ignore[reportMissingImports]
+
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+        except ImportError:
+            pass
 
     def generate(
         self,
@@ -406,42 +512,126 @@ class VLLMBackend:
         top_logprobs: int,
         episode: Episode | None = None,
     ) -> GenerateResult:
-        """Greedy, regex-constrained generation through vLLM with top-k logprobs."""
+        """Greedy, regex-constrained generation through vLLM with top-k logprobs.
+
+        Request format (vLLM 0.24.0 ``TextPrompt``): ``prompt`` (chat-templated string),
+        ``multi_modal_data={"video": (frames, metadata)}`` where frames is a (T, H, W, 3)
+        uint8 array and metadata the dict Qwen3VLMultiModalProcessor unpacks into
+        transformers' VideoMetadata (total_num_frames, fps, frames_indices, duration), and the
+        per-request ``mm_processor_kwargs={"do_sample_frames": False}`` so the given frames
+        are used as-is and the timestamp tokens come from ``frames_indices / fps``.
+        ``logprobs`` are raw (pre-grammar) top-k per generated position, a list of
+        {token_id: Logprob} dicts aligned with ``token_ids``; the last generated digit is the
+        Score token, as in the released terminal_reward.py.
+        """
         if episode is None:
             raise RuntimeError("VLLMBackend needs the episode to read video")
         self.load()
-        from vllm import SamplingParams  # type: ignore[import-not-found]
-        from vllm.sampling_params import StructuredOutputsParams  # type: ignore[import-not-found]
-
         frames = clip_array(episode, video, self.reader)
+        params = self._params(regex, max_new_tokens, top_logprobs)
+        t0 = time.perf_counter()
+        (res,) = self._llm.generate(
+            [self._prompt(messages, video, episode, frames)], params, use_tqdm=False
+        )
+        return self._result(res, top_logprobs, time.perf_counter() - t0)
+
+    def generate_many(
+        self,
+        requests: Sequence[GenRequest],
+        *,
+        batch: int | None = None,
+        workers: int | None = None,
+    ) -> Iterator[GenerateResult]:
+        """``generate`` for every request, answers yielded in request order.
+
+        Requests go to the engine ``batch`` at a time (``$TF_VLLM_BATCH``, default 8; 1 means one
+        ``generate`` call each) while ``workers`` threads (``$TF_PREFETCH_WORKERS``, default 6)
+        decode the clips of the current and next chunk, so frame reading and the processor's
+        input work overlap the GPU instead of alternating with it (measured 2026-10-23 on the
+        Colab A100: one clip per call left the GPU ~70% idle on REASSEMBLE). Prompts, frames,
+        sampling parameters and parsing are those of ``generate``; ``LLM.generate`` returns
+        outputs in prompt order. ``latency_s`` is the chunk's wall time per request.
+        """
+        batch = batch or int(os.environ.get("TF_VLLM_BATCH", "8"))
+        workers = workers or int(os.environ.get("TF_PREFETCH_WORKERS", "6"))
+        reqs = list(requests)
+        eps: list[Episode] = []
+        for r in reqs:
+            if r.episode is None:
+                raise RuntimeError("VLLMBackend needs the episode to read video")
+            eps.append(r.episode)
+        if batch <= 1:
+            for r in reqs:
+                yield self.generate(
+                    r.messages,
+                    r.video,
+                    regex=r.regex,
+                    max_new_tokens=r.max_new_tokens,
+                    top_logprobs=r.top_logprobs,
+                    episode=r.episode,
+                )
+            return
+        self.load()
+        futs: dict[int, Future[np.ndarray]] = {}
+        with ThreadPoolExecutor(max(1, workers)) as pool:
+            for start in range(0, len(reqs), batch):
+                for i in range(start, min(start + 2 * batch, len(reqs))):
+                    if i not in futs:
+                        futs[i] = pool.submit(clip_array, eps[i], reqs[i].video, self.reader)
+                idx = list(range(start, min(start + batch, len(reqs))))
+                prompts = [
+                    self._prompt(reqs[i].messages, reqs[i].video, eps[i], futs.pop(i).result())
+                    for i in idx
+                ]
+                params = [
+                    self._params(reqs[i].regex, reqs[i].max_new_tokens, reqs[i].top_logprobs)
+                    for i in idx
+                ]
+                t0 = time.perf_counter()
+                outs = self._llm.generate(prompts, params, use_tqdm=False)
+                if len(outs) != len(idx):
+                    raise RuntimeError(f"vLLM returned {len(outs)} outputs for {len(idx)} prompts")
+                dt = (time.perf_counter() - t0) / len(idx)
+                for i, res in zip(idx, outs, strict=True):
+                    yield self._result(res, reqs[i].top_logprobs, dt)
+
+    def _prompt(
+        self,
+        messages: Sequence[Mapping[str, Any]],
+        video: VideoSpec,
+        episode: Episode,
+        frames: np.ndarray,
+    ) -> dict[str, Any]:
         prompt = self._processor.apply_chat_template(
             list(messages), tokenize=False, add_generation_prompt=True, enable_thinking=False
         )
-        params = SamplingParams(
+        meta = _video_metadata(video, episode)
+        return {
+            "prompt": prompt,
+            "multi_modal_data": {"video": (frames, dict(meta))},
+            "mm_processor_kwargs": {"do_sample_frames": False},
+        }
+
+    @staticmethod
+    def _params(regex: str | None, max_new_tokens: int, top_logprobs: int) -> Any:
+        from vllm import SamplingParams  # type: ignore[import-not-found]
+        from vllm.sampling_params import StructuredOutputsParams  # type: ignore[import-not-found]
+
+        return SamplingParams(
             temperature=0.0,
             max_tokens=max_new_tokens,
-            logprobs=top_logprobs or None,
+            logprobs=top_logprobs if top_logprobs > 0 else None,
             structured_outputs=StructuredOutputsParams(regex=regex) if regex else None,
         )
-        meta = _video_metadata(video, episode)
-        t0 = time.perf_counter()
-        (res,) = self._llm.generate(
-            [
-                {
-                    "prompt": prompt,
-                    "multi_modal_data": {"video": (frames, meta)},
-                    "mm_processor_kwargs": {"do_sample_frames": False},
-                }
-            ],
-            params,
-            use_tqdm=False,
-        )
-        latency = time.perf_counter() - t0
+
+    def _result(self, res: Any, top_logprobs: int, latency: float) -> GenerateResult:
         comp = res.outputs[0]
         tok = self._llm.get_tokenizer()
         lp: dict[str, float] | None = None
-        if top_logprobs and comp.logprobs:
-            for token, cands in zip(reversed(comp.token_ids), reversed(comp.logprobs), strict=True):
+        if top_logprobs > 0 and comp.logprobs:
+            token_ids = list(comp.token_ids)
+            positions = list(comp.logprobs)
+            for token, cands in zip(reversed(token_ids), reversed(positions), strict=True):
                 if tok.decode([token]).strip() in DIGITS:
                     lp = _merge_digit_logprobs(
                         [(tok.decode([i]), float(c.logprob)) for i, c in cands.items()]
@@ -451,13 +641,22 @@ class VLLMBackend:
 
 
 def make_backend(
-    kind: str, checkpoint: str = "released", reader: FrameReader | None = None
+    kind: str,
+    checkpoint: str = "released",
+    reader: FrameReader | None = None,
+    *,
+    model_dir: str | None = None,
 ) -> Backend:
-    """Return the backend named ``kind`` ("stub", "hf" or "vllm") for ``checkpoint``."""
+    """Return the backend named ``kind`` ("stub", "hf" or "vllm") for ``checkpoint``.
+
+    ``model_dir`` is the local snapshot of the released weights for vLLM (else
+    ``$TACTILE_FLORA_MODEL_DIR``); HFBackend keeps loading ``MODEL_ID`` and merging the run's
+    adapter at load time. A vLLM run checkpoint must have been merged (MergedModelMissingError).
+    """
     if kind == "stub":
         return StubBackend()
     if kind == "hf":
         return HFBackend(checkpoint, reader)
     if kind == "vllm":
-        return VLLMBackend(checkpoint, reader)
+        return VLLMBackend(checkpoint, reader, model_dir=model_dir)
     raise ValueError(f"unknown backend {kind!r}; choose stub, hf or vllm")

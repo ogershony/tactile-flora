@@ -1,7 +1,8 @@
 """Writing and reading the accepted manifest and the frozen holdout id file.
 
-Owns: build_manifest, read_manifest, manifest_hash, freeze_holdout, load_holdout, window_id and
-the errors SplitFrozenError, HoldoutExistsError, SourceFailedError.
+Owns: build_manifest, merge_manifests, write_rows, read_manifest, manifest_hash, freeze_holdout,
+load_holdout, window_id and the errors SplitFrozenError, HoldoutExistsError, SourceFailedError,
+MergeConflictError.
 Must never: change the split of a frozen row, read raw datasets or run checks.
 
 Split assignment: ``splits`` maps a split name to a list of session names and/or episode ids;
@@ -14,13 +15,21 @@ train episodes, and ``max_windows`` (or the per-kind ``max_dense_windows`` /
 ``max_outcome_windows``, None = use ``max_windows``) thins train windows. Rows of episodes
 frozen as train in the holdout file are never dropped by a cap. Sync shifts:
 ``ManifestRow.shift_s`` is the clock correction (``-lag``, see verify/windowing.py);
-the ``<name>.shifts.json`` sidecar keeps the raw lags.
+the ``<name>.shifts.json`` sidecar keeps the raw lags. ``ManifestRow.norm_group`` records the
+normalization group (``force.normalize.norm_group``) whose constants rendered the row.
 
 drop_channel: ``dropped_arms`` reads the failed arm(s) from the check detail (``arm=L,arm=R`` or the
 older ``L: f_a, ...`` format). A drop_channel whose detail names no arm is treated
 as drop_episode (always for single-arm episodes, conservatively for two-arm ones), and so is one
 that removes every arm. verify/windowing.prepare_episode removes the named arms from the stream.
 An eval_only source may not put rows in the train split (EvalOnlyTrainError).
+
+Several sources: ``build_manifest`` (``tf manifest --name X``) writes ONE source per file and
+overwrites ``X.parquet``, so a multi-source manifest is made by building each source into its own
+file and concatenating them with ``merge_manifests`` (``tf manifest merge``). Rows are copied
+unchanged (source, split, norm_group, norm_version, report_version, shift_s), so every per-source
+cap and verdict is already applied; ``splits`` keeps only those splits (a benchmark manifest is
+one source's val or test rows, the training manifest every source's train rows).
 """
 
 from __future__ import annotations
@@ -29,7 +38,7 @@ import hashlib
 import json
 import random
 import re
-from collections.abc import Iterable
+from collections.abc import Collection, Iterable, Sequence
 from pathlib import Path
 from typing import Any, cast, get_args
 
@@ -37,12 +46,14 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from tactile_flora.config import SourceConfig
+from tactile_flora.force import normalize
 from tactile_flora.schema import (
     Arm,
     CheckResult,
     Episode,
     HoldoutFile,
     ManifestRow,
+    PromptKind,
     Split,
     Window,
     episode_key,
@@ -52,6 +63,7 @@ from tactile_flora.verify.report import source_verdicts
 DEFAULT_HOLDOUT = Path("data/manifest/holdout_ids.json")
 _ORIGIN_RANK = {"human": 0, "source": 1, "programmatic": 2, "pseudo": 3}
 _SPLITS = get_args(Split)
+_KINDS = get_args(PromptKind)
 
 
 class SplitFrozenError(RuntimeError):
@@ -68,6 +80,10 @@ class EvalOnlyTrainError(ValueError):
 
 class SourceFailedError(RuntimeError):
     """Raised when a source-level check failed, so no manifest may be built."""
+
+
+class MergeConflictError(ValueError):
+    """Raised when two merge inputs carry the same window_id with different rows."""
 
 
 def window_id(source: str, episode_id: str, prompt_kind: str, anchor_s: float) -> str:
@@ -145,6 +161,7 @@ _SCHEMA = pa.schema(
         ("license", pa.string()),
         ("report_version", pa.string()),
         ("shift_s", pa.float64()),
+        ("norm_group", pa.string()),
     ]
 )
 
@@ -201,7 +218,13 @@ def build_manifest(
     Raises SourceFailedError if a source-level check failed, and SplitFrozenError (before
     writing anything) if an episode's assigned split differs from its frozen split.
     """
-    failed = sorted(n for n, ok in source_verdicts(check_results).items() if not ok)
+    verdicts = source_verdicts(
+        check_results,
+        sync_median_s=source_cfg.sync_median_s,
+        norm_p99_max=source_cfg.norm_p99_max,
+        norm_grasp_range=source_cfg.norm_grasp_range,
+    )
+    failed = sorted(n for n, ok in verdicts.items() if not ok)
     if failed:
         raise SourceFailedError(f"source {source_cfg.name} failed: {', '.join(failed)}")
     cache = hashes or {}
@@ -247,6 +270,7 @@ def build_manifest(
                     f"{ep.source}/{ep.episode_id} is frozen as {frozen!r}, build assigned {split!r}"
                 )
         shift = shift_of(check_results[ep.episode_id])
+        group = normalize.norm_group(ep)
         for w in wins:
             candidates.append(
                 (
@@ -264,17 +288,16 @@ def build_manifest(
                         license=ep.license,
                         report_version=report_version,
                         shift_s=shift,
+                        norm_group=group,
                     ),
                     ep,
                 )
             )
     unique = {row.window_id: row for row, _ in candidates}
     ordered = _cap_windows(sorted(unique.values(), key=lambda r: r.window_id), source_cfg, holdout)
-    rows = sorted(ordered, key=lambda r: (r.source, r.episode_id, r.prompt_kind, r.anchor_s))
+    rows = _sorted(ordered)
     out = Path(out_path)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    cols: dict[str, Any] = {f: [getattr(r, f) for r in rows] for f in ManifestRow.model_fields}
-    pq.write_table(pa.table(cols, schema=_SCHEMA), out)
+    write_rows(rows, out)
     shifts = {
         ep.episode_id: check_results[ep.episode_id]["sync"].value
         for ep, _ in pairs
@@ -287,9 +310,104 @@ def build_manifest(
     return rows
 
 
+def _sorted(rows: Iterable[ManifestRow]) -> list[ManifestRow]:
+    return sorted(rows, key=lambda r: (r.source, r.episode_id, r.prompt_kind, r.anchor_s))
+
+
+def write_rows(rows: Sequence[ManifestRow], out: Path | str) -> Path:
+    """Write ``rows`` as a manifest parquet with the fixed schema (parent dirs are created)."""
+    path = Path(out)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    cols: dict[str, Any] = {f: [getattr(r, f) for r in rows] for f in ManifestRow.model_fields}
+    pq.write_table(pa.table(cols, schema=_SCHEMA), path)
+    return path
+
+
 def read_manifest(path: Path | str) -> list[ManifestRow]:
     """Read a manifest parquet into ManifestRow objects."""
     return [ManifestRow.model_validate(r) for r in pq.read_table(path).to_pylist()]
+
+
+def _sidecar_shifts(path: Path, rows: Sequence[ManifestRow]) -> dict[str, float]:
+    """Raw lags of ``path``'s ``.shifts.json`` keyed "source/episode_id", for ``rows`` only.
+
+    A per-source sidecar (build_manifest) keys by episode_id alone; a merged one already by
+    "source/episode_id". Both forms are accepted.
+    """
+    side = path.with_suffix(".shifts.json")
+    if not side.exists():
+        return {}
+    raw: dict[str, Any] = json.loads(side.read_text(encoding="utf-8"))
+    keys = {episode_key(r.source, r.episode_id) for r in rows}
+    sources = sorted({r.source for r in rows})
+    out: dict[str, float] = {}
+    for k, v in raw.items():
+        if k in keys:
+            out[k] = float(v)
+            continue
+        hits = [episode_key(s, k) for s in sources if episode_key(s, k) in keys]
+        if len(hits) == 1:
+            out[hits[0]] = float(v)
+    return out
+
+
+def merge_manifests(
+    inputs: Sequence[Path | str],
+    out: Path | str,
+    *,
+    splits: Collection[str] | None = None,
+    prompt_kinds: Collection[str] | None = None,
+) -> list[ManifestRow]:
+    """Concatenate manifests into ``out``, keeping only rows whose split is in ``splits``.
+
+    ``prompt_kinds`` (None = both) keeps only rows of those prompt kinds, e.g. ``["outcome"]``
+    for an outcome-only judge set; an unknown kind is a ValueError like an unknown split.
+
+    Rows are copied unchanged, so each input's source, split, norm_group, norm_version,
+    report_version and shift_s survive and the per-source caps already applied by build_manifest
+    are respected. The same window_id in two inputs must be the identical row
+    (MergeConflictError); identical duplicates collapse to one. ``splits`` None keeps every
+    split; an empty or unknown split list, or a selection with no rows, is a ValueError so a
+    misnamed split cannot silently produce an empty benchmark. The output is sorted like
+    build_manifest's and its ``.shifts.json`` sidecar keys the raw lags by "source/episode_id".
+    """
+    if not inputs:
+        raise ValueError("merge needs at least one input manifest")
+    wanted = set(splits) if splits is not None else None
+    if wanted is not None and not wanted:
+        raise ValueError("splits must name at least one split")
+    unknown = sorted(wanted - set(_SPLITS)) if wanted else []
+    if unknown:
+        raise ValueError(f"unknown splits {unknown}; valid: {sorted(_SPLITS)}")
+    kinds = set(prompt_kinds) if prompt_kinds is not None else None
+    if kinds is not None and (not kinds or kinds - set(_KINDS)):
+        raise ValueError(f"prompt kinds must be a non-empty subset of {sorted(_KINDS)}: {kinds}")
+    merged: dict[str, ManifestRow] = {}
+    shifts: dict[str, float] = {}
+    for p in inputs:
+        path = Path(p)
+        kept = [
+            r
+            for r in read_manifest(path)
+            if (wanted is None or r.split in wanted) and (kinds is None or r.prompt_kind in kinds)
+        ]
+        for r in kept:
+            prev = merged.setdefault(r.window_id, r)
+            if prev != r:
+                raise MergeConflictError(
+                    f"window {r.window_id} ({r.source}/{r.episode_id}) differs between inputs"
+                )
+        shifts.update(_sidecar_shifts(path, kept))
+    if not merged:
+        which = sorted(wanted) if wanted is not None else "any"
+        what = f"kinds {sorted(kinds)}" if kinds is not None else "any kind"
+        raise ValueError(f"no rows for splits {which}, {what} in {[str(p) for p in inputs]}")
+    rows = _sorted(merged.values())
+    path = write_rows(rows, out)
+    path.with_suffix(".shifts.json").write_text(
+        json.dumps(shifts, indent=2, sort_keys=True), encoding="utf-8"
+    )
+    return rows
 
 
 def manifest_hash(path: Path | str) -> str:

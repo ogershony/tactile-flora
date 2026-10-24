@@ -65,12 +65,14 @@ from tactile_flora.eval.inference import (
     SCORE_ONLY_MAX_NEW_TOKENS,
     TOP_LOGPROBS,
     Backend,
+    GenerateResult,
+    GenRequest,
     expected_score,
 )
 from tactile_flora.force import normalize, render
 from tactile_flora.force.resample import resample
 from tactile_flora.labels import windows as W
-from tactile_flora.prompts.flora import build_prompt, to_messages
+from tactile_flora.prompts.flora import build_prompt, force_sentence_for, to_messages
 from tactile_flora.prompts.parse import (
     ParsedDense,
     ParsedOutcome,
@@ -251,8 +253,9 @@ def window_features(
 ) -> ResampledForce:
     """Resample and normalize the episode force at the window's frame times.
 
-    A non-zero ``shift_s`` (ManifestRow.shift_s) is applied through
-    ``verify.windowing.resample_shifted`` when that function exists.
+    The constants of the episode's ``norm_group`` are applied. A non-zero ``shift_s``
+    (ManifestRow.shift_s) is applied through ``verify.windowing.resample_shifted`` when that
+    function exists.
     """
     from tactile_flora.verify import windowing
 
@@ -263,7 +266,7 @@ def window_features(
         if shift_s:
             log.warning("manifest shift_s=%s ignored: resample_shifted is unavailable", shift_s)
         feats = resample(ep.force, ep.gripper, w.frame_times, force_cfg.resample)
-    return normalize.apply(feats, consts, force_cfg.render)
+    return normalize.apply(feats, consts, force_cfg.render, group=normalize.norm_group(ep))
 
 
 def _sha(obj: object) -> str:
@@ -379,6 +382,52 @@ def stale_reason(
     return None
 
 
+class _Job(NamedTuple):
+    """One window's prompt, built before any generation (shuffled pairings included)."""
+
+    ekey: str
+    ep: Episode
+    obj: str
+    wid: str
+    w: Window
+    bundle: Any
+    dense: bool
+    regex: str | None
+    budget: int
+
+
+def _generate_all(backend: Backend, jobs: list[_Job]) -> Iterator[GenerateResult]:
+    """Answers in job order.
+
+    The backend's ``generate_many`` (batched, clips prefetched) when it has one, else one
+    ``generate`` call per job.
+    """
+    reqs = [
+        GenRequest(
+            messages=to_messages(j.bundle),
+            video=j.bundle.video,
+            regex=j.regex,
+            max_new_tokens=j.budget,
+            top_logprobs=0 if j.dense else TOP_LOGPROBS,
+            episode=j.ep,
+        )
+        for j in jobs
+    ]
+    many = getattr(backend, "generate_many", None)
+    if callable(many):
+        yield from many(reqs)
+        return
+    for r in reqs:
+        yield backend.generate(
+            r.messages,
+            r.video,
+            regex=r.regex,
+            max_new_tokens=r.max_new_tokens,
+            top_logprobs=r.top_logprobs,
+            episode=r.episode,
+        )
+
+
 def run_eval(
     checkpoint: str,
     benchmark: str,
@@ -440,126 +489,130 @@ def run_eval(
     over_comp: dict[str, bool] = {}
     no_logprobs = 0
     k = 0
-    with open(out / "log.jsonl", "w", encoding="utf-8") as logf:
-        for ekey, b in batches.items():
-            ep = b.episode
-            cam = ep.cameras.get("scene") or next(iter(ep.cameras.values()))
-            obj = str(ep.meta.get("object", ""))
-            obj_of[ekey] = obj
-            over_comp[ekey] = _has_over_compression(ep)
-            for wid, w in zip(b.window_ids, b.windows, strict=True):
-                block: str | None = None
-                blank = False
-                if need_force:
-                    ident = PoolEntry(
-                        features=feat_of[wid],
-                        source=ep.source,
-                        episode_id=ep.episode_id,
-                        prompt_kind=w.prompt_kind,
+    jobs: list[_Job] = []
+    for ekey, b in batches.items():
+        ep = b.episode
+        cam = ep.cameras.get("scene") or next(iter(ep.cameras.values()))
+        obj = str(ep.meta.get("object", ""))
+        obj_of[ekey] = obj
+        over_comp[ekey] = _has_over_compression(ep)
+        for wid, w in zip(b.window_ids, b.windows, strict=True):
+            block: str | None = None
+            blank = False
+            if need_force:
+                ident = PoolEntry(
+                    features=feat_of[wid],
+                    source=ep.source,
+                    episode_id=ep.episode_id,
+                    prompt_kind=w.prompt_kind,
+                )
+                abl = apply_force_mode(
+                    feat_of[wid], force_mode, pool=pool, seed=seed + k, identity=ident
+                )
+                blank = abl.video_blank
+                if abl.features is not None:
+                    lines = render.render_lines(
+                        abl.features, w.frame_times, ep.force.channel, cfg=force_cfg.render
                     )
-                    abl = apply_force_mode(
-                        feat_of[wid], force_mode, pool=pool, seed=seed + k, identity=ident
-                    )
-                    blank = abl.video_blank
-                    if abl.features is not None:
-                        lines = render.render_lines(abl.features, w.frame_times, ep.force.channel)
-                        block = (
-                            render.render_block(
-                                lines, force_cfg.render, abl.features, ep.episode_id
-                            )
-                            or None
+                    block = (
+                        render.render_block(
+                            lines,
+                            force_cfg.render,
+                            abl.features,
+                            ep.episode_id,
+                            source=ep.source,
                         )
-                k += 1
-                rationale = w.prompt_kind == "outcome" and not spec.score_only
-                bundle = build_prompt(
-                    w,
-                    block,
-                    video_blank=blank,
-                    with_rationale=rationale,
-                    task=ep.task,
-                    camera_roles=tuple(ep.cameras),
-                    fps=cam.fps,
-                    frame_indices=_frame_indices(w, cam.fps, cam.n_frames),
-                )
-                dense = w.prompt_kind == "dense"
-                regex = dense_regex() if dense else outcome_regex(rationale)
-                budget = (
-                    DENSE_MAX_NEW_TOKENS
-                    if dense
-                    else (RATIONALE_MAX_NEW_TOKENS if rationale else SCORE_ONLY_MAX_NEW_TOKENS)
-                )
-                res = backend.generate(
-                    to_messages(bundle),
-                    bundle.video,
-                    regex=regex,
-                    max_new_tokens=budget,
-                    top_logprobs=0 if dense else TOP_LOGPROBS,
-                    episode=ep,
-                )
-                parsed: ParsedDense | ParsedOutcome = (
-                    parse_dense(res.text) if dense else parse_outcome(res.text)
-                )
-                es = math.nan
-                score = math.nan
-                if isinstance(parsed, ParsedDense):
-                    dense_pred.setdefault(ekey, []).append((w.anchor_s, parsed.digits))
-                    truth = parse_dense(w.target)
-                    dense_truth.setdefault(ekey, []).append((w.anchor_s, truth.digits))
-                else:
-                    t_out = parse_outcome(w.target)
-                    if parsed.score is not None:
-                        score = float(parsed.score)
-                        if res.score_token_logprobs:
-                            es = expected_score(res.score_token_logprobs)
-                        else:
-                            no_logprobs += 1  # NaN, never silently the integer score
-                    else:
-                        # unparsable: counted in parse_failed AND replaced by the middle score
-                        score = float(M.OUTCOME_PARSE_FAIL_SCORE)
-                        es = score
-                    out_pred.append({"episode_id": ekey, "score": score, "expected_score": es})
-                    t_score = float(t_out.score) if t_out.score is not None else math.nan
-                    success = bool(t_score >= M.SUCCESS_THRESHOLD)
-                    out_truth.append(
-                        {
-                            "episode_id": ekey,
-                            "score": t_score,
-                            "label": int(success),
-                            "dsr": _dsr(ep, success),
-                            "object": obj,
-                        }
+                        or None
                     )
-                recs.append(
+            k += 1
+            rationale = w.prompt_kind == "outcome" and not spec.score_only
+            bundle = build_prompt(
+                w,
+                block,
+                video_blank=blank,
+                with_rationale=rationale,
+                task=ep.task,
+                camera_roles=tuple(ep.cameras),
+                fps=cam.fps,
+                frame_indices=_frame_indices(w, cam.fps, cam.n_frames),
+                force_sentence=force_sentence_for(force_cfg.render),
+                collage=spec.collage,
+            )
+            dense = w.prompt_kind == "dense"
+            regex = dense_regex() if dense else outcome_regex(rationale)
+            budget = (
+                DENSE_MAX_NEW_TOKENS
+                if dense
+                else (RATIONALE_MAX_NEW_TOKENS if rationale else SCORE_ONLY_MAX_NEW_TOKENS)
+            )
+            jobs.append(_Job(ekey, ep, obj, wid, w, bundle, dense, regex, budget))
+    with open(out / "log.jsonl", "w", encoding="utf-8") as logf:
+        for job, res in zip(jobs, _generate_all(backend, jobs), strict=True):
+            ekey, ep, obj, wid, w, dense = job.ekey, job.ep, job.obj, job.wid, job.w, job.dense
+            parsed: ParsedDense | ParsedOutcome = (
+                parse_dense(res.text) if dense else parse_outcome(res.text)
+            )
+            es = math.nan
+            score = math.nan
+            if isinstance(parsed, ParsedDense):
+                dense_pred.setdefault(ekey, []).append((w.anchor_s, parsed.digits))
+                truth = parse_dense(w.target)
+                dense_truth.setdefault(ekey, []).append((w.anchor_s, truth.digits))
+            else:
+                t_out = parse_outcome(w.target)
+                if parsed.score is not None:
+                    score = float(parsed.score)
+                    if res.score_token_logprobs:
+                        es = expected_score(res.score_token_logprobs)
+                    else:
+                        no_logprobs += 1  # NaN, never silently the integer score
+                else:
+                    # unparsable: counted in parse_failed AND replaced by the middle score
+                    score = float(M.OUTCOME_PARSE_FAIL_SCORE)
+                    es = score
+                out_pred.append({"episode_id": ekey, "score": score, "expected_score": es})
+                t_score = float(t_out.score) if t_out.score is not None else math.nan
+                success = bool(t_score >= M.SUCCESS_THRESHOLD)
+                out_truth.append(
                     {
-                        "window_id": wid,
-                        "source": ep.source,
-                        "episode_id": ep.episode_id,
-                        "prompt_kind": w.prompt_kind,
-                        "anchor_s": w.anchor_s,
+                        "episode_id": ekey,
+                        "score": t_score,
+                        "label": int(success),
+                        "dsr": _dsr(ep, success),
                         "object": obj,
-                        "raw_text": res.text,
-                        "parsed": parsed.model_dump_json(),
-                        "score": score,
-                        "expected_score": es,
-                        "parse_failed": parsed.parse_failed,
-                        "latency_s": res.latency_s,
-                        "truth_target": w.target,
                     }
                 )
-                logf.write(
-                    json.dumps(
-                        {
-                            "window_id": wid,
-                            "episode_id": ep.episode_id,
-                            "prompt_kind": w.prompt_kind,
-                            "parse_failed": parsed.parse_failed,
-                            "latency_s": res.latency_s,
-                        }
-                    )
-                    + "\n"
+            recs.append(
+                {
+                    "window_id": wid,
+                    "source": ep.source,
+                    "episode_id": ep.episode_id,
+                    "prompt_kind": w.prompt_kind,
+                    "anchor_s": w.anchor_s,
+                    "object": obj,
+                    "raw_text": res.text,
+                    "parsed": parsed.model_dump_json(),
+                    "score": score,
+                    "expected_score": es,
+                    "parse_failed": parsed.parse_failed,
+                    "latency_s": res.latency_s,
+                    "truth_target": w.target,
+                }
+            )
+            logf.write(
+                json.dumps(
+                    {
+                        "window_id": wid,
+                        "episode_id": ep.episode_id,
+                        "prompt_kind": w.prompt_kind,
+                        "parse_failed": parsed.parse_failed,
+                        "latency_s": res.latency_s,
+                    }
                 )
-                if parsed.parse_failed:
-                    log.warning("parse failed: %s", wid)
+                + "\n"
+            )
+            if parsed.parse_failed:
+                log.warning("parse failed: %s", wid)
 
     preds = pd.DataFrame(recs)
     preds.to_parquet(out / "predictions.parquet", index=False)
@@ -647,7 +700,10 @@ def run_grid(
     """Run every grid cell without a current metrics.json; return the cells run.
 
     A cell is skipped only if its metrics.json (written last) exists with the current manifest,
-    windows-cache and config hashes; otherwise it is rerun and the reason logged.
+    windows-cache and config hashes; otherwise it is rerun and the reason logged. Cells are
+    grouped by checkpoint (expand_grid order), and one backend lives at a time: when the next
+    checkpoint's backend is created the previous one is ``close()``d if it has that method, so
+    a vLLM engine releases the GPU before the next 56 GB model is loaded.
     """
     done: list[Path] = []
     backends: dict[str, Backend] = {}
@@ -662,6 +718,11 @@ def run_grid(
         if (d / "predictions.parquet").exists() or (d / "metrics.json").exists():
             log.warning("rerun cell %s: %s", d, why)
         if ckpt not in backends:
+            for previous in backends.values():
+                close = getattr(previous, "close", None)
+                if callable(close):
+                    close()
+            backends.clear()
             backends[ckpt] = backend_factory(ckpt)
         done.append(
             run_eval(

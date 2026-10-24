@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pyarrow.parquet as pq
@@ -93,3 +94,71 @@ def test_normalization_verdict_is_pooled() -> None:
     assert report.source_verdicts(p99) == {"normalization": False}
     nodetail = {"a": {"normalization": CheckResult(passed=False, detail="no constants")}}
     assert report.source_verdicts(nodetail) == {"normalization": False}
+
+
+def test_sync_median_gate_is_configurable() -> None:
+    results = {
+        f"e{i}": {"sync": CheckResult(passed=True, value=v, action="shift")}
+        for i, v in enumerate((0.15, -0.15, 0.12))
+    }
+    assert report.source_verdicts(results)["sync_median"] is False  # spec default 0.1 s
+    assert report.source_verdicts(results, sync_median_s=0.2)["sync_median"] is True
+    assert report.source_verdicts(results, sync_median_s=0.1)["sync_median"] is False
+
+
+def test_pooled_normalization_skips_episodes_excluded_from_the_fit() -> None:
+    def _n(grasp: float, excluded: bool = False) -> CheckResult:
+        doc: dict[str, object] = {"grasp": [grasp], "free": [0.0], "p99": [grasp], "problems": []}
+        if excluded:
+            doc["excluded"] = True
+        return CheckResult(passed=True, detail=json.dumps(doc))
+
+    typical = {f"s{i}": {"normalization": _n(1.0)} for i in range(3)}
+    squeezed = {f"f{i}": {"normalization": _n(2.0, excluded=True)} for i in range(3)}
+    assert report.source_verdicts({**typical, **squeezed}) == {"normalization": True}
+    # the same off-scale episodes without the marker fail the pooled verdict (median 1.5)
+    counted = {f"f{i}": {"normalization": _n(2.0)} for i in range(3)}
+    assert report.source_verdicts({**typical, **counted}) == {"normalization": False}
+    # a pool of excluded episodes only has nothing to judge
+    assert report.source_verdicts(squeezed) == {"normalization": False}
+
+
+def test_pooled_grasp_band_is_configurable(tmp_path: Path) -> None:
+    from tactile_flora.force.normalize import ArmNorm, NormConstants
+
+    def _n(grasp: float) -> CheckResult:
+        doc = {"grasp": [grasp], "free": [0.0], "p99": [2.0], "problems": []}
+        return CheckResult(passed=True, detail=json.dumps(doc))
+
+    heavy = {f"e{i}": {"normalization": _n(1.25)} for i in range(3)}
+    assert report.source_verdicts(heavy) == {"normalization": False}
+    assert report.source_verdicts(heavy, norm_grasp_range=(0.8, 1.3)) == {"normalization": True}
+    assert report.source_verdicts(heavy, norm_grasp_range=(0.8, 1.2)) == {"normalization": False}
+    arm = ArmNorm(baseline=0.46, grasp=2.5, sigma=0.08, tau=0.7, scale=2.04, p99_fprime=5.1)
+    norm = NormConstants(source="s", channel="wrist", groups={"all": {"R": arm}})
+    text = report.write_report(
+        "s", heavy, tmp_path, norm=norm, norm_grasp_range=(0.8, 1.3)
+    ).read_text()
+    assert "- normalization: pass" in text and "pooled grasp band [0.8, 1.3]" in text
+    plain = report.write_report("s", heavy, tmp_path / "b", norm=norm).read_text()
+    assert "- normalization: FAIL" in plain and "pooled grasp band [0.8, 1.2]" in plain
+
+
+def test_norm_p99_gate_is_configurable_and_constants_are_reported(tmp_path: Path) -> None:
+    from tactile_flora.force.normalize import ArmNorm, NormConstants
+
+    def _n(p99: float) -> CheckResult:
+        doc = {"grasp": [1.0], "free": [0.0], "p99": [p99], "problems": []}
+        return CheckResult(passed=True, detail=json.dumps(doc))
+
+    heavy_tail = {f"e{i}": {"normalization": _n(44.0)} for i in range(3)}
+    assert report.source_verdicts(heavy_tail) == {"normalization": False}
+    assert report.source_verdicts(heavy_tail, norm_p99_max=60) == {"normalization": True}
+    assert report.source_verdicts(heavy_tail, norm_p99_max=40) == {"normalization": False}
+    arm = ArmNorm(baseline=0.43, grasp=0.69, sigma=0.01, tau=0.46, scale=0.26, p99_fprime=44.0)
+    norm = NormConstants(source="s", channel="pad", groups={"all": {"L": arm}})
+    text = report.write_report("s", heavy_tail, tmp_path, norm_p99_max=60, norm=norm).read_text()
+    assert "- normalization: pass" in text and "gate 60" in text
+    assert "| all | L | 0.43 | 0.69 | 0.01 | 0.46 | threshold (g 0.6) | 44.00 |" in text
+    plain = report.write_report("s", heavy_tail, tmp_path / "b").read_text()
+    assert "- normalization: FAIL" in plain and "Normalization constants" not in plain

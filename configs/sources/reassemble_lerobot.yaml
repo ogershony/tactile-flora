@@ -1,0 +1,33 @@
+name: reassemble_lerobot
+root: data/raw/reassemble_lerobot
+license_allowed: [CC-BY-4.0]
+max_windows: 150
+max_episodes: 300
+eval_only: false
+# Measured on the port (robot-lev/reassemble, 2026-10-22): 131 of 149 recordings contain at
+# least one failed non-idle segment (segment.success == false), so 0.88 of episodes carry a
+# bad label before programmatic events are added. check_label_sanity allows a factor 2.
+expected_label_rate: 0.88
+split_rules:
+  by: port
+  note: meta/splits.json "train" trains; "test" is held out and hashed into val/test by recording date
+  val_fraction: 0.1
+  test_fraction: 0.1
+seed: 0
+# Pooled 99th-percentile-of-F' gate (spec default 3). The gravity-compensated grasp scale on these
+# light parts is about 0.26 N (p10 0.08 N), so a normal 11.8 N peak is F' (11.8 - 0.43) / 0.26
+# = 44; the clip at render.clip_max still bounds the rendered block. See docs/deviations.md 3.
+norm_p99_max: 60
+# Source-level median |force-gripper lag| gate (s); the global default is 0.1. Measured on the
+# full port 2026-10-22 (149 recordings, configs/force.code.yaml): median |lag| 0.225 s, p75
+# 0.325, p90 0.50, max 1.0 (7 recordings pinned at the 1.0 s search bound); 138 of 149 lags are
+# negative (force leads the reported gripper width, median -0.225 s), so this is a systematic
+# port offset that the per-episode sync shift corrects. 0.25 is one dense frame period, the same
+# bound as PHANTOM's 0.2; the per-episode 0.25 s drop rule is unchanged (54 recordings fail it).
+# See docs/deviations.md section 3.
+sync_median_s: 0.25
+# Pooled grasp band for the normalization verdict (spec [0.8, 1.2]). Measured 2026-10-22: the
+# median over recordings of the per-recording grasp median is 1.233 (per-recording p10 0.29, p90
+# 2.13; the fit's frame-weighted pooled median is 1.0 by construction). The typical recording's
+# grasp still renders at level F2 (0.5-1.5). See docs/deviations.md section 3.
+norm_grasp_range: [0.8, 1.3]

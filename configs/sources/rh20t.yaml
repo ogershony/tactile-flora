@@ -9,3 +9,15 @@ split_rules:
   by: session
   note: placeholder until milestone 5
 seed: 0
+# Only these cameras are downloaded (data/colab/fetch_rh20t.py; rh20t_config.json "inhand" names
+# the in-hand serial per config). Keys are matched per config directory, in this order, and the
+# first one a config has becomes the scene view: cfg3 cam_104122062295 (external) with
+# cam_045322071843 (in-hand) as extra; cfg5 cam_036422060215 (external, also the port's first
+# declared camera) with cam_104422070042 (in-hand). Without this list the adapter references the
+# 7-8 undownloaded streams per episode and every episode fails integrity. Whether these two
+# external views frame the workspace well is unverified (inspect data/verified/rh20t/spot).
+cameras:
+  - observation.images.cam_104122062295
+  - observation.images.cam_045322071843
+  - observation.images.cam_036422060215
+  - observation.images.cam_104422070042

@@ -1,12 +1,31 @@
 seed: 0
-checkpoints: [released, data/runs/control, data/runs/force]
-# released and control are force-free models: only the omitted row is meaningful for them.
+checkpoints:
+  [
+    released,
+    data/runs/control,
+    data/runs/force,
+    data/runs/judge,
+    data/runs/judge_control,
+    data/runs/judge_pf,
+    data/runs/judge_pf_control,
+  ]
+# control is a force-free model: only its omitted row is meaningful. The released checkpoint also
+# runs real and shuffled: the 2026-10-22 frozen-model probe on Colab showed it reads the force
+# block (REASSEMBLE balanced accuracy 0.613 omitted, 0.645 real, 0.585 shuffled, McNemar
+# p = 0.014), so its force rows are the no-training baseline for the force adapter. Omitted-only
+# benchmarks (roboreward_500) still cap every checkpoint at omitted. See docs/deviations.md 6.
 checkpoint_modes:
-  released: [omitted]
+  released: [omitted, real, shuffled]
   data/runs/control: [omitted]
+  # the judge control is trained without a force block, so only its omitted row is meaningful
+  data/runs/judge_control: [omitted]
+  # judge_pf_control (train_judge_pf, held-out PHANTOM failures) is likewise force-free
+  data/runs/judge_pf_control: [omitted]
 modes:
   phantom_val: [omitted, zero, real, shuffled, video_blank]
   reassemble_test: [omitted, zero, real, shuffled, video_blank]
+  reassemble_seg_test: [omitted, real, shuffled]
+  phantom_fail_test: [omitted, real, shuffled]
   hrdexdb: [omitted, zero, real, shuffled, video_blank]
   softvtbench: [omitted, zero, real, shuffled, video_blank]
   baxter: [omitted, zero, real, shuffled, video_blank]

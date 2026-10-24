@@ -1,11 +1,24 @@
+# HRDexDB (HRDexDB/HRDexDB @ 98b8f8ea). v4 (2026-10-23): both Inspire hands, tared fingertip force,
+# recorded video timestamps, FLORA-native frames from the pre-rendered cache
+# (scripts/v4/hrdexdb_fetch_render.py), the frozen object split configs/v4/hrdexdb_split.json
+# (scripts/v4/hrdexdb_split.py) and manifests from scripts/v4/prepare_hrdexdb_v4.py. Still
+# eval_only by default: training on it needs TrainConfig.trainable_eval_sources: [hrdexdb].
+# hrdexdb_cameras is the collage (first = scene); set from the zero-shot camera study on TRAIN
+# clips only (docs/v4/plan.md, Phase 2).
 name: hrdexdb
 root: data/raw/hrdexdb
 license_allowed: [CC-BY-NC-4.0]
 max_windows: 0
 max_episodes: 0
 eval_only: true
-expected_label_rate: 0.5
+expected_label_rate: 0.3
 split_rules:
-  by: session
-  note: placeholder until milestone 5
+  by: object
+  note: configs/v4/hrdexdb_split.json (frozen 2026-10-23)
 seed: 0
+hrdexdb_use_video_timestamps: true
+hrdexdb_force_representation: tared
+hrdexdb_tare_s: 1.0
+hrdexdb_cameras: ["22641005"]
+hrdexdb_frames_root: data/frames/hrdexdb
+hrdexdb_task_template: "Grasp the {object}, lift it off the table and hold it in the air for 10 seconds."

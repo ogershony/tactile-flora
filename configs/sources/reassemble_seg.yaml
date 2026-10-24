@@ -1,0 +1,41 @@
+# Segment-level view of the REASSEMBLE LeRobot port for the failure judge (added 2026-10-22):
+# one episode per qualifying segment of the same recordings as reassemble_lerobot, outcome
+# prompts only. See sources/reassemble_lerobot.py (segment mode) and docs/deviations.md 7.
+name: reassemble_seg
+root: data/raw/reassemble_lerobot
+license_allowed: [CC-BY-4.0]
+# No train thinning: the balanced selection below is the sampling rule (train 1,146 segments).
+max_windows: 0
+max_episodes: 0
+eval_only: false
+episode_unit: segment
+# The E0b protocol (data/colab/e0b_reassemble_force.py): a segment qualifies when its task is
+# not "No action." and its last frame is >= 1.0 s after its first; per port split every failed
+# segment plus up to 2x as many successes after a seed-0 shuffle, the test split capped at 450.
+# Measured on the local port 2026-10-22: test 37 recordings, 1,110 qualifying segments, 133
+# failures -> 399 clips (the Colab set, same ids in the same order); train 111 recordings,
+# 3,432 segments, 382 failures -> 1,146 episodes.
+segment_select:
+  min_duration_s: 1.0
+  success_multiple: 2
+  max_total: {test: 450}
+  seed: 0
+# Failed segments are one third of each split by construction (133/399, 382/1146).
+expected_label_rate: 0.333
+split_rules:
+  by: port
+  note: meta/splits.json "test" recordings are test, every other recording trains (no val)
+seed: 0
+# Recording-level checks and the pooled normalization constants are reused from
+# data/verified/reassemble_lerobot/ (checks.parquet, norm.json): integrity, sensor_health, sync,
+# normalization and overlap are inherited per parent recording; label_sanity, spot_check,
+# prompt_diff, holdout and license run on the segments. "record" keeps the segments of the 54
+# recordings dropped by the per-episode 0.25 s sync rule and of the sensor-health drops (their
+# failures stay visible in checks.parquet; the force is rendered unshifted for them) so that the
+# test split is the complete E0b set. Segment-weighted median |lag| 0.200 s (2026-10-22).
+verify_from: reassemble_lerobot
+inherited_drops: record
+# Same gates as reassemble_lerobot (the inherited stats are the parent's).
+norm_p99_max: 60
+sync_median_s: 0.25
+norm_grasp_range: [0.8, 1.3]

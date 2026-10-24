@@ -9,3 +9,7 @@ split_rules:
   by: session
   note: placeholder until milestone 5
 seed: 0
+# Source-level median |force-gripper lag| gate (s); the global default is 0.1. The dense frame
+# grid is 0.25 s and the measured median on the local subset is 0.15 s (p90 0.275 s); the
+# per-episode 0.25 s drop rule is unchanged. See docs/deviations.md section 3.
+sync_median_s: 0.2

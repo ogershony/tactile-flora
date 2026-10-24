@@ -1,0 +1,13 @@
+# coverage subset (HRDexDB test trials whose video covers the sensor timeline within 0.5 s); AUROC and paired dAUROC only (columns cut at 79 in the terminal)
+force_classifier|hrdexdb_v4_test_covered|none  AU 0.774 [0.707,0.823]
+released|hrdexdb_v4_test_covered|omitted       AU 0.779 [0.727,0.822]
+released|hrdexdb_v4_test_covered|real          AU 0.849 [0.804,0.887]
+v4_control|hrdexdb_v4_test_covered|omitted     AU 0.963 [0.938,0.982]
+v4_force|hrdexdb_v4_test_covered|omitted       AU 0.961 [0.938,0.979]
+v4_force|hrdexdb_v4_test_covered|real          AU 0.953 [0.925,0.976]
+v4_force|hrdexdb_v4_test_covered|shuffled      AU 0.956 [0.924,0.979]
+hrdexdb_v4_test_covered|primary                dAU +0.174 [+0.133,+0.219]
+hrdexdb_v4_test_covered|force vs control       dAU -0.009 [-0.030,+0.005]
+hrdexdb_v4_test_covered|fine-tuning alone      dAU +0.184 [+0.141,+0.229]
+hrdexdb_v4_test_covered|real vs shuffled force dAU -0.003 [-0.014,+0.010]
+hrdexdb_v4_test_covered|real vs no force       dAU -0.008 [-0.025,+0.004]

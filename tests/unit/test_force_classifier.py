@@ -99,3 +99,46 @@ def test_summary_line_shows_classifier_probability(tmp_path) -> None:
     assert "force-only classifier P(success)=" in scored
     value = float(scored.rsplit("=", 1)[1])
     assert 0.0 <= value <= 1.0
+
+
+def test_code_block_puts_the_classifier_line_under_the_summary_for_its_source_only(
+    tmp_path,  # type: ignore[no-untyped-def]
+) -> None:
+    pytest.importorskip("sklearn")
+    from pathlib import Path
+
+    from tactile_flora.config import ForceConfig, load_config
+    from tactile_flora.force import render
+
+    feats = [_features(i, strong=i % 3 != 0) for i in range(40)]
+    X = np.stack([C.extract_features(f) for f in feats])
+    y = np.asarray([int(i % 3 != 0) for i in range(40)])
+    ids = [f"ep{i}" for i in range(40)]
+    groups = [f"rec{i // 4}" for i in range(40)]
+    scorer = C.fit_cv(X, y, groups, ids, source="src", params={"n_estimators": 10})
+    path = tmp_path / "clf.json"
+    scorer.save(path)
+    root = Path(__file__).resolve().parents[2]
+    code = load_config(root / "configs" / "force.code.yaml", ForceConfig).render
+    cfg = code.model_copy(update={"classifier_json": str(path)})
+    assert render.classifier_line(code, feats[0], "src", "ep0") is None  # no scorer configured
+    assert render.classifier_line(cfg, feats[0], "other", "ep0") is None  # another source
+    line = render.classifier_line(cfg, feats[3], "src", "ep3")
+    k = scorer.fold_of_episode["ep3"]
+    assert (
+        line == f"Force-only classifier P(success)={scorer.fold_models[k].predict_proba(X[3]):.2f}"
+    )
+    lines = render.render_lines(feats[3], feats[3].frame_times, "pad", cfg=cfg)
+    block = render.render_block(lines, cfg, feats[3], "ep3", source="src").split("\n")
+    assert block[0] == cfg.header_code and block[1].startswith("Summary ") and block[2] == line
+    assert block[3:] == lines
+    # another source: same block without the classifier line
+    other = render.render_block(lines, cfg, feats[3], "ep3", source="other").split("\n")
+    assert other == block[:2] + block[3:]
+    # compact: header_compact, summary, classifier line, no frame lines
+    compact = cfg.model_copy(update={"frame_lines": False})
+    assert render.render_block(lines, compact, feats[3], "ep3", source="src").split("\n") == [
+        compact.header_compact,
+        block[1],
+        line,
+    ]

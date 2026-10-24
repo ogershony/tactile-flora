@@ -1,0 +1,14 @@
+{
+ "0": {
+  "recording": "2025-01-11-14-45-48",
+  "split": "train"
+ },
+ "1": {
+  "recording": "2025-01-13-11-16-17",
+  "split": "test"
+ },
+ "2": {
+  "recording": "2025-01-10-16-17-40",
+  "split": "unassigned"
+ }
+}

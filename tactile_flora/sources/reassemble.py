@@ -28,7 +28,8 @@ Resolved open questions (verified 2026-10-21, docs/research/datasets.md):
 - Clock: zero is ``timestamps/hama1[0]``; the offset is stored in ``meta["clock_offset_s"]`` and
   subtracted from every stream and segment time.
 - Anomaly format: there is NO span/frame anomaly annotation. Only per-segment ``success`` and
-  the README known-issues table (``KNOWN_ISSUES`` below, exposed in ``meta["known_issues"]``).
+  the README known-issues table plus two measured additions (``KNOWN_ISSUES`` below, exposed
+  in ``meta["known_issues"]``; the LeRobot-port adapter reads the same table by recording stem).
   native_labels() returns one ``event`` Label whose spans are the segments (quality 3 if
   success else 1, rationale = segment text); labels/mapping.py may ignore or re-map them.
 - Session = recording date (file name ``YYYY-MM-DD``); splits by date (hash, see split_rules).
@@ -72,6 +73,12 @@ KNOWN_ISSUES: dict[str, list[str]] = {
     "2025-01-11-15-35-08": ["ft_invalid_last_action"],
     "2025-01-13-11-16-17": ["gripper_broke_last_action"],
     "2025-01-13-11-18-57": ["pose_unavailable_last_action"],
+    # Not in the README table. Same signature as the three ft_invalid_last_action files above:
+    # the gravity-compensated force offset is confined to the last idle segment (6.4 N and
+    # 3.9 N there, below 0.6 N in the first idle segment). Measured on the LeRobot port with
+    # scripts/measure_reassemble_force_keys.py (2026-10-22, all 149 recordings).
+    "2025-01-13-18-06-08": ["ft_invalid_last_action"],
+    "2025-01-13-18-16-38": ["ft_invalid_last_action"],
 }
 EXTRACTED_DIR = "extracted"
 VIDEO_ROLES = {"hama1": "scene", "hama2": "scene_2", "hand": "wrist_right"}

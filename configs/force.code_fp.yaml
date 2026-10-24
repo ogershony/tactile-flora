@@ -1,0 +1,59 @@
+# force.code.yaml plus the REASSEMBLE force-only classifier line (added 2026-10-22, judge_fp):
+# scripts/fit_force_classifier.py fits it on the reassemble_seg rows of train_judge_pf (grouped
+# 5-fold by recording, out-of-fold for training episodes; OOF AUROC 0.869) and its full model
+# scores reassemble_seg_test at AUROC 0.815. Other sources render without the line.
+# Same as configs/force.yaml except render.format is "code" and the token budget is sized for it.
+# Measured 2026-10-21 with the Qwen3.5 tokenizer (digits one per character) on 64-line fixture
+# windows (t = 0.00 to 15.75), legend header and summary line included:
+#   one-arm pad    19-21 tokens per line, block 1,473 real (0.72 tokens/char fallback: 1,751)
+#   one-arm wrist  17-19 tokens per line, block 1,345 real (fallback 1,613)
+#   two-arm pad    27-30 tokens per line, block 2,077 real (fallback 2,267)
+#   worst case, two-arm pad with four-digit frame times: 31 per line, 2,200 real (fallback 2,397)
+# 2500 admits every 64-line window, two-arm pad included (decimal needs 3000 and rejects two-arm).
+resample:
+  half_window_s: 0.125
+  frame_period_s: 0.25
+  group_period_s: 0.5
+  raw_rate_hz: 100.0
+  contact_sigma: 3.0
+render:
+  format: code
+  header: "Force (normalized: 0 free space, 1 median grasp, max 3):"
+  decimals: 2
+  max_tokens: 2500
+  # Real runs set this to the Qwen3.5 tokenizer.json path so budget checks use the real count.
+  tokenizer_json: null
+  clip_max: 3.0
+  # Thresholds in normalized units: F' (1.0 = median grasp), dF' per second, gripper g in [0, 1].
+  # levels: F' cut points between levels 1|2, 2|3, 3|4 (level 0 = no contact).
+  # asym_frac: |delta'| / F' above which one pad dominates (A = a or b, else =).
+  # trend_up / trend_down / sharp_drop: dF' cut points for + / - / ! (sharp_drop = events.slip_df).
+  # closure: g cut points between o|m and m|c.
+  header_code: "Force code per frame (F force level: 0 none, 1 light, 2 median grasp, 3 firm, 4 crush-level; levels are relative to this object's typical grasp (F2 = this object's median grasp); A pad asymmetry a/b/=; T trend +/0/-/! sharp drop; C contact 0/1; G gripper o open/m mid/c closed):"
+  summary: true
+  levels: [0.5, 1.5, 2.5]
+  asym_frac: 0.3
+  trend_up: 1.0
+  trend_down: -1.0
+  sharp_drop: -2.0
+  closure: [0.3, 0.6]
+  classifier_json: data/verified/reassemble_seg/force_classifier.json
+normalize:
+  # Gripper closure above which a frame is a grasp frame for the normalization fit. A group
+  # (PHANTOM object family; "all" elsewhere) in which fewer than min_group_frac of the fitted
+  # episodes have such a frame falls back to its 75th percentile of g, recorded in norm.json as
+  # grasp_rule: p75 (force/normalize.py). Episodes with meta.exclude_from_norm_fit (PHANTOM
+  # failure demos) never feed the fit.
+  grasp_g: 0.6
+  min_group_frac: 0.25
+events:
+  grasp_g: 0.6
+  grasp_f: 0.5
+  grasp_window_s: 0.5
+  slip_df: -2.0
+  slip_min_s: 0.1
+  slip_g_tol: 0.02
+  contact_loss_s: 0.3
+  regrasp_window_s: 3.0
+  crush_f: 2.0
+  off_axis_delta: 0.6

@@ -6,6 +6,10 @@ dataset it is reading (field choices belong to the adapters).
 
 Video note: v3 concatenates many episodes into one mp4; ``video()`` therefore returns the file
 path plus the episode's ``from_timestamp`` inside it (adapters store that in ``meta``).
+
+Data files are read whole and the last ``TABLE_CACHE`` of them kept in memory (an RH20T file is
+120-150 MB in Arrow and holds 500-800 episodes; filtering it in memory costs 10 ms where a
+filtered parquet read costs 250 ms, and verify loads every episode four times).
 """
 
 from __future__ import annotations
@@ -16,11 +20,14 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
+import pyarrow.compute as pc
 import pyarrow.parquet as pq
 
 from tactile_flora.sources._common import py
 
 DEFAULT_DATA_PATH = "data/chunk-{chunk_index:03d}/file-{file_index:03d}.parquet"
+TABLE_CACHE = 2  # data files kept in memory per dataset (most recently read)
 DEFAULT_VIDEO_PATH = "videos/{video_key}/chunk-{chunk_index:03d}/file-{file_index:03d}.mp4"
 
 
@@ -32,6 +39,7 @@ class LeRobotV3:
         self.info: dict[str, Any] = json.loads((root / "meta" / "info.json").read_text())
         self.fps = float(self.info.get("fps", 30))
         self._records = self._read_episode_records()
+        self._tables: dict[Path, pa.Table] = {}
 
     # -- metadata ---------------------------------------------------------------------
     def _read_episode_records(self) -> dict[int, dict[str, Any]]:
@@ -86,10 +94,18 @@ class LeRobotV3:
             path = self.root / tmpl.format(
                 chunk_index=int(rec["data/chunk_index"]), file_index=int(rec["data/file_index"])
             )
-        df = pq.read_table(path, filters=[("episode_index", "==", idx)]).to_pandas()
+        df = self._table(path).filter(pc.field("episode_index") == idx).to_pandas()
         if "frame_index" in df.columns:
             df = df.sort_values("frame_index").reset_index(drop=True)
         return df
+
+    def _table(self, path: Path) -> pa.Table:
+        """Return the whole data file at ``path`` (cached, most recent TABLE_CACHE files)."""
+        if path not in self._tables:
+            if len(self._tables) >= TABLE_CACHE:
+                del self._tables[next(iter(self._tables))]
+            self._tables[path] = pq.read_table(path)
+        return self._tables[path]
 
     def video(self, idx: int, key: str) -> tuple[Path, float]:
         """Return (mp4 path, from_timestamp seconds inside that file) for one camera."""

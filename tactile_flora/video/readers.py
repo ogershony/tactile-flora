@@ -1,6 +1,7 @@
 """The FrameReader implementations: PyAV (mp4), zarr JPEG (PHANTOM), synthetic (tests), auto.
 
-Owns: PyAVReader, ZarrJpegReader, SyntheticReader, AutoReader, SourceRootReader, smooth_image.
+Owns: PyAVReader, ZarrJpegReader, FrameCacheReader, SyntheticReader, AutoReader, SourceRootReader,
+smooth_image.
 Must never: compose mosaics (video/mosaic.py does), decide whether an episode is accepted, or
 read anything but the files a ``VideoRef`` names.
 
@@ -12,6 +13,10 @@ LeRobot v3 mp4s hold many episodes back to back; ``meta["video_from_s"][role]`` 
 start of this episode, so episode frame ``i`` is in-file frame ``round((video_from_s + i / fps)
 * fps)``. PHANTOM scene video is a zarr group (``VideoRef.path`` is a directory ending in
 ``camera_scene_color``) whose ``data`` array holds one JPEG byte string per frame.
+
+A pre-rendered frame cache (scripts/v4/hrdexdb_fetch_render.py) is a camera directory of
+``<index:05d>.jpg`` files next to a ``video.json``; only the indices the outcome sampling needs
+exist, already at the collage cell size. ``VideoRef.path`` is the camera directory.
 """
 
 from __future__ import annotations
@@ -29,13 +34,30 @@ from tactile_flora.video.zarr_compat import open_group
 
 ZARR_SUFFIX = "camera_scene_color"
 _RESEEK_GAP = 64  # decode forward through gaps up to this many frames, otherwise seek again
+_TAIL_SLACK = 2  # frames a header may count past the last decodable frame (see read_many)
+# FrameCacheReader: how far the nearest rendered frame may be from the wanted index. Each camera
+# is rendered at its own outcome indices, while a collage reads every view at the first camera's
+# indices; HRDexDB streams of one trial differ by up to 2 frames (1 trial of 1,204), which with
+# rounding puts the nearest rendered frame up to 3 frames (100 ms at 30 fps) away.
+_CACHE_SLACK = 3
 SIZE = 64
 
 
 def video_path(root: Path, episode: Episode, role: str) -> Path:
-    """Resolve ``episode.cameras[role].path`` (relative paths hang off ``root``)."""
+    """Resolve ``episode.cameras[role].path``.
+
+    Absolute paths are used as they are. A relative path normally hangs off ``root``; the LeRobot
+    adapters, however, store paths that already start with the source root (``data/raw/<src>/...``,
+    relative to the working directory): when ``root / p`` does not exist but ``p`` does, ``p``
+    is used.
+    """
     p = Path(episode.cameras[role].path)
-    return p if p.is_absolute() else root / p
+    if p.is_absolute():
+        return p
+    joined = root / p
+    if not joined.exists() and p.exists():
+        return p
+    return joined
 
 
 def file_offset_frames(episode: Episode, role: str) -> int:
@@ -113,8 +135,10 @@ class PyAVReader(_Base):
                 ptr = 0
                 while ptr < len(wanted):
                     c.seek(t0 + int(wanted[ptr] / rate / tb), stream=s, backward=True)
+                    last: tuple[int, Any] | None = None  # the last decoded frame of this pass
                     for frame in c.decode(s):
                         idx = round((int(frame.pts or 0) - t0) * tb * rate)
+                        last = (idx, frame)
                         if idx < wanted[ptr]:
                             continue
                         img = np.asarray(frame.to_ndarray(format="rgb24"), dtype=np.uint8)
@@ -125,7 +149,15 @@ class PyAVReader(_Base):
                             break
                     else:
                         if ptr < len(wanted):
-                            raise IndexError(f"frame {wanted[ptr]} not found in {path}")
+                            # Headers can count frames the decoder never returns (a RoboRewardBench
+                            # h264 clip: header 135, 134 decodable); wanted frames at most
+                            # _TAIL_SLACK past the last decoded one get that frame.
+                            if last is None or wanted[-1] - last[0] > _TAIL_SLACK:
+                                raise IndexError(f"frame {wanted[ptr]} not found in {path}")
+                            img = np.asarray(last[1].to_ndarray(format="rgb24"), dtype=np.uint8)
+                            for i in wanted[ptr:]:
+                                found[i] = img
+                            ptr = len(wanted)
         return [found[_file_index(episode, role, int(i))] for i in indices]
 
 
@@ -182,6 +214,49 @@ def smooth_image(seed_key: str, size: int = SIZE) -> np.ndarray:
     return img * 255
 
 
+def is_frame_cache(p: Path) -> bool:
+    """Return True for a pre-rendered camera directory (``<episode>/<camera>/`` by video.json)."""
+    return p.is_dir() and (p.parent / "video.json").is_file()
+
+
+class FrameCacheReader(_Base):
+    """Pre-rendered JPEG frames: ``<camera dir>/<index:05d>.jpg``.
+
+    An index that was not rendered (a rounding tie between two sampling rules, or a view whose
+    stream is a frame or two longer than the first camera's) reads the nearest rendered index;
+    anything farther than ``_CACHE_SLACK`` frames away is an error.
+    """
+
+    def __init__(self, root: Path | str = ".") -> None:
+        """Relative camera paths resolve against ``root``."""
+        self.root = Path(root)
+        self._have: dict[Path, list[int]] = {}
+
+    def _indices(self, p: Path) -> list[int]:
+        if p not in self._have:
+            self._have[p] = sorted(int(f.stem) for f in p.glob("*.jpg"))
+        return self._have[p]
+
+    def frame_count(self, episode: Episode, role: str) -> int:
+        """Return the source stream's frame count (the VideoRef's, from video.json)."""
+        return episode.cameras[role].n_frames
+
+    def read_many(self, episode: Episode, role: str, indices: Sequence[int]) -> list[np.ndarray]:
+        """Load the JPEG at each index (nearest rendered index within ``_CACHE_SLACK``)."""
+        from PIL import Image
+
+        p = video_path(self.root, episode, role)
+        have = np.asarray(self._indices(p))
+        out: list[np.ndarray] = []
+        for i in indices:
+            j = int(have[np.abs(have - int(i)).argmin()]) if have.size else -1
+            if j < 0 or abs(j - int(i)) > _CACHE_SLACK:
+                raise FileNotFoundError(f"{p}: frame {i} was not rendered")
+            with Image.open(p / f"{j:05d}.jpg") as img:
+                out.append(np.asarray(img.convert("RGB"), dtype=np.uint8))
+        return out
+
+
 class SyntheticReader(_Base):
     """In-memory frames derived from the episode id (tests); no video files.
 
@@ -214,16 +289,19 @@ class SyntheticReader(_Base):
 
 
 class AutoReader(_Base):
-    """Dispatch on the VideoRef path: a zarr group directory goes to ZarrJpegReader, else PyAV."""
+    """Dispatch on the VideoRef path: a frame cache, a zarr group directory, else PyAV (mp4)."""
 
     def __init__(self, root: Path | str = ".") -> None:
-        """Both underlying readers resolve relative paths against ``root``."""
+        """Resolve the underlying readers' relative paths against ``root``."""
         self.root = Path(root)
         self._av = PyAVReader(self.root)
         self._zarr = ZarrJpegReader(self.root)
+        self._cache = FrameCacheReader(self.root)
 
-    def _pick(self, episode: Episode, role: str) -> PyAVReader | ZarrJpegReader:
+    def _pick(self, episode: Episode, role: str) -> PyAVReader | ZarrJpegReader | FrameCacheReader:
         p = video_path(self.root, episode, role)
+        if is_frame_cache(p):
+            return self._cache
         if p.is_dir() or p.name.endswith(ZARR_SUFFIX):
             return self._zarr
         return self._av

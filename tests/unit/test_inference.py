@@ -1,5 +1,6 @@
 import math
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
@@ -148,3 +149,91 @@ def test_hf_generation_with_fp32_deltanet_and_bf16_weights() -> None:
     # The tokenizer EOS differs from model EOS=127; it must stop after one token.
     assert generated.text == "126"
     assert all(p.dtype == torch.float32 for n, p in model.named_parameters() if "linear_attn" in n)
+
+
+def _fake_model_dir(path: Path) -> Path:
+    path.mkdir(parents=True, exist_ok=True)
+    (path / "config.json").write_text("{}")
+    (path / "model.safetensors.index.json").write_text("{}")
+    return path
+
+
+def test_merged_model_dir_resolution(tmp_path: Path) -> None:
+    run = tmp_path / "runs" / "force"
+    (run / "adapter").mkdir(parents=True)
+    with pytest.raises(I.MergedModelMissingError, match="merge-adapter --run"):
+        I.merged_model_dir(str(run))
+    with pytest.raises(I.MergedModelMissingError):
+        I.VLLMBackend(str(run))
+    merged = _fake_model_dir(run / "merged")
+    for ck in (run, run / "adapter", run / "merged"):
+        assert I.merged_model_dir(str(ck)) == merged
+    assert I.is_model_dir(merged) and not I.is_model_dir(run)
+    # a single-file checkpoint counts too
+    (merged / "model.safetensors.index.json").rename(merged / "model.safetensors")
+    assert I.is_model_dir(merged)
+
+
+def test_make_backend_checkpoint_resolution(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    run = tmp_path / "runs" / "force"
+    _fake_model_dir(run / "merged")
+    monkeypatch.delenv(I.MODEL_DIR_ENV, raising=False)
+    vl = I.make_backend("vllm", str(run))
+    assert isinstance(vl, I.VLLMBackend) and vl.model_path == str(run / "merged")
+    rel = I.make_backend("vllm")
+    assert isinstance(rel, I.VLLMBackend) and rel.model_path == I.MODEL_ID
+    local = tmp_path / "snap"
+    with_dir = I.make_backend("vllm", model_dir=str(local))
+    assert isinstance(with_dir, I.VLLMBackend) and with_dir.model_path == str(local)
+    monkeypatch.setenv(I.MODEL_DIR_ENV, "/content/models/Flora-Rewarder")
+    assert I.VLLMBackend().model_path == "/content/models/Flora-Rewarder"
+    assert I.VLLMBackend(model_dir=str(local)).model_path == str(local)  # argument wins
+    assert I.VLLMBackend(str(run)).model_path == str(run / "merged")  # env ignored for runs
+    # HFBackend is unchanged: it merges the run's adapter itself and never needs merged/
+    hf = I.make_backend("hf", str(tmp_path / "runs" / "control"))
+    assert isinstance(hf, I.HFBackend)
+    assert hf.adapter == str(tmp_path / "runs" / "control") and hf.model_id == I.MODEL_ID
+    with pytest.raises(I.MergedModelMissingError):
+        I.make_backend("vllm", str(tmp_path / "runs" / "control"))
+    assert I.VLLMBackend().close() is None  # nothing loaded: a no-op
+
+
+def test_vllm_generate_many_keeps_request_order(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Batched answers line up with their requests (chunking, prefetch, last partial chunk)."""
+    calls: list[int] = []
+
+    def fake_clip(ep, video, reader):  # noqa: ANN001, ANN202
+        return np.full((1, 1, 1, 3), int(video.frame_times[0]), dtype=np.uint8)
+
+    class Out:
+        def __init__(self, k: int) -> None:
+            self.outputs = [SimpleNamespace(text=f"Score: {k % 5 + 1}", token_ids=[], logprobs=None)]
+
+    class FakeLLM:
+        def generate(self, prompts, params, use_tqdm=False):  # noqa: ANN001, ANN202
+            assert len(prompts) == len(params)
+            calls.append(len(prompts))
+            return [Out(int(p["multi_modal_data"]["video"][0][0, 0, 0, 0])) for p in prompts]
+
+        def get_tokenizer(self):  # noqa: ANN202
+            return None
+
+    monkeypatch.setattr(I, "clip_array", fake_clip)
+    monkeypatch.setattr(I, "_video_metadata", lambda video, episode: {})
+    be = I.VLLMBackend("released")
+    be._llm = FakeLLM()
+    be._processor = SimpleNamespace(apply_chat_template=lambda m, **kw: "prompt")
+    monkeypatch.setattr(I.VLLMBackend, "_params", staticmethod(lambda r, n, k: (r, n, k)))
+    ep = make_pad_episode(0)
+    reqs = []
+    for k in range(19):
+        w = window("outcome").model_copy(update={"frame_times": (float(k),) * 8})
+        b = build_prompt(w, None, camera_roles=("scene",), fps=4.0)
+        reqs.append(I.GenRequest(to_messages(b), b.video, None, 12, 0, ep))
+    got = [r.text for r in be.generate_many(reqs, batch=8, workers=3)]
+    assert got == [f"Score: {k % 5 + 1}" for k in range(19)]
+    assert calls == [8, 8, 3]
+    with pytest.raises(RuntimeError, match="needs the episode"):
+        list(be.generate_many([reqs[0]._replace(episode=None)], batch=8))

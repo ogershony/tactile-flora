@@ -1,0 +1,23 @@
+# scripts/v4/summarize_results.py data/eval/results.json hrdexdb_v4_test (Colab, 2026-10-24 02:57 UTC; chain4_done 02:54:59)
+# transcribed from the terminal; lines rejoined where the terminal wrapped them
+force_classifier|hrdexdb_v4_test|none                AU 0.751 [0.691,0.799] PR 0.657 BA 0.642 FR 0.364 SR 0.921 F80 0.570 F90 0.404 MAE 1.10 n 428/151
+fusion_released|hrdexdb_v4_test|none                 AU 0.829 [0.776,0.870] PR 0.791 BA nan FR nan SR nan F80 0.702 F90 0.596 MAE nan n 428/151
+fusion_v4_control|hrdexdb_v4_test|none               AU 0.916 [0.885,0.943] PR 0.889 BA nan FR nan SR nan F80 0.868 F90 0.755 MAE nan n 428/151
+hand_prior|hrdexdb_v4_test|none                      AU 0.547 [0.475,0.610] PR 0.377 BA 0.500 FR 0.000 SR 1.000 F80 0.000 F90 0.000 MAE 1.41 n 428/151
+released|hrdexdb_v4_test|omitted                     AU 0.783 [0.739,0.827] PR 0.797 BA 0.672 FR 0.344 SR 1.000 F80 0.675 F90 0.636 MAE 1.84 n 428/151
+released|hrdexdb_v4_test|real                        AU 0.838 [0.787,0.881] PR 0.831 BA 0.732 FR 0.464 SR 1.000 F80 0.722 F90 0.662 MAE 1.63 n 428/151
+v4_control|hrdexdb_v4_test|omitted                   AU 0.964 [0.943,0.980] PR 0.955 BA 0.913 FR 0.848 SR 0.978 F80 0.934 F90 0.881 MAE 0.27 n 428/151
+v4_force|hrdexdb_v4_test|omitted                     AU 0.963 [0.943,0.978] PR 0.951 BA 0.907 FR 0.828 SR 0.986 F80 0.901 F90 0.868 MAE 0.28 n 428/151
+v4_force|hrdexdb_v4_test|real                        AU 0.956 [0.932,0.975] PR 0.947 BA 0.912 FR 0.841 SR 0.982 F80 0.901 F90 0.881 MAE 0.27 n 428/151
+v4_force|hrdexdb_v4_test|shuffled                    AU 0.958 [0.930,0.976] PR 0.950 BA 0.917 FR 0.848 SR 0.986 F80 0.921 F90 0.868 MAE 0.25 n 428/151
+hrdexdb_v4_test|primary                              dAU +0.173 [+0.131,+0.215] p 7.6e-12 dBA +0.239 dFR +0.497 McN 75/5 p 4.3e-17
+hrdexdb_v4_test|force vs control                     dAU -0.008 [-0.023,+0.004] p 2.1e-01 dBA -0.002 dFR -0.007 McN 6/6 p 1.0e+00
+hrdexdb_v4_test|fine-tuning alone                    dAU +0.181 [+0.138,+0.224] p 3.6e-13 dBA +0.241 dFR +0.503 McN 76/6 p 1.6e-16
+hrdexdb_v4_test|real vs shuffled force               dAU -0.001 [-0.011,+0.010] p 8.2e-01 dBA -0.005 dFR -0.007 McN 1/3 p 6.2e-01
+hrdexdb_v4_test|real vs no force                     dAU -0.006 [-0.018,+0.003] p 2.1e-01 dBA +0.005 dFR +0.013 McN 3/2 p 1.0e+00
+hrdexdb_v4_test|vs released + force text             dAU +0.118 [+0.083,+0.159] p 1.8e-10 dBA +0.180 dFR +0.377 McN 57/5 p 3.1e-12
+hrdexdb_v4_test|vs force classifier alone            dAU +0.206 [+0.164,+0.256] p 4.0e-20 dBA +0.269 dFR +0.477 McN 95/6 p 1.1e-21
+hrdexdb_v4_test|vs late fusion, released + classifier dAU +0.128 [+0.096,+0.168] p 1.5e-12 dBA +nan dFR +nan McN 0/0 p nan
+hrdexdb_v4_test|vs late fusion, control + classifier dAU +0.040 [+0.025,+0.058] p 1.2e-05 dBA +nan dFR +nan McN 0/0 p nan
+hrdexdb_v4_test|force text, no training              dAU +0.055 [+0.025,+0.087] p 5.5e-04 dBA +0.060 dFR +0.119 McN 19/1 p 4.0e-05
+HOLM {'reassemble_seg_test': '1.5e-20', 'hrdexdb_v4_test': '1.5e-11', 'phantom_fail_test': '2.0e-01'}

@@ -33,7 +33,9 @@ Resolved open questions (verified 2026-10-21, docs/research/datasets.md; NOT LeR
 - Unverified: whether newer exports use zarr v2 or v3 stores (zarr>=3 reads both).
 
 meta keys read by labels/mapping.py: success, failure_demo, task_folder, tactile_contact, object,
-peak_force_N. Also provided: operator, max_contact_mm2, tags, manifest_split, clock_offset_s.
+peak_force_N. ``exclude_from_norm_fit`` (= failure_demo) tells verify to leave the episode out
+of the normalization fit (force/normalize.py). Also provided: operator, max_contact_mm2, tags,
+manifest_split, clock_offset_s.
 """
 
 from __future__ import annotations
@@ -195,6 +197,8 @@ class PhantomAdapter:
             "tags": py(meta_json.get("tags", [])),
             "clock_offset_s": offset,
             "manifest_split": row.get("split"),
+            # failure demos (over-squeeze, under-grasp) must not define the "typical grasp"
+            "exclude_from_norm_fit": failure_demo,
             "native_saturation": native_saturation,
             "native_max_counts": native_max_counts,
             "native_timing": native_timing,

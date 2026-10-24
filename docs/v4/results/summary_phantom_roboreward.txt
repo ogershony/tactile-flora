@@ -1,0 +1,18 @@
+# scripts/v4/summarize_results.py data/eval/results.json phantom_fail_test / roboreward (Colab, 2026-10-24 ~03:02 UTC); wrapped lines rejoined
+released|phantom_fail_test|omitted                   AU 0.512 [0.307,0.702] PR 0.663 BA 0.525 FR 0.050 SR 1.000 F80 0.350 F90 0.350 MAE 1.88 n 40/20
+released|phantom_fail_test|real                      AU 0.522 [0.336,0.720] PR 0.680 BA 0.625 FR 0.300 SR 0.950 F80 0.400 F90 0.400 MAE 1.55 n 40/20
+v4_control|phantom_fail_test|omitted                 AU 0.662 [0.473,0.821] PR 0.674 BA 0.700 FR 0.650 SR 0.750 F80 0.600 F90 0.200 MAE 1.20 n 40/20
+v4_force|phantom_fail_test|omitted                   AU 0.585 [0.393,0.763] PR 0.651 BA 0.575 FR 0.150 SR 1.000 F80 0.300 F90 0.250 MAE 1.70 n 40/20
+v4_force|phantom_fail_test|real                      AU 0.585 [0.378,0.757] PR 0.689 BA 0.550 FR 0.400 SR 0.700 F80 0.400 F90 0.350 MAE 1.80 n 40/20
+v4_force|phantom_fail_test|shuffled                  AU 0.585 [0.395,0.755] PR 0.669 BA 0.575 FR 0.400 SR 0.750 F80 0.400 F90 0.350 MAE 1.70 n 40/20
+phantom_fail_test|primary                            dAU +0.073 [-0.038,+0.188] p 2.0e-01 dBA +0.025 dFR +0.350 McN 7/6 p 1.0e+00
+phantom_fail_test|force vs control                   dAU -0.078 [-0.251,+0.098] p 3.9e-01 dBA -0.150 dFR -0.250 McN 4/10 p 1.8e-01
+phantom_fail_test|fine-tuning alone                  dAU +0.150 [-0.023,+0.336] p 9.9e-02 dBA +0.175 dFR +0.600 McN 12/5 p 1.4e-01
+phantom_fail_test|real vs shuffled force             dAU -0.000 [-0.129,+0.118] p 1.0e+00 dBA -0.025 dFR +0.000 McN 3/4 p 1.0e+00
+phantom_fail_test|real vs no force                   dAU -0.000 [-0.161,+0.151] p 1.0e+00 dBA -0.025 dFR +0.250 McN 5/6 p 1.0e+00
+phantom_fail_test|vs released + force text           dAU +0.062 [-0.015,+0.157] p 1.3e-01 dBA -0.075 dFR +0.100 McN 2/5 p 4.5e-01
+phantom_fail_test|force text, no training            dAU +0.010 [-0.070,+0.085] p 7.8e-01 dBA +0.100 dFR +0.250 McN 5/1 p 2.2e-01
+released|roboreward_500|omitted                      AU 0.934 [0.912,0.956] PR 0.944 BA 0.886 FR 0.847 SR 0.925 F80 0.894 F90 0.855 MAE 0.40 n 500/235
+v4_control|roboreward_500|omitted                    AU 0.916 [0.891,0.938] PR 0.914 BA 0.768 FR 0.936 SR 0.600 F80 0.860 F90 0.732 MAE 0.98 n 500/235
+v4_force|roboreward_500|omitted                      AU 0.920 [0.897,0.942] PR 0.926 BA 0.784 FR 0.885 SR 0.683 F80 0.851 F90 0.774 MAE 0.96 n 500/235
+roboreward_500|fine-tuning alone                     dAU -0.018 [-0.039,+0.004] p 9.9e-02 dBA -0.118 dFR +0.089 McN 30/95 p 4.7e-09

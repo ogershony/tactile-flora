@@ -1,0 +1,36 @@
+# v4 benchmarks (2026-10-23; docs/v4/plan.md): FLORA-native collage, released score-only prompt.
+# hrdexdb_v4_test is LOCKED: scored once per final model. hrdexdb_v4_dev sets thresholds only.
+output_dir: data/eval_v4
+benchmarks:
+  hrdexdb_v4_dev:
+    manifest: data/manifest/hrdexdb_v4_val.parquet
+    prompts: [outcome]
+    metrics: [balanced_acc, failure_recall, mae]
+    score_only: true
+    collage: flora
+  hrdexdb_v4_test:
+    manifest: data/manifest/hrdexdb_v4_test.parquet
+    prompts: [outcome]
+    metrics: [balanced_acc, failure_recall, mae]
+    score_only: true
+    collage: flora
+  reassemble_seg_test:
+    manifest: data/manifest/reassemble_seg_test.parquet
+    prompts: [outcome]
+    metrics: [balanced_acc, failure_recall, mae]
+    score_only: true
+    collage: flora
+  phantom_fail_test:
+    manifest: data/manifest/phantom_fail_test.parquet
+    prompts: [outcome]
+    metrics: [balanced_acc, failure_recall, mae]
+    score_only: true
+    collage: flora
+  # General, camera-only regression check (RoboRewardBench, stratified 500; FLORA paper: MAE x100 = 40.0
+  # on the full benchmark). Scored for released and for both adapters with no force block.
+  roboreward_500:
+    manifest: data/manifest/roboreward_500.parquet
+    prompts: [outcome]
+    metrics: [mae]
+    score_only: true
+    collage: flora

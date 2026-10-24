@@ -258,3 +258,29 @@ def test_provider_called_once(env: tuple[Path, Path]) -> None:
     harness.run_eval("released", "synth", "shuffled", E.eval_cfg(mp, root), FORCE_CFG, root,
                      StubBackend(), seed=1, provider=counting)  # fmt: skip
     assert len(calls) == 1
+
+
+def test_grid_closes_previous_backend_when_checkpoint_changes(env: tuple[Path, Path]) -> None:
+    root, mp = env
+    cfg = E.eval_cfg(mp, root)
+    grid = GridConfig(
+        checkpoints=["released", "data/runs/force"], modes={"synth": ["omitted", "real"]}, seed=0
+    )
+    events: list[str] = []
+
+    class Closing(StubBackend):
+        def __init__(self, ck: str) -> None:
+            super().__init__()
+            self.ck = ck
+
+        def close(self) -> None:
+            events.append(f"close {self.ck}")
+
+    def factory(ck: str) -> StubBackend:
+        events.append(f"open {ck}")
+        return Closing(ck)
+
+    kw: dict[str, Any] = {"source_cfgs": {"synthetic": E.SOURCE_CFG}}
+    cells = harness.run_grid(grid, cfg, FORCE_CFG, root, factory, **kw)
+    assert len(cells) == 4  # two modes per checkpoint, no caps
+    assert events == ["open released", "close released", "open data/runs/force"]

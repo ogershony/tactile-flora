@@ -53,3 +53,21 @@ def test_outcome_words_stripped_and_labels() -> None:
     assert a.native_labels(EID) == []
     s = a.splits()
     assert sum(len(v) for v in s.values()) == 1
+
+
+def test_cameras_restriction_orders_roles_and_drops_the_rest() -> None:
+    keep = ["observation.images.cam_f0002", "observation.images.cam_missing"]
+    a = Rh20tAdapter(_cfg().model_copy(update={"cameras": keep}))
+    a.discover(ROOT)
+    ep = a.load(EID)
+    assert list(ep.cameras) == ["scene"]
+    assert ep.cameras["scene"].path.endswith("observation.images.cam_f0002/chunk-000/file-000.mp4")
+    assert list(ep.meta["video_from_s"]) == ["scene"]
+    both = ["observation.images.cam_f0002", "observation.images.cam_f0001"]
+    b = Rh20tAdapter(_cfg().model_copy(update={"cameras": both}))
+    b.discover(ROOT)
+    assert list(b.load(EID).cameras) == ["scene", "extra_f0001"]
+    none = Rh20tAdapter(_cfg().model_copy(update={"cameras": ["observation.images.cam_missing"]}))
+    none.discover(ROOT)
+    with pytest.raises(ValueError, match="none of cfg.cameras"):
+        none.load(EID)

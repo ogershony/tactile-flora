@@ -250,7 +250,7 @@ in `docs/deviations.md`.
 | REASSEMBLE anomaly format | Resolved: there is none; per-segment `success` plus known-issues table. Dense spans come from failed segments |
 | SoftVTBench contact fields and DSR tolerance | Contact resolved (`obs/finger_force`). Tolerance still open: unset in config (`dsr_tolerance_pct: null`) |
 | HRDexDB tactile layout and hands | Resolved for allegro_v5, inspire_dftp and (2026-10-22) inspire_f1: per-pad normal/tangential force dicts, decoded with a restricted unpickler; robotiq, human raise NotImplementedError |
-| Sensor identity (ASIN B0CZ6L5NMM) | Open. `sensor_confirmed: false`; `r_ref_ohm` 4700 and saturation counts are placeholders |
+| Sensor identity (ASIN B0FGD267GK, rated 20 g-2 kg) | Open. R(F) not measured; `sensor_confirmed: false`; `r_ref_ohm` 4700 is a placeholder. Rated range is below the spec's 50 N |
 | Baxter gripper force command range and per-episode variation | Open; blocks the recorder's `meta.json` fields |
 | AIRoA wrench key and per-primitive labels | Open (gated dataset; heuristics in the adapter) |
 | Force block token budget | Open decision: 3,000 now, spec said 1,500 (see deviations) |
@@ -276,7 +276,7 @@ in `docs/deviations.md`.
    available GPUs before starting force/control SFT.
 6. Run the released no-force baselines on phantom_val and roboreward_500 (gate 4), then the
    pseudo-labeling, `tf manifest`, `tf manifest freeze-holdout`, and the force and control runs.
-7. Confirm the sensor part (B0CZ6L5NMM): two-wire thin-film FSR, about 10 mm, at least 50 N.
+7. Measure the sensor part (B0FGD267GK, rated 20 g-2 kg, so below the spec's 50 N: cap Baxter's gripper force or accept saturation).
    Measure no-load resistance and resistance at 10 N, pick `r_ref_ohm`, redo calibration, then
    set `sensor_confirmed: true` and measure force-video sync before recording.
 8. Decide the force block token budget (3,000 now; options in `docs/deviations.md`).

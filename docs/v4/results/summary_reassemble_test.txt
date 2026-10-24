@@ -1,0 +1,20 @@
+# scripts/v4/summarize_results.py data/eval/results.json reassemble_seg_test (Colab, 2026-10-24 ~03:00 UTC); wrapped lines rejoined
+force_classifier|reassemble_seg_test|none            AU 0.815 [0.760,0.863] PR 0.724 BA 0.705 FR 0.504 SR 0.906 F80 0.669 F90 0.504 MAE 0.91 n 399/133
+fusion_released|reassemble_seg_test|none             AU 0.813 [0.762,0.864] PR 0.639 BA nan FR nan SR nan F80 0.647 F90 0.444 MAE nan n 399/133
+fusion_v4_control|reassemble_seg_test|none           AU 0.909 [0.871,0.943] PR 0.840 BA nan FR nan SR nan F80 0.842 F90 0.699 MAE nan n 399/133
+released|reassemble_seg_test|omitted                 AU 0.648 [0.586,0.712] PR 0.450 BA 0.617 FR 0.767 SR 0.466 F80 0.383 F90 0.195 MAE 1.78 n 399/133
+released|reassemble_seg_test|real                    AU 0.746 [0.677,0.820] PR 0.573 BA 0.682 FR 0.707 SR 0.658 F80 0.579 F90 0.451 MAE 1.47 n 399/133
+v4_control|reassemble_seg_test|omitted               AU 0.940 [0.911,0.967] PR 0.900 BA 0.863 FR 0.842 SR 0.883 F80 0.917 F90 0.835 MAE 0.52 n 399/133
+v4_force|reassemble_seg_test|omitted                 AU 0.908 [0.874,0.940] PR 0.840 BA 0.836 FR 0.782 SR 0.891 F80 0.865 F90 0.782 MAE 0.58 n 399/133
+v4_force|reassemble_seg_test|real                    AU 0.919 [0.882,0.950] PR 0.856 BA 0.838 FR 0.797 SR 0.880 F80 0.895 F90 0.782 MAE 0.59 n 399/133
+v4_force|reassemble_seg_test|shuffled                AU 0.891 [0.853,0.923] PR 0.814 BA 0.808 FR 0.744 SR 0.872 F80 0.797 F90 0.714 MAE 0.68 n 399/133
+reassemble_seg_test|primary                          dAU +0.271 [+0.212,+0.329] p 5.1e-21 dBA +0.222 dFR +0.030 McN 140/26 p 4.3e-20
+reassemble_seg_test|force vs control                 dAU -0.021 [-0.042,-0.002] p 1.0e-02 dBA -0.024 dFR -0.045 McN 12/19 p 2.8e-01
+reassemble_seg_test|fine-tuning alone                dAU +0.292 [+0.236,+0.343] p 8.4e-26 dBA +0.246 dFR +0.075 McN 139/18 p 2.4e-24
+reassemble_seg_test|real vs shuffled force           dAU +0.028 [+0.000,+0.059] p 4.0e-02 dBA +0.030 dFR +0.053 McN 27/18 p 2.3e-01
+reassemble_seg_test|real vs no force                 dAU +0.012 [-0.010,+0.033] p 2.2e-01 dBA +0.002 dFR +0.015 McN 16/17 p 1.0e+00
+reassemble_seg_test|vs released + force text         dAU +0.173 [+0.120,+0.224] p 2.6e-13 dBA +0.156 dFR +0.090 McN 97/26 p 8.0e-11
+reassemble_seg_test|vs force classifier alone        dAU +0.104 [+0.067,+0.150] p 2.6e-08 dBA +0.133 dFR +0.293 McN 52/20 p 2.1e-04
+reassemble_seg_test|vs late fusion, released + classifier dAU +0.106 [+0.069,+0.141] p 1.5e-09 dBA +nan dFR +nan McN 0/0 p nan
+reassemble_seg_test|vs late fusion, control + classifier dAU +0.010 [-0.005,+0.026] p 2.2e-01 dBA +nan dFR +nan McN 0/0 p nan
+reassemble_seg_test|force text, no training          dAU +0.098 [+0.064,+0.134] p 5.3e-08 dBA +0.066 dFR -0.060 McN 66/23 p 5.7e-06

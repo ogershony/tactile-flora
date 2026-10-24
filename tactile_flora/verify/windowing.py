@@ -22,6 +22,12 @@ is read ``lag`` later in raw time. The gripper and the video are NOT shifted, so
 ``resample_shifted`` (not a plain ``resample`` on shifted times, which would shift the gripper
 too). Windows built during ``run_verify`` are unshifted (the sync check has not run yet); the
 manifest and training paths apply the shift. PHANTOM p99 is always computed unshifted.
+
+Normalization constants are applied per episode with ``normalize.norm_group(episode)`` (PHANTOM
+object family, "all" elsewhere); the manifest row records that group.
+
+``meta["prompt_kinds"]`` (``prompt_kinds(episode)``) restricts which windows an episode yields:
+segment episodes carry ``["outcome"]`` and get neither dense windows nor programmatic events.
 """
 
 from __future__ import annotations
@@ -97,6 +103,7 @@ class SourceInputs:
 
     adapter: LabelSource
     phantom_p99: dict[str, float] = field(default_factory=lambda: dict[str, float]())
+    phantom_peak_p5: dict[str, float] = field(default_factory=lambda: dict[str, float]())
     pseudo: dict[str, list[Label]] = field(default_factory=lambda: dict[str, list[Label]]())
     results: dict[str, dict[str, CheckResult]] = field(
         default_factory=lambda: dict[str, dict[str, CheckResult]]()
@@ -110,6 +117,19 @@ class SourceInputs:
     def shift_of(self, episode_id: str) -> float:
         """Clock correction (shift_s) for an episode from its saved sync check."""
         return manifest_mod.shift_of(self.results.get(episode_id, {}))
+
+
+ALL_PROMPT_KINDS: frozenset[str] = frozenset({"dense", "outcome"})
+
+
+def prompt_kinds(episode: Episode) -> frozenset[str]:
+    """Prompt kinds an episode may produce: ``meta["prompt_kinds"]`` when set, else both.
+
+    Segment episodes (reassemble_lerobot segment mode) set ``["outcome"]``: no dense windows
+    are built and no programmatic event labels are detected for them.
+    """
+    kinds = episode.meta.get("prompt_kinds")
+    return frozenset(str(k) for k in kinds) if kinds else ALL_PROMPT_KINDS
 
 
 def _frame_grid(duration_s: float, period: float) -> list[float]:
@@ -137,9 +157,10 @@ def build_source_inputs(
     ids: Sequence[str],
     results: dict[str, dict[str, CheckResult]] | None = None,
 ) -> SourceInputs:
-    """Gather per-source label inputs: PHANTOM per-object p99, pseudo labels and check results.
+    """Gather per-source label inputs: PHANTOM per-object stats, pseudo labels and check results.
 
-    The PHANTOM p99 is computed once here over the success-set episodes (normalized features).
+    The PHANTOM per-object p99 of F' and 5th percentile of per-episode peak F' are computed once
+    here over the success-set episodes (features normalized with each episode's norm_group).
     """
     inputs = SourceInputs(
         adapter=adapter,
@@ -155,9 +176,14 @@ def build_source_inputs(
                 ep = adapter.load(eid)
                 times = _frame_grid(ep.duration_s, force_cfg.resample.frame_period_s)
                 feats = resample(ep.force, ep.gripper, times, force_cfg.resample)
-                yield ep, normalize.apply(feats, consts, force_cfg.render)
+                yield (
+                    ep,
+                    normalize.apply(
+                        feats, consts, force_cfg.render, group=normalize.norm_group(ep)
+                    ),
+                )
 
-        inputs.phantom_p99 = mapping.phantom_success_p99(_pairs())
+        inputs.phantom_p99, inputs.phantom_peak_p5 = mapping.phantom_success_stats(_pairs())
     return inputs
 
 
@@ -201,16 +227,23 @@ def assemble_labels(
     if consts is not None:
         times = _frame_grid(episode.duration_s, cfg.resample.frame_period_s)
         feats = normalize.apply(
-            resample_shifted(episode, times, cfg.resample, shift_s), consts, cfg.render
+            resample_shifted(episode, times, cfg.resample, shift_s),
+            consts,
+            cfg.render,
+            group=normalize.norm_group(episode),
         )
     obj = str(episode.meta.get("object", ""))
     if episode.source in mapping.MAPPED_SOURCES:  # other sources (tests) keep native labels only
         labels += mapping.map_native_labels(
-            episode.source, episode, features=feats, phantom_p99=inputs.phantom_p99.get(obj)
+            episode.source,
+            episode,
+            features=feats,
+            phantom_p99=inputs.phantom_p99.get(obj),
+            phantom_peak_p5=inputs.phantom_peak_p5.get(obj),
         )
     outcomes = [lab.outcome for lab in labels if lab.kind == "outcome" and lab.outcome]
     task_complete = bool(outcomes) and merge_outcome(labels) >= 4
-    if feats is not None:
+    if feats is not None and "dense" in prompt_kinds(episode):
         labels += E.detect_all(feats, cfg.events, task_complete=task_complete)
     labels += inputs.pseudo.get(episode.episode_id, [])
     return labels
@@ -230,8 +263,8 @@ def _lines(
     shift_s: float,
 ) -> list[str]:
     feats = resample_shifted(episode, times, cfg.resample, shift_s)
-    norm = normalize.apply(feats, consts, cfg.render)
-    return render.render_lines(norm, list(times), episode.force.channel)
+    norm = normalize.apply(feats, consts, cfg.render, group=normalize.norm_group(episode))
+    return render.render_lines(norm, list(times), episode.force.channel, cfg=cfg.render)
 
 
 def episode_windows(
@@ -261,18 +294,25 @@ def episode_windows(
         else episode.labels
     )
     merged = merge_labels(labels)
+    kinds = prompt_kinds(episode)
     if not with_force or consts is None:
-        return W.make_windows(episode, None, merged, split)
-    dense = {
-        a: _lines(episode, consts, cfg, W.dense_frame_times(a), shift_s)
-        for a in W.dense_anchors(episode.duration_s)
-    }
+        wins = W.make_windows(episode, None, merged, split)
+        return [w for w in wins if w.prompt_kind in kinds]
+    dense = (
+        {
+            a: _lines(episode, consts, cfg, W.dense_frame_times(a), shift_s)
+            for a in W.dense_anchors(episode.duration_s)
+        }
+        if "dense" in kinds
+        else {}
+    )
     cam = episode.cameras.get("scene")
     outcome: list[str] = []
-    if cam is not None:
+    if cam is not None and "outcome" in kinds:
         idx = W.outcome_frame_indices(cam.n_frames, cam.fps)
         outcome = _lines(episode, consts, cfg, [i / cam.fps for i in idx], shift_s)
-    return W.make_windows(episode, dense, merged, split, outcome_force_lines=outcome)
+    wins = W.make_windows(episode, dense, merged, split, outcome_force_lines=outcome)
+    return [w for w in wins if w.prompt_kind in kinds]
 
 
 __all__ = [
@@ -281,6 +321,7 @@ __all__ = [
     "build_source_inputs",
     "episode_windows",
     "prepare_episode",
+    "prompt_kinds",
     "read_pseudo",
     "resample_shifted",
     "shifted_frame_times",

@@ -1,0 +1,21 @@
+# Failure judge with held-out PHANTOM failures: judge_pf.yaml with the force block omitted
+# (control). Same manifest, train_judge_pf.parquet (scripts/make_phantom_fail_split.py, seed 0;
+# docs/deviations.md 8).
+manifest: data/manifest/train_judge_pf.parquet
+base_model: nvidia/Flora-Rewarder
+force_mode: omitted
+seed: 0
+epochs: 1
+learning_rate: 1.0e-4
+warmup_frac: 0.03
+grad_clip: 1.0
+effective_batch: 16
+lora:
+  rank: 32
+  alpha: 64
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+output_dir: data/runs
+# class-balance for the loss: successes / failures of train_judge_pf.parquet = 788 / 405 = 1.95
+# (1,193 rows: 405 failures with score <= 2 = 382 reassemble_seg + 23 phantom; 788 successes),
+# counted by the dry run on 2026-10-22.
+failure_weight: 1.95

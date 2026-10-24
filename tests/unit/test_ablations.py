@@ -3,12 +3,13 @@ import pytest
 from tactile_flora.config import ForceConfig, load_config
 from tactile_flora.eval.ablations import PoolEntry, apply_force_mode
 from tactile_flora.force import normalize
-from tactile_flora.force.render import render_lines
+from tactile_flora.force.render import code_summary, parse_code_line, render_lines
 from tactile_flora.force.resample import resample
 from tactile_flora.schema import ResampledForce
 from tests.fixtures.synthetic import make_pad_episode
 
 CFG = load_config("configs/force.yaml", ForceConfig)
+CODE = load_config("configs/force.code.yaml", ForceConfig)
 TIMES = [i * 0.25 for i in range(10)]
 
 
@@ -37,6 +38,25 @@ def test_zero_renders_zeros() -> None:
     for line in render_lines(z, TIMES, "pad"):
         assert "F=0.00 D=0.00 dF=0.00 g=0.00 c=0" in line
         assert "c=1" not in line
+
+
+def test_zero_and_shuffled_render_valid_code_lines() -> None:
+    pool = _pool()
+    zero = apply_force_mode(pool[0], "zero", seed=0).features
+    assert zero is not None
+    lines = render_lines(zero, TIMES, "pad", cfg=CODE.render)
+    assert all(line.endswith(" L F0 A= T0 C0 Go | R F0 A= T0 C0 Go") for line in lines)
+    assert code_summary(lines) == "Summary L: no contact. R: no contact."
+    shuffled = apply_force_mode(pool[0], "shuffled", pool=pool, seed=3).features
+    assert shuffled is not None
+    lines = render_lines(shuffled, TIMES, "pad", cfg=CODE.render)
+    real = render_lines(pool[0], TIMES, "pad", cfg=CODE.render)
+    assert len(lines) == len(real) == 10
+    assert [ln.split(" ", 1)[0] for ln in lines] == [ln.split(" ", 1)[0] for ln in real]
+    for line in lines:
+        _, arms = parse_code_line(line)  # raises on anything outside the grammar
+        assert all(f is not None and f.asym in ("a", "b", "=") for f in arms.values())
+    assert code_summary(lines).startswith("Summary L: first contact t=")
 
 
 def test_shuffled_draws_from_other_episode() -> None:

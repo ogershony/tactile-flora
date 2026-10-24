@@ -22,9 +22,15 @@ import numpy as np
 
 from tactile_flora.config import ResampleConfig
 from tactile_flora.force import normalize
-from tactile_flora.force.render import TokenBudgetError, budget_check, load_tokenizer
+from tactile_flora.force.render import (
+    TokenBudgetError,
+    budget_check,
+    fallback_tokens_per_char,
+    load_tokenizer,
+    render_block,
+)
 from tactile_flora.force.resample import resample
-from tactile_flora.prompts.flora import prompt_diff
+from tactile_flora.prompts.flora import force_sentence_for, prompt_diff
 from tactile_flora.schema import (
     CheckResult,
     Episode,
@@ -47,7 +53,6 @@ _DEFAULT_RESAMPLE = ResampleConfig(
     raw_rate_hz=100.0,
     contact_sigma=3.0,
 )
-_GRIPPER_CLOSED = 0.6
 
 
 def _ok(value: float | None = None, detail: str = "", action: str = "keep") -> CheckResult:
@@ -243,9 +248,9 @@ def _xcorr_lag(f: np.ndarray, g: np.ndarray, step: float, search_s: float) -> fl
 BAXTER_ONSET_MAX_S = 0.1
 
 
-def _onset_lags(feats: ResampledForce, ctx: VerifyContext) -> dict[str, float]:
+def _onset_lags(feats: ResampledForce, ctx: VerifyContext, group: str) -> dict[str, float]:
     """Per arm: time of first contact flag minus time of first g >= 0.5 (arms with both)."""
-    normed = normalize.apply(feats, ctx.norm, ctx.render_cfg)  # type: ignore[arg-type]
+    normed = normalize.apply(feats, ctx.norm, ctx.render_cfg, group=group)  # type: ignore[arg-type]
     out: dict[str, float] = {}
     for arm, af in normed.arms.items():
         if af.g is None or af.c is None:
@@ -290,7 +295,7 @@ def check_sync(episode: Episode, ctx: VerifyContext) -> CheckResult:
     worst = max(lags.values(), key=abs)
     detail = ", ".join(f"{a}={v * 1000:+.0f}ms" for a, v in sorted(lags.items()))
     if ctx.source == "baxter" and ctx.norm is not None and ctx.render_cfg is not None:
-        onset = _onset_lags(feats, ctx)
+        onset = _onset_lags(feats, ctx, normalize.norm_group(episode))
         if onset:
             detail += "; onset " + ", ".join(
                 f"{a}={v * 1000:+.0f}ms" for a, v in sorted(onset.items())
@@ -311,21 +316,37 @@ def check_sync(episode: Episode, ctx: VerifyContext) -> CheckResult:
 def check_normalization(episode: Episode, ctx: VerifyContext) -> CheckResult:
     """Record, per episode, the grasp median, free-space median and 99th percentile of F'.
 
-    F' is the UNCLIPPED normalized force ((F - baseline) / scale), so the 99th percentile can
-    exceed the clip. ``detail`` is JSON ``{"grasp": [...], "free": [...], "p99": [...],
-    "problems": [...]}`` (one entry per arm) which report.source_verdicts pools over all
-    episodes: the source fails only if the pooled grasp median is outside [0.8, 1.2], the
-    pooled free-space median outside [-0.1, 0.1] or the pooled p99 above 3. The per-episode
-    ``passed`` flag is informational (thresholds from VerifyThresholds) with action "keep".
+    F' is the UNCLIPPED normalized force ((F - baseline) / scale) under the episode's
+    ``norm_group`` constants, so the 99th percentile can exceed the clip. Grasp frames follow
+    the fitted arm's grasp rule (``normalize.grasp_mask``: g above the configured cut, or at or
+    above the group's 75th percentile when the fit fell back) with contact. ``detail`` is JSON
+    ``{"grasp": [...], "free": [...], "p99": [...], "problems": [...]}`` (one entry per arm)
+    which report.source_verdicts pools over the episodes that fed the fit: the source fails only
+    if the pooled grasp median is outside [0.8, 1.2], the pooled free-space median outside
+    [-0.1, 0.1] or the pooled p99 above 3. An episode the adapter excluded from the fit
+    (``meta["exclude_from_norm_fit"]``, PHANTOM failure demos) is expected to be off-scale, so
+    its detail carries ``"excluded": true`` and the pooled verdict skips it; its stats are still
+    recorded. The per-episode ``passed`` flag is informational (thresholds from
+    VerifyThresholds) with action "keep".
     """
     th = ctx.thresholds
     if ctx.norm is None or ctx.render_cfg is None:
         return _fail("keep", "no normalization constants in context")
     cfg = ctx.resample_cfg or _DEFAULT_RESAMPLE
     times = _frame_times(episode.duration_s, cfg.frame_period_s)
-    feats = normalize.apply(
-        resample(episode.force, episode.gripper, times, cfg), ctx.norm, ctx.render_cfg, clip=False
-    )
+    group = normalize.norm_group(episode)
+    consts: normalize.NormConstants = ctx.norm
+    try:
+        arm_norms = consts.arms_for(group)
+        feats = normalize.apply(
+            resample(episode.force, episode.gripper, times, cfg),
+            consts,
+            ctx.render_cfg,
+            group=group,
+            clip=False,
+        )
+    except normalize.NormError as exc:
+        return _fail("keep", str(exc))
     problems: list[str] = []
     grasp_meds: list[float] = []
     free_meds: list[float] = []
@@ -345,17 +366,19 @@ def check_normalization(episode: Episode, ctx: VerifyContext) -> CheckResult:
             if abs(fm) > th.norm_free_tol:
                 problems.append(f"{arm} free-space median {fm:.2f}")
         if af.g is not None:
-            held = ok & (np.asarray(af.g) > _GRIPPER_CLOSED) & (np.asarray(af.c) == 1)
+            held = ok & normalize.grasp_mask(af.g, arm_norms[arm]) & (np.asarray(af.c) == 1)
             if held.any():
                 med = float(np.median(F[held]))
                 grasp_meds.append(med)
                 if abs(med - 1.0) > th.norm_grasp_tol:
                     problems.append(f"{arm} grasp median {med:.2f}")
     value = float(np.median(grasp_meds)) if grasp_meds else None
-    detail = json.dumps(
-        {"grasp": grasp_meds, "free": free_meds, "p99": p99s, "problems": problems},
-        separators=(",", ":"),
-    )
+    doc: dict[str, object] = {
+        "grasp": grasp_meds, "free": free_meds, "p99": p99s, "problems": problems
+    }  # fmt: skip
+    if episode.meta.get("exclude_from_norm_fit", False):
+        doc["excluded"] = True
+    detail = json.dumps(doc, separators=(",", ":"))
     if problems:
         return _fail("keep", detail, value)
     return _ok(value, detail)
@@ -515,8 +538,14 @@ def check_spot_check(episode: Episode, ctx: VerifyContext) -> CheckResult:
     """Fail the source unless a human passed at least spot_min_pass of the spot windows.
 
     The windows are written by write_spot_strips; ``ctx.spot_n`` is how many exist and
-    ``ctx.spot_reviewer_pass`` the recorded pass count (None while awaiting review).
+    ``ctx.spot_reviewer_pass`` the recorded pass count (None while awaiting review). The verdict
+    is source-level (``spot_verdict``); the episode plays no part.
     """
+    return spot_verdict(ctx)
+
+
+def spot_verdict(ctx: VerifyContext) -> CheckResult:
+    """Return the spot-check gate's result from the context alone (see check_spot_check)."""
     th = ctx.thresholds
     if ctx.spot_n == 0:
         return _fail("keep", "no spot-check strips written")
@@ -545,13 +574,20 @@ def check_prompt_diff(episode: Episode, ctx: VerifyContext) -> CheckResult:
         return _ok(detail="no force windows to diff")
     roles = list(episode.cameras) or ["scene"]
     tokenizer = load_tokenizer(ctx.render_cfg)
+    sentence = force_sentence_for(ctx.render_cfg)
+    fallback = fallback_tokens_per_char(ctx.render_cfg)
     problems: list[str] = []
     worst = 0
     for w in wins:
         try:
-            prompt_diff(w, header=ctx.render_cfg.header, task=episode.task, camera_roles=roles)
-            block = "\n".join([ctx.render_cfg.header, *w.force_lines])
-            worst = max(worst, budget_check(block, ctx.render_cfg.max_tokens, tokenizer))
+            block = render_block(w.force_lines, ctx.render_cfg)
+            prompt_diff(
+                w, block=block, force_sentence=sentence, task=episode.task, camera_roles=roles
+            )
+            worst = max(
+                worst,
+                budget_check(block, ctx.render_cfg.max_tokens, tokenizer, fallback=fallback),
+            )
         except (AssertionError, TokenBudgetError) as exc:
             problems.append(f"{w.prompt_kind}@{w.anchor_s}: {exc}")
     if problems:

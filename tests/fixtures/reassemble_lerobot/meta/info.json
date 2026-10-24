@@ -1,0 +1,95 @@
+{
+ "codebase_version": "v3.0",
+ "fps": 30,
+ "total_episodes": 3,
+ "total_frames": 50,
+ "data_path": "data/chunk-{chunk_index:03d}/file-{file_index:03d}.parquet",
+ "video_path": "videos/{video_key}/chunk-{chunk_index:03d}/file-{file_index:03d}.mp4",
+ "features": {
+  "observation.force": {
+   "dtype": "float32",
+   "shape": [
+    3
+   ],
+   "names": null
+  },
+  "observation.torque": {
+   "dtype": "float32",
+   "shape": [
+    3
+   ],
+   "names": null
+  },
+  "observation.state.gripper_position": {
+   "dtype": "float32",
+   "shape": [
+    2
+   ],
+   "names": null
+  },
+  "segment.success": {
+   "dtype": "bool",
+   "shape": [
+    1
+   ],
+   "names": null
+  },
+  "segment.index": {
+   "dtype": "int64",
+   "shape": [
+    1
+   ],
+   "names": null
+  },
+  "task_index": {
+   "dtype": "int64",
+   "shape": [
+    1
+   ],
+   "names": null
+  },
+  "observation.force.base": {
+   "dtype": "float32",
+   "shape": [
+    3
+   ],
+   "names": null
+  },
+  "observation.torque.base": {
+   "dtype": "float32",
+   "shape": [
+    3
+   ],
+   "names": null
+  },
+  "observation.images.hand": {
+   "dtype": "video",
+   "shape": [
+    32,
+    32,
+    3
+   ],
+   "names": null
+  },
+  "observation.images.hama1": {
+   "dtype": "video",
+   "shape": [
+    32,
+    32,
+    3
+   ],
+   "names": null
+  },
+  "observation.images.hama2": {
+   "dtype": "video",
+   "shape": [
+    32,
+    32,
+    3
+   ],
+   "names": null
+  }
+ },
+ "total_tasks": 3,
+ "robot_type": "franka"
+}

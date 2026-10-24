@@ -6,6 +6,7 @@ Must never: contain stage logic, read YAML outside load_config, or write outside
 
 from __future__ import annotations
 
+import contextlib
 import subprocess
 from collections.abc import Callable
 from pathlib import Path
@@ -74,9 +75,17 @@ def verify(
     spot_pass: Annotated[
         int | None, typer.Option("--spot-pass", help="Reviewer's pass count for the spot check.")
     ] = None,
+    record_only: Annotated[
+        bool,
+        typer.Option(
+            "--record-only",
+            help="With --spot-pass: record the count and re-score only the spot gate from the "
+            "saved checks (no video is decoded, no other check re-run).",
+        ),
+    ] = False,
 ) -> None:
     """Run every verification check over a source and write its report."""
-    from tactile_flora.verify import run_verify
+    from tactile_flora.verify import record_spot_pass, run_verify
     from tactile_flora.video.readers import AutoReader
 
     cfg = load_config(config, SourceConfig)
@@ -84,15 +93,35 @@ def verify(
         raise typer.BadParameter(
             f"config is for {cfg.name!r}, not {source!r}", param_hint="--source"
         )
+    if record_only and spot_pass is None:
+        raise typer.BadParameter("--record-only needs --spot-pass N", param_hint="--record-only")
     fcfg = load_config(force_config, ForceConfig)
     out = data_root / "verified" / source
 
     def _entry() -> None:
-        summary = run_verify(cfg, fcfg, data_root, AutoReader("."), spot_pass=spot_pass)
+        if record_only and spot_pass is not None:
+            summary = record_spot_pass(cfg, data_root, spot_pass)
+        else:
+            summary = run_verify(cfg, fcfg, data_root, AutoReader("."), spot_pass=spot_pass)
         for name, ok in summary.source_verdicts.items():
             typer.echo(f"{name}: {'pass' if ok else 'FAIL'}")
         n_ok = sum(summary.episode_ok.values())
         typer.echo(f"episodes: {n_ok}/{summary.n_episodes} pass; report {summary.report_path}")
+        if summary.norm_error:
+            typer.echo(f"normalization fit: {summary.norm_error}")
+        elif record_only:
+            typer.echo("normalization fit: unchanged (record-only)")
+        else:
+            typer.echo(
+                f"normalization fit: {summary.norm_fit_episodes}/{summary.n_episodes} episodes"
+            )
+            if summary.norm_path:
+                from tactile_flora.force import normalize
+                from tactile_flora.verify.report import norm_lines
+
+                consts = normalize.load(summary.norm_path)
+                for line in norm_lines(consts, cfg.norm_p99_max, cfg.norm_grasp_range)[2:]:
+                    typer.echo(line)
         if not summary.source_ok:
             raise typer.Exit(code=1)
 
@@ -148,8 +177,59 @@ def freeze_holdout(
     _run(config, out, _entry)
 
 
+@manifest_app.command("merge")
+def manifest_merge(
+    inputs: Annotated[
+        list[str],
+        typer.Argument(help="Input manifests: names under data/manifest/ or parquet paths."),
+    ],
+    out: Annotated[str, typer.Option("--out", help="Output name: data/manifest/<out>.parquet.")],
+    split: Annotated[
+        list[str] | None,
+        typer.Option("--split", help="Keep only these splits (repeatable); default: every split."),
+    ] = None,
+    prompt_kind: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--prompt-kind", help="Keep only these prompt kinds (repeatable); default: both."
+        ),
+    ] = None,
+    data_root: DataRootOpt = Path("data"),
+) -> None:
+    """Concatenate per-source manifests (rows unchanged; per-source caps already applied)."""
+    from collections import Counter
+
+    from tactile_flora.verify import manifest as mf
+
+    paths = [
+        p if (p := Path(i)).suffix == ".parquet" else data_root / "manifest" / f"{i}.parquet"
+        for i in inputs
+    ]
+    out_path = data_root / "manifest" / f"{out}.parquet"
+    typer.echo("inputs:   " + " ".join(str(p) for p in paths))
+    typer.echo(f"git hash: {git_hash()}")
+    typer.echo(f"output:   {out_path}")
+    try:
+        rows = mf.merge_manifests(paths, out_path, splits=split, prompt_kinds=prompt_kind)
+    except (ValueError, FileNotFoundError) as exc:
+        typer.echo(f"{type(exc).__name__}: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+    counts = Counter((r.source, r.split, r.prompt_kind) for r in rows)
+    for (src, sp, kind), n in sorted(counts.items()):
+        typer.echo(f"{src} {sp} {kind}: {n}")
+    typer.echo(f"rows: {len(rows)}")
+
+
 BackendOpt = Annotated[str, typer.Option("--backend", help="Inference backend: stub, hf or vllm.")]
 SourcesDirOpt = Annotated[Path, typer.Option("--sources-dir", help="configs/sources directory.")]
+ModelDirOpt = Annotated[
+    str | None,
+    typer.Option(
+        "--model-dir",
+        help="vllm only: local snapshot of the released weights (default "
+        "$TACTILE_FLORA_MODEL_DIR, else the Hub id).",
+    ),
+]
 
 
 @app.command()
@@ -235,6 +315,7 @@ def eval_run(
     force_config: ForceConfigOpt = Path("configs/force.yaml"),
     data_root: DataRootOpt = Path("data"),
     sources_dir: SourcesDirOpt = Path("configs/sources"),
+    model_dir: ModelDirOpt = None,
 ) -> None:
     """Evaluate one checkpoint x benchmark x force-mode cell."""
     from tactile_flora.eval import harness
@@ -251,7 +332,7 @@ def eval_run(
     def _entry() -> None:
         from tactile_flora.video.readers import SourceRootReader
 
-        be = make_backend(backend, checkpoint, SourceRootReader(sdir))
+        be = make_backend(backend, checkpoint, SourceRootReader(sdir), model_dir=model_dir)
         cell = harness.run_eval(
             checkpoint, benchmark, force_mode, cfg, fcfg, data_root, be,  # type: ignore[arg-type]
             seed=seed, sources_dir=sdir,
@@ -271,26 +352,80 @@ def eval_grid(
     force_config: ForceConfigOpt = Path("configs/force.yaml"),
     data_root: DataRootOpt = Path("data"),
     sources_dir: SourcesDirOpt = Path("configs/sources"),
+    model_dir: ModelDirOpt = None,
+    checkpoint: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--checkpoint",
+            help="Restrict the grid to these checkpoints of the config (repeatable), e.g. to "
+            "run one merged model per process.",
+        ),
+    ] = None,
 ) -> None:
     """Expand the full condition matrix, skipping cells whose predictions exist."""
     from tactile_flora.eval import harness
-    from tactile_flora.eval.inference import make_backend
+    from tactile_flora.eval.inference import make_backend, merged_model_dir
 
     cfg = load_config(config, GridConfig)
     ecfg = load_config(eval_config, EvalConfig)
     fcfg, sdir = _eval_common(force_config, sources_dir)
+    if checkpoint:
+        unknown = sorted(set(checkpoint) - set(cfg.checkpoints))
+        if unknown:
+            raise typer.BadParameter(
+                f"not in the grid config: {unknown}", param_hint="--checkpoint"
+            )
+        cfg = cfg.model_copy(
+            update={"checkpoints": [c for c in cfg.checkpoints if c in checkpoint]}
+        )
 
     def _entry() -> None:
         from tactile_flora.video.readers import SourceRootReader
 
+        if backend == "vllm":  # fail before the first cell, not after hours of released cells
+            for ck in cfg.checkpoints:
+                if ck != "released":
+                    merged_model_dir(ck)
         reader = SourceRootReader(sdir)
         cells = harness.run_grid(
-            cfg, ecfg, fcfg, data_root, lambda ck: make_backend(backend, ck, reader),
+            cfg, ecfg, fcfg, data_root,
+            lambda ck: make_backend(backend, ck, reader, model_dir=model_dir),
             sources_dir=sdir,
         )  # fmt: skip
         typer.echo(f"ran {len(cells)} cells")
 
     _run(config, data_root / "eval", _entry)
+
+
+@eval_app.command("merge-adapter")
+def eval_merge_adapter(
+    run: Annotated[
+        Path, typer.Option("--run", help="Run directory holding adapter/ (data/runs/<name>).")
+    ],
+    base: Annotated[
+        str, typer.Option("--base", help="Base model: Hub id or local snapshot directory.")
+    ] = "nvidia/Flora-Rewarder",
+    out: Annotated[
+        Path | None, typer.Option("--out", help="Output directory (default <run>/merged).")
+    ] = None,
+    overwrite: Annotated[
+        bool, typer.Option("--overwrite", help="Replace an existing output directory.")
+    ] = False,
+    device_map: Annotated[
+        str | None,
+        typer.Option("--device-map", help="transformers device_map (default: auto on CUDA, CPU)."),
+    ] = None,
+) -> None:
+    """Merge a run's LoRA adapter into the base weights (bf16 safetensors) for vLLM."""
+    from tactile_flora.eval.merge_adapter import merge_adapter
+
+    typer.echo(f"run:      {run}")
+    typer.echo(f"git hash: {git_hash()}")
+    try:
+        merge_adapter(run, base, out, overwrite=overwrite, device_map=device_map, echo=typer.echo)
+    except (RuntimeError, FileExistsError) as exc:
+        typer.echo(f"{type(exc).__name__}: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
 
 
 @eval_app.command("report")

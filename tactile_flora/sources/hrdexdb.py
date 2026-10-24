@@ -85,6 +85,7 @@ from tactile_flora.schema import (
     GripperStream,
     Label,
     PadArmForce,
+    VideoRef,
 )
 from tactile_flora.sources._eval_common import nearest_index, probe_video, rate_from_times
 from tactile_flora.sources.base import register_source, strip_outcome_words
@@ -96,7 +97,10 @@ _TACTILE_FILES = {"allegro_v5": "tactile", "inspire_dftp": "force", "inspire_f1"
 # hand -> hand position file stem (default "position")
 _POSITION_FILES = {"inspire_f1": "right_joint_states"}
 # Inspire hands report larger joint values when open; the closure proxy is flipped for them.
-_LARGER_IS_OPEN = {"inspire_dftp": "inspire_angle_1000_open", "inspire_f1": "inspire_f1_larger_is_open"}
+_LARGER_IS_OPEN = {
+    "inspire_dftp": "inspire_angle_1000_open",
+    "inspire_f1": "inspire_f1_larger_is_open",
+}
 _UNSUPPORTED = {
     "robotiq_2f85": "it has no tactile or force file",
     "human": "there is no robot, hence no tactile or force stream",
@@ -369,12 +373,8 @@ class HrdexdbAdapter:
             gripper_convention = _LARGER_IS_OPEN[hand]
         g = closure[nearest_index(t_pos - offset, t)]
 
-        vids = sorted((trial / "vid").glob("*.mp4"))
-        if not vids:
-            raise FileNotFoundError(f"no videos under {trial / 'vid'}")
-        # SourceRootReader prepends the configured root to relative VideoRef paths. Resolve here
-        # because ``trial`` already includes that root (which may itself be a relative path).
-        scene_ref = probe_video(vids[0].resolve())
+        cameras, serial = self._cameras(episode_id, trial)
+        scene_ref = cameras["scene"]
         alignment = {"method": "legacy_sensor_origin"}
         if self.cfg.hrdexdb_use_video_timestamps:
             mask, t, alignment = video_clock(trial, t_raw, scene_ref.fps, scene_ref.n_frames or 0)
@@ -386,9 +386,13 @@ class HrdexdbAdapter:
             source=self.name,
             episode_id=episode_id,
             session=hand,
-            task=strip_outcome_words(f"grasp and lift the {obj.replace('_', ' ')}"),
+            task=strip_outcome_words(
+                (self.cfg.hrdexdb_task_template or "grasp and lift the {object}").format(
+                    object=obj.replace("_", " ")
+                )
+            ),
             duration_s=duration,
-            cameras={"scene": scene_ref},
+            cameras=cameras,
             force=ForceStream(
                 channel="pad",
                 arms={"R": PadArmForce(f_a=f_a.tolist(), f_b=f_b.tolist())},
@@ -403,7 +407,12 @@ class HrdexdbAdapter:
                 "hand": hand,
                 "object": obj,
                 "scene_id": scene,
-                "camera_serial": vids[0].stem,
+                "camera_serial": serial,
+                "camera_serials": [
+                    serial,
+                    *(r.removeprefix("cam_") for r in cameras if r != "scene"),
+                ],
+                "norm_by_hand": bool(self.cfg.hrdexdb_frames_root),
                 "tactile_file": f"raw/hand/{stem}.npy",
                 "tactile_channels": [int(top[0]), int(top[1])],
                 "tactile_channel_names": (
@@ -426,6 +435,41 @@ class HrdexdbAdapter:
                 "clock_alignment": alignment,
             },
         )
+
+    def _cameras(self, episode_id: str, trial: Path) -> tuple[dict[str, VideoRef], str]:
+        """Camera VideoRefs (``scene`` first) and the scene serial.
+
+        Frame-cache mode (``hrdexdb_frames_root``): ``hrdexdb_cameras`` in collage order (default:
+        the first serial in video.json), each a pre-rendered directory whose fps, header frame
+        count and source size come from video.json. Legacy: the first mp4 in ``vid/`` (sorted).
+        """
+        root = self.cfg.hrdexdb_frames_root
+        if root:
+            edir = Path(root) / episode_id
+            meta = json.loads((edir / "video.json").read_text())
+            serials = list(self.cfg.hrdexdb_cameras) or [
+                sorted(c for c in meta if not meta[c].get("missing"))[0]
+            ]
+            missing = [c for c in serials if c not in meta or meta[c].get("missing")]
+            if missing:
+                raise FileNotFoundError(f"{edir}: cameras {missing} were not rendered")
+            refs = {
+                ("scene" if k == 0 else f"cam_{c}"): VideoRef(
+                    path=str((edir / c).resolve()),
+                    fps=float(meta[c]["fps"]),
+                    n_frames=int(meta[c]["n_frames"]),
+                    width=int(meta[c]["width"]),
+                    height=int(meta[c]["height"]),
+                )
+                for k, c in enumerate(serials)
+            }
+            return refs, serials[0]
+        vids = sorted((trial / "vid").glob("*.mp4"))
+        if not vids:
+            raise FileNotFoundError(f"no videos under {trial / 'vid'}")
+        # SourceRootReader prepends the configured root to relative VideoRef paths. Resolve here
+        # because ``trial`` already includes that root (which may itself be a relative path).
+        return {"scene": probe_video(vids[0].resolve())}, vids[0].stem
 
     def splits(self) -> dict[str, list[str]]:
         """Eval only: every episode is in split "benchmark"."""
