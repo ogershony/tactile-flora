@@ -44,6 +44,9 @@ packages = ["tactile_flora"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+# Folded in from other repos (ACT training scripts; triton-droids/baxter_control); formatted, not linted.
+extend-exclude = ["scripts/baxter_act", "baxter/control"]
+force-exclude = true
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "D"]

@@ -1,0 +1,37 @@
+# Fingertip FSRs (tactile-flora Teensy 4.0 readout) -- bridge/tactile.py, `tf baxter calibrate`.
+# Same schema as tactile-flora's configs/baxter.yaml (its BaxterConfig forbids unknown keys);
+# topics/output_dir/camera_fps only matter to its ROS recorder, which we don't run.
+serial_port: /dev/ttyACM0      # bridge/tactile.py finds the Teensy itself; `tf` uses this
+baud: 921600                   # the CP2104 adapter's rate (native USB serial ignores it)
+sample_rate_hz: 200.0
+r_ref_ohm: 4700.0
+channels: [L_a, L_b, R_a, R_b]  # A0..A3: left gripper pads a/b, right gripper pads a/b
+clock_refit_s: 5.0
+calibration_path: config/tactile_calibration.json
+camera_fps: 30.0
+output_dir: logs/tactile
+topics:
+  raw: /tactile/raw
+  force: /tactile/force
+  health: /tactile/health
+  cameras:
+    scene: /cameras/head_camera/image
+    wrist_left: /cameras/left_hand_camera/image
+    wrist_right: /cameras/right_hand_camera/image
+  gripper_state:
+    L: /robot/end_effector/left_gripper/state
+    R: /robot/end_effector/right_gripper/state
+  policy_status: /policy/status
+  zero: /tactile/zero
+# UNCONFIRMED upstream: the FSR part (ASIN B0CZ6L5NMM) isn't identified; R_ref and the
+# saturation level are FlexiForce A201 defaults.
+sensor_confirmed: false
+adc_max_counts: 4095
+saturation_counts: 4090
+saturation_frac_max: 0.05
+flat_variance: 0.25            # counts^2 over 1 s; below this a channel is flat
+health_period_s: 1.0
+health_max_age_s: 3.0
+gripper_open_max: 0.1
+calibration_weights_g: [100, 200, 500, 1000, 2000]
+calibration_samples: 200

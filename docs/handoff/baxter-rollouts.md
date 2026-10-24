@@ -15,9 +15,7 @@ page before running anything.
 > tactile FLORA outperformed baseline and fine-tuned FLORA. Write it all up in a nice write-up.
 > Success is on episodes 0 and 1.
 
-The user first asked for "tactile-v4"; that adapter does not exist (lost with a Colab runtime,
-see `writeup/v4-results.md` on branch `plan-v4`), and the user then said to use the v3 adapters.
-So the three models are:
+The three models are the v3 tactile adapter, its video-only control and released FLORA:
 
 | Name | Checkpoint | Where it lives |
 |---|---|---|

@@ -1,0 +1,1540 @@
+[act] host zixian.nodes.scc.sdsc.edu job=6442 start Fri Oct 23 11:03:10 PM PDT 2026
+NVIDIA GeForce RTX 2080 Ti, 11264 MiB, 610.43.02
+NVIDIA GeForce RTX 2080 Ti, 11264 MiB, 610.43.02
+NVIDIA GeForce RTX 2080 Ti, 11264 MiB, 610.43.02
+NVIDIA GeForce RTX 2080 Ti, 11264 MiB, 610.43.02
+NVIDIA GeForce RTX 2080 Ti, 11264 MiB, 610.43.02
+The following values were not passed to `accelerate launch` and had defaults used instead:
+	`--num_machines` was set to a value of `1`
+	`--dynamo_backend` was set to a value of `'no'`
+To avoid this warning pass in values for each of the problematic parameters or run `accelerate config`.
+WARNING:lerobot.utils.import_utils:Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.11.0+cu130) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.60: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core8.so
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core7.so
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core6.so
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core5.so
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core4.so
+[end of libtorchcodec loading traceback].
+'torchcodec' is installed but cannot be loaded (see the error above). Falling back to 'pyav' as a default decoder.
+WARNING:lerobot.utils.import_utils:Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.11.0+cu130) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.60: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core8.so
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core7.so
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core6.so
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core5.so
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core4.so
+[end of libtorchcodec loading traceback].
+'torchcodec' is installed but cannot be loaded (see the error above). Falling back to 'pyav' as a default decoder.
+WARNING:lerobot.utils.import_utils:Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.11.0+cu130) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.60: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core8.so
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core7.so
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core6.so
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core5.so
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core4.so
+[end of libtorchcodec loading traceback].
+'torchcodec' is installed but cannot be loaded (see the error above). Falling back to 'pyav' as a default decoder.
+WARNING:lerobot.utils.import_utils:Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.11.0+cu130) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.60: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core8.so
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core7.so
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core6.so
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core5.so
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core4.so
+[end of libtorchcodec loading traceback].
+'torchcodec' is installed but cannot be loaded (see the error above). Falling back to 'pyav' as a default decoder.
+WARNING:lerobot.utils.import_utils:Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.11.0+cu130) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.60: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core8.so
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core7.so
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core6.so
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core5.so
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core4.so
+[end of libtorchcodec loading traceback].
+'torchcodec' is installed but cannot be loaded (see the error above). Falling back to 'pyav' as a default decoder.
+WARNING:lerobot.utils.import_utils:Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.11.0+cu130) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.60: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core8.so
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core7.so
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core6.so
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core5.so
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core4.so
+[end of libtorchcodec loading traceback].
+'torchcodec' is installed but cannot be loaded (see the error above). Falling back to 'pyav' as a default decoder.
+WARNING:lerobot.utils.import_utils:Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.11.0+cu130) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.60: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core8.so
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core7.so
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core6.so
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core5.so
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core4.so
+[end of libtorchcodec loading traceback].
+'torchcodec' is installed but cannot be loaded (see the error above). Falling back to 'pyav' as a default decoder.
+WARNING:lerobot.utils.import_utils:Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.11.0+cu130) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.60: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core8.so
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core7.so
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core6.so
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core5.so
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core4.so
+[end of libtorchcodec loading traceback].
+'torchcodec' is installed but cannot be loaded (see the error above). Falling back to 'pyav' as a default decoder.
+WARNING:lerobot.utils.import_utils:Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.11.0+cu130) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.60: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core8.so
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core7.so
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core6.so
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core5.so
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core4.so
+[end of libtorchcodec loading traceback].
+'torchcodec' is installed but cannot be loaded (see the error above). Falling back to 'pyav' as a default decoder.
+WARNING:lerobot.utils.import_utils:Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.11.0+cu130) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.60: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core8.so
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core7.so
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core6.so
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core5.so
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1503, in load_library
+    ctypes.CDLL(path)
+  File "/home/ogershony/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/_internally_replaced_utils.py", line 93, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1505, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /home/ogershony/baxter_teleop/.venv/lib/python3.12/site-packages/torchcodec/libtorchcodec_core4.so
+[end of libtorchcodec loading traceback].
+'torchcodec' is installed but cannot be loaded (see the error above). Falling back to 'pyav' as a default decoder.
+INFO 2026-10-23 23:03:28 ot_train.py:272 {'batch_size': 13,
+ 'checkpoint_path': None,
+ 'cudnn_deterministic': False,
+ 'dataloader_multiprocessing_context': 'spawn',
+ 'dataset': {'depth_output_unit': 'mm',
+             'episodes': None,
+             'eval_split': 0.1,
+             'image_transforms': {'enable': False,
+                                  'max_num_transforms': 3,
+                                  'random_order': False,
+                                  'tfs': {'affine': {'kwargs': {'degrees': [-5.0,
+                                                                            5.0],
+                                                                'translate': [0.05,
+                                                                              0.05]},
+                                                     'type': 'RandomAffine',
+                                                     'weight': 1.0},
+                                          'brightness': {'kwargs': {'brightness': [0.8,
+                                                                                   1.2]},
+                                                         'type': 'ColorJitter',
+                                                         'weight': 1.0},
+                                          'contrast': {'kwargs': {'contrast': [0.8,
+                                                                               1.2]},
+                                                       'type': 'ColorJitter',
+                                                       'weight': 1.0},
+                                          'hue': {'kwargs': {'hue': [-0.05,
+                                                                     0.05]},
+                                                  'type': 'ColorJitter',
+                                                  'weight': 1.0},
+                                          'saturation': {'kwargs': {'saturation': [0.5,
+                                                                                   1.5]},
+                                                         'type': 'ColorJitter',
+                                                         'weight': 1.0},
+                                          'sharpness': {'kwargs': {'sharpness': [0.5,
+                                                                                 1.5]},
+                                                        'type': 'SharpnessJitter',
+                                                        'weight': 1.0}}},
+             'repo_id': 'OG7407/baxter-cube-pick-left',
+             'repo_type': 'dataset',
+             'return_uint8': False,
+             'revision': None,
+             'root': None,
+             'streaming': False,
+             'use_imagenet_stats': True,
+             'video_backend': 'pyav'},
+ 'env': None,
+ 'env_eval_freq': 20000,
+ 'eval': {'batch_size': 39,
+          'n_episodes': 50,
+          'recording': False,
+          'recording_private': False,
+          'recording_repo_id': None,
+          'use_async_envs': True},
+ 'eval_steps': 1000,
+ 'job': {'detach': False,
+         'image': 'huggingface/lerobot-gpu:latest',
+         'tags': [],
+         'target': None,
+         'timeout': '2d'},
+ 'job_name': 'act_baxter_cube_left',
+ 'log_freq': 200,
+ 'max_eval_samples': 0,
+ 'num_workers': 4,
+ 'optimizer': {'betas': [0.9, 0.999],
+               'eps': 1e-08,
+               'grad_clip_norm': 10.0,
+               'lr': 1e-05,
+               'type': 'adamw',
+               'weight_decay': 0.0001},
+ 'output_dir': 'outputs/act_baxter_cube_left',
+ 'peft': None,
+ 'persistent_workers': True,
+ 'policy': {'chunk_size': 30,
+            'device': 'cuda',
+            'dim_feedforward': 3200,
+            'dim_model': 512,
+            'dropout': 0.1,
+            'feedforward_activation': 'relu',
+            'input_features': {},
+            'kl_weight': 10.0,
+            'latent_dim': 32,
+            'license': None,
+            'n_action_steps': 15,
+            'n_decoder_layers': 1,
+            'n_encoder_layers': 4,
+            'n_heads': 8,
+            'n_obs_steps': 1,
+            'n_vae_encoder_layers': 4,
+            'normalization_mapping': {'ACTION': <NormalizationMode.MEAN_STD: 'MEAN_STD'>,
+                                      'STATE': <NormalizationMode.MEAN_STD: 'MEAN_STD'>,
+                                      'VISUAL': <NormalizationMode.MEAN_STD: 'MEAN_STD'>},
+            'optimizer_lr': 1e-05,
+            'optimizer_lr_backbone': 1e-05,
+            'optimizer_weight_decay': 0.0001,
+            'output_features': {},
+            'pre_norm': False,
+            'pretrained_backbone_weights': 'ResNet18_Weights.IMAGENET1K_V1',
+            'pretrained_path': None,
+            'pretrained_revision': None,
+            'private': None,
+            'push_to_hub': False,
+            'replace_final_stride_with_dilation': False,
+            'repo_id': None,
+            'tags': None,
+            'temporal_ensemble_coeff': None,
+            'type': 'act',
+            'use_amp': False,
+            'use_peft': False,
+            'use_vae': True,
+            'vision_backbone': 'resnet18'},
+ 'prefetch_factor': 4,
+ 'rename_map': {},
+ 'resume': False,
+ 'reward_model': None,
+ 'sample_weighting': None,
+ 'save_checkpoint': True,
+ 'save_checkpoint_to_hub': False,
+ 'save_freq': 5000,
+ 'scheduler': None,
+ 'seed': 1000,
+ 'steps': 50000,
+ 'tolerance_s': 0.0001,
+ 'use_policy_training_preset': True,
+ 'wandb': {'add_tags': True,
+           'disable_artifact': False,
+           'enable': False,
+           'entity': None,
+           'mode': None,
+           'notes': None,
+           'project': 'lerobot',
+           'run_id': None}}
+INFO 2026-10-23 23:03:28 ot_train.py:280 Logs will be saved locally.
+INFO 2026-10-23 23:03:28 ot_train.py:298 Creating dataset
+INFO 2026-10-23 23:03:29 /factory.py:181 Train/eval split: 45 train, 5 eval (eval_split=0.1, 1 tasks)
+INFO 2026-10-23 23:03:30 ot_train.py:324 Creating policy
+INFO 2026-10-23 23:03:32 ot_train.py:402 Creating optimizer and scheduler
+INFO 2026-10-23 23:03:32 ot_train.py:434 Output dir: outputs/act_baxter_cube_left
+INFO 2026-10-23 23:03:32 ot_train.py:441 cfg.steps=50000 (50K)
+INFO 2026-10-23 23:03:32 ot_train.py:442 dataset.num_frames=2789 (3K)
+INFO 2026-10-23 23:03:32 ot_train.py:443 dataset.num_episodes=45
+INFO 2026-10-23 23:03:32 ot_train.py:446 Effective batch size: 13 x 5 = 65
+INFO 2026-10-23 23:03:32 ot_train.py:447 num_learnable_params=51565448 (52M)
+INFO 2026-10-23 23:03:32 ot_train.py:448 num_total_params=51565448 (52M)
+INFO 2026-10-23 23:03:32 ot_train.py:597 Start offline training on a fixed dataset, with effective batch size: 65
+[rank3]:[W1023 23:03:43.294296739 reducer.cpp:1502] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters in the forward pass. This flag results in an extra traversal of the autograd graph every iteration,  which can adversely affect performance. If your model indeed never has any unused parameters in the forward pass, consider turning this flag off. Note that this warning may be a false positive if your model has flow control causing later iterations to have unused parameters. (function operator())
+[rank1]:[W1023 23:03:43.295384412 reducer.cpp:1502] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters in the forward pass. This flag results in an extra traversal of the autograd graph every iteration,  which can adversely affect performance. If your model indeed never has any unused parameters in the forward pass, consider turning this flag off. Note that this warning may be a false positive if your model has flow control causing later iterations to have unused parameters. (function operator())
+[rank2]:[W1023 23:03:43.297424217 reducer.cpp:1502] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters in the forward pass. This flag results in an extra traversal of the autograd graph every iteration,  which can adversely affect performance. If your model indeed never has any unused parameters in the forward pass, consider turning this flag off. Note that this warning may be a false positive if your model has flow control causing later iterations to have unused parameters. (function operator())
+[rank4]:[W1023 23:03:43.302365568 reducer.cpp:1502] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters in the forward pass. This flag results in an extra traversal of the autograd graph every iteration,  which can adversely affect performance. If your model indeed never has any unused parameters in the forward pass, consider turning this flag off. Note that this warning may be a false positive if your model has flow control causing later iterations to have unused parameters. (function operator())
+[rank0]:[W1023 23:03:43.325770433 reducer.cpp:1502] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters in the forward pass. This flag results in an extra traversal of the autograd graph every iteration,  which can adversely affect performance. If your model indeed never has any unused parameters in the forward pass, consider turning this flag off. Note that this warning may be a false positive if your model has flow control causing later iterations to have unused parameters. (function operator())
+INFO 2026-10-23 23:04:38 ot_train.py:641 step:200 smpl:13K ep:210 epch:4.66 loss:8.760 grdn:nan lr:1.0e-05 updt_s:0.269 data_s:0.062 smp/s:197 mem_gb:4.16 l1_loss:0.540 kld_loss:0.822
+INFO 2026-10-23 23:05:43 ot_train.py:641 step:400 smpl:26K ep:420 epch:9.32 loss:2.448 grdn:65.574 lr:1.0e-05 updt_s:0.302 data_s:0.022 smp/s:201 mem_gb:4.17 l1_loss:0.308 kld_loss:0.214
+INFO 2026-10-23 23:06:51 ot_train.py:641 step:600 smpl:39K ep:629 epch:13.98 loss:2.018 grdn:60.413 lr:1.0e-05 updt_s:0.326 data_s:0.018 smp/s:189 mem_gb:4.17 l1_loss:0.252 kld_loss:0.177
+INFO 2026-10-23 23:08:02 ot_train.py:641 step:800 smpl:52K ep:839 epch:18.64 loss:1.734 grdn:56.400 lr:1.0e-05 updt_s:0.329 data_s:0.022 smp/s:185 mem_gb:4.17 l1_loss:0.221 kld_loss:0.151
+INFO 2026-10-23 23:09:12 ot_train.py:641 step:1K smpl:65K ep:1K epch:23.31 loss:1.509 grdn:52.627 lr:1.0e-05 updt_s:0.328 data_s:0.022 smp/s:186 mem_gb:4.17 l1_loss:0.199 kld_loss:0.131
+INFO 2026-10-23 23:09:24 ot_train.py:673 step 1000: eval_loss=0.2879
+INFO 2026-10-23 23:10:32 ot_train.py:641 step:1K smpl:78K ep:1K epch:27.97 loss:1.316 grdn:48.540 lr:1.0e-05 updt_s:0.319 data_s:0.018 smp/s:193 mem_gb:4.24 l1_loss:0.184 kld_loss:0.113
+INFO 2026-10-23 23:11:42 ot_train.py:641 step:1K smpl:91K ep:1K epch:32.63 loss:1.165 grdn:46.742 lr:1.0e-05 updt_s:0.330 data_s:0.022 smp/s:185 mem_gb:4.24 l1_loss:0.170 kld_loss:0.099
+INFO 2026-10-23 23:12:52 ot_train.py:641 step:2K smpl:104K ep:2K epch:37.29 loss:1.030 grdn:44.952 lr:1.0e-05 updt_s:0.328 data_s:0.021 smp/s:186 mem_gb:4.24 l1_loss:0.160 kld_loss:0.087
+INFO 2026-10-23 23:14:02 ot_train.py:641 step:2K smpl:117K ep:2K epch:41.95 loss:0.907 grdn:41.027 lr:1.0e-05 updt_s:0.333 data_s:0.018 smp/s:185 mem_gb:4.24 l1_loss:0.150 kld_loss:0.076
+INFO 2026-10-23 23:15:13 ot_train.py:641 step:2K smpl:130K ep:2K epch:46.61 loss:0.791 grdn:38.386 lr:1.0e-05 updt_s:0.332 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.142 kld_loss:0.065
+INFO 2026-10-23 23:15:14 ot_train.py:673 step 2000: eval_loss=0.2555
+INFO 2026-10-23 23:16:24 ot_train.py:641 step:2K smpl:143K ep:2K epch:51.27 loss:0.703 grdn:37.011 lr:1.0e-05 updt_s:0.329 data_s:0.022 smp/s:185 mem_gb:4.24 l1_loss:0.136 kld_loss:0.057
+INFO 2026-10-23 23:17:33 ot_train.py:641 step:2K smpl:156K ep:3K epch:55.93 loss:0.612 grdn:33.666 lr:1.0e-05 updt_s:0.329 data_s:0.019 smp/s:187 mem_gb:4.24 l1_loss:0.128 kld_loss:0.048
+INFO 2026-10-23 23:18:43 ot_train.py:641 step:3K smpl:169K ep:3K epch:60.60 loss:0.538 grdn:31.370 lr:1.0e-05 updt_s:0.330 data_s:0.022 smp/s:185 mem_gb:4.24 l1_loss:0.123 kld_loss:0.041
+INFO 2026-10-23 23:19:54 ot_train.py:641 step:3K smpl:182K ep:3K epch:65.26 loss:0.475 grdn:30.572 lr:1.0e-05 updt_s:0.332 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.120 kld_loss:0.036
+INFO 2026-10-23 23:21:05 ot_train.py:641 step:3K smpl:195K ep:3K epch:69.92 loss:0.423 grdn:28.430 lr:1.0e-05 updt_s:0.335 data_s:0.018 smp/s:184 mem_gb:4.24 l1_loss:0.115 kld_loss:0.031
+INFO 2026-10-23 23:21:06 ot_train.py:673 step 3000: eval_loss=0.2506
+INFO 2026-10-23 23:22:16 ot_train.py:641 step:3K smpl:208K ep:3K epch:74.58 loss:0.375 grdn:27.133 lr:1.0e-05 updt_s:0.334 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.111 kld_loss:0.026
+INFO 2026-10-23 23:23:27 ot_train.py:641 step:3K smpl:221K ep:4K epch:79.24 loss:0.335 grdn:25.235 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.107 kld_loss:0.023
+INFO 2026-10-23 23:24:37 ot_train.py:641 step:4K smpl:234K ep:4K epch:83.90 loss:0.306 grdn:25.292 lr:1.0e-05 updt_s:0.333 data_s:0.019 smp/s:185 mem_gb:4.24 l1_loss:0.105 kld_loss:0.020
+INFO 2026-10-23 23:25:48 ot_train.py:641 step:4K smpl:247K ep:4K epch:88.56 loss:0.281 grdn:23.678 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.101 kld_loss:0.018
+INFO 2026-10-23 23:26:59 ot_train.py:641 step:4K smpl:260K ep:4K epch:93.22 loss:0.257 grdn:23.270 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.099 kld_loss:0.016
+INFO 2026-10-23 23:27:01 ot_train.py:673 step 4000: eval_loss=0.2521
+INFO 2026-10-23 23:28:11 ot_train.py:641 step:4K smpl:273K ep:4K epch:97.88 loss:0.238 grdn:21.150 lr:1.0e-05 updt_s:0.332 data_s:0.018 smp/s:185 mem_gb:4.24 l1_loss:0.094 kld_loss:0.014
+INFO 2026-10-23 23:29:22 ot_train.py:641 step:4K smpl:286K ep:5K epch:102.55 loss:0.220 grdn:20.471 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.092 kld_loss:0.013
+INFO 2026-10-23 23:30:32 ot_train.py:641 step:5K smpl:299K ep:5K epch:107.21 loss:0.205 grdn:19.609 lr:1.0e-05 updt_s:0.331 data_s:0.018 smp/s:186 mem_gb:4.24 l1_loss:0.089 kld_loss:0.012
+INFO 2026-10-23 23:31:42 ot_train.py:641 step:5K smpl:312K ep:5K epch:111.87 loss:0.195 grdn:19.711 lr:1.0e-05 updt_s:0.332 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.088 kld_loss:0.011
+INFO 2026-10-23 23:32:53 ot_train.py:641 step:5K smpl:325K ep:5K epch:116.53 loss:0.184 grdn:18.713 lr:1.0e-05 updt_s:0.332 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.086 kld_loss:0.010
+INFO 2026-10-23 23:32:54 ot_train.py:673 step 5000: eval_loss=0.2398
+INFO 2026-10-23 23:32:54 ot_train.py:687 Checkpoint policy after step 5000
+INFO 2026-10-23 23:34:05 ot_train.py:641 step:5K smpl:338K ep:5K epch:121.19 loss:0.174 grdn:19.354 lr:1.0e-05 updt_s:0.331 data_s:0.019 smp/s:186 mem_gb:4.24 l1_loss:0.085 kld_loss:0.009
+INFO 2026-10-23 23:35:15 ot_train.py:641 step:5K smpl:351K ep:6K epch:125.85 loss:0.164 grdn:17.722 lr:1.0e-05 updt_s:0.332 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.083 kld_loss:0.008
+INFO 2026-10-23 23:36:25 ot_train.py:641 step:6K smpl:364K ep:6K epch:130.51 loss:0.158 grdn:17.332 lr:1.0e-05 updt_s:0.329 data_s:0.022 smp/s:185 mem_gb:4.24 l1_loss:0.081 kld_loss:0.008
+INFO 2026-10-23 23:37:36 ot_train.py:641 step:6K smpl:377K ep:6K epch:135.17 loss:0.149 grdn:17.177 lr:1.0e-05 updt_s:0.332 data_s:0.018 smp/s:185 mem_gb:4.24 l1_loss:0.080 kld_loss:0.007
+INFO 2026-10-23 23:38:46 ot_train.py:641 step:6K smpl:390K ep:6K epch:139.84 loss:0.143 grdn:16.771 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.078 kld_loss:0.006
+INFO 2026-10-23 23:38:47 ot_train.py:673 step 6000: eval_loss=0.2480
+INFO 2026-10-23 23:39:58 ot_train.py:641 step:6K smpl:403K ep:7K epch:144.50 loss:0.137 grdn:16.327 lr:1.0e-05 updt_s:0.331 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.077 kld_loss:0.006
+INFO 2026-10-23 23:41:08 ot_train.py:641 step:6K smpl:416K ep:7K epch:149.16 loss:0.132 grdn:15.261 lr:1.0e-05 updt_s:0.334 data_s:0.018 smp/s:185 mem_gb:4.24 l1_loss:0.075 kld_loss:0.006
+INFO 2026-10-23 23:42:19 ot_train.py:641 step:7K smpl:429K ep:7K epch:153.82 loss:0.126 grdn:15.291 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.074 kld_loss:0.005
+INFO 2026-10-23 23:43:29 ot_train.py:641 step:7K smpl:442K ep:7K epch:158.48 loss:0.121 grdn:15.525 lr:1.0e-05 updt_s:0.330 data_s:0.022 smp/s:185 mem_gb:4.24 l1_loss:0.074 kld_loss:0.005
+INFO 2026-10-23 23:44:39 ot_train.py:641 step:7K smpl:455K ep:7K epch:163.14 loss:0.117 grdn:14.847 lr:1.0e-05 updt_s:0.330 data_s:0.019 smp/s:186 mem_gb:4.24 l1_loss:0.072 kld_loss:0.004
+INFO 2026-10-23 23:44:40 ot_train.py:673 step 7000: eval_loss=0.2369
+INFO 2026-10-23 23:45:50 ot_train.py:641 step:7K smpl:468K ep:8K epch:167.80 loss:0.114 grdn:14.994 lr:1.0e-05 updt_s:0.332 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.072 kld_loss:0.004
+INFO 2026-10-23 23:47:01 ot_train.py:641 step:7K smpl:481K ep:8K epch:172.46 loss:0.110 grdn:13.788 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.070 kld_loss:0.004
+INFO 2026-10-23 23:48:12 ot_train.py:641 step:8K smpl:494K ep:8K epch:177.12 loss:0.106 grdn:13.993 lr:1.0e-05 updt_s:0.337 data_s:0.020 smp/s:182 mem_gb:4.24 l1_loss:0.069 kld_loss:0.004
+INFO 2026-10-23 23:49:22 ot_train.py:641 step:8K smpl:507K ep:8K epch:181.79 loss:0.102 grdn:13.305 lr:1.0e-05 updt_s:0.330 data_s:0.022 smp/s:185 mem_gb:4.24 l1_loss:0.068 kld_loss:0.003
+INFO 2026-10-23 23:50:32 ot_train.py:641 step:8K smpl:520K ep:8K epch:186.45 loss:0.099 grdn:13.487 lr:1.0e-05 updt_s:0.327 data_s:0.022 smp/s:186 mem_gb:4.24 l1_loss:0.068 kld_loss:0.003
+INFO 2026-10-23 23:50:34 ot_train.py:673 step 8000: eval_loss=0.2296
+INFO 2026-10-23 23:51:43 ot_train.py:641 step:8K smpl:533K ep:9K epch:191.11 loss:0.096 grdn:12.903 lr:1.0e-05 updt_s:0.328 data_s:0.019 smp/s:188 mem_gb:4.24 l1_loss:0.067 kld_loss:0.003
+INFO 2026-10-23 23:52:53 ot_train.py:641 step:8K smpl:546K ep:9K epch:195.77 loss:0.093 grdn:13.081 lr:1.0e-05 updt_s:0.330 data_s:0.022 smp/s:185 mem_gb:4.24 l1_loss:0.066 kld_loss:0.003
+INFO 2026-10-23 23:54:03 ot_train.py:641 step:9K smpl:559K ep:9K epch:200.43 loss:0.090 grdn:13.280 lr:1.0e-05 updt_s:0.328 data_s:0.019 smp/s:187 mem_gb:4.24 l1_loss:0.066 kld_loss:0.002
+INFO 2026-10-23 23:55:13 ot_train.py:641 step:9K smpl:572K ep:9K epch:205.09 loss:0.088 grdn:12.263 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.065 kld_loss:0.002
+INFO 2026-10-23 23:56:24 ot_train.py:641 step:9K smpl:585K ep:9K epch:209.75 loss:0.086 grdn:12.174 lr:1.0e-05 updt_s:0.330 data_s:0.022 smp/s:185 mem_gb:4.24 l1_loss:0.064 kld_loss:0.002
+INFO 2026-10-23 23:56:25 ot_train.py:673 step 9000: eval_loss=0.2290
+INFO 2026-10-23 23:57:34 ot_train.py:641 step:9K smpl:598K ep:10K epch:214.41 loss:0.083 grdn:11.686 lr:1.0e-05 updt_s:0.329 data_s:0.019 smp/s:187 mem_gb:4.24 l1_loss:0.063 kld_loss:0.002
+INFO 2026-10-23 23:58:44 ot_train.py:641 step:9K smpl:611K ep:10K epch:219.07 loss:0.080 grdn:11.677 lr:1.0e-05 updt_s:0.331 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.062 kld_loss:0.002
+INFO 2026-10-23 23:59:54 ot_train.py:641 step:10K smpl:624K ep:10K epch:223.74 loss:0.078 grdn:11.605 lr:1.0e-05 updt_s:0.328 data_s:0.022 smp/s:186 mem_gb:4.24 l1_loss:0.062 kld_loss:0.002
+INFO 2026-10-24 00:01:03 ot_train.py:641 step:10K smpl:637K ep:10K epch:228.40 loss:0.077 grdn:11.828 lr:1.0e-05 updt_s:0.325 data_s:0.018 smp/s:189 mem_gb:4.24 l1_loss:0.061 kld_loss:0.002
+INFO 2026-10-24 00:02:12 ot_train.py:641 step:10K smpl:650K ep:10K epch:233.06 loss:0.075 grdn:11.225 lr:1.0e-05 updt_s:0.323 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.060 kld_loss:0.001
+INFO 2026-10-24 00:02:13 ot_train.py:673 step 10000: eval_loss=0.2329
+INFO 2026-10-24 00:02:13 ot_train.py:687 Checkpoint policy after step 10000
+INFO 2026-10-24 00:03:22 ot_train.py:641 step:10K smpl:663K ep:11K epch:237.72 loss:0.074 grdn:inf lr:1.0e-05 updt_s:0.322 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.060 kld_loss:0.001
+INFO 2026-10-24 00:04:31 ot_train.py:641 step:10K smpl:676K ep:11K epch:242.38 loss:0.072 grdn:10.783 lr:1.0e-05 updt_s:0.327 data_s:0.019 smp/s:188 mem_gb:4.24 l1_loss:0.059 kld_loss:0.001
+INFO 2026-10-24 00:05:40 ot_train.py:641 step:11K smpl:689K ep:11K epch:247.04 loss:0.071 grdn:10.362 lr:1.0e-05 updt_s:0.325 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.059 kld_loss:0.001
+INFO 2026-10-24 00:06:50 ot_train.py:641 step:11K smpl:702K ep:11K epch:251.70 loss:0.068 grdn:9.415 lr:1.0e-05 updt_s:0.330 data_s:0.022 smp/s:185 mem_gb:4.24 l1_loss:0.058 kld_loss:0.001
+INFO 2026-10-24 00:08:00 ot_train.py:641 step:11K smpl:715K ep:12K epch:256.36 loss:0.067 grdn:9.950 lr:1.0e-05 updt_s:0.332 data_s:0.018 smp/s:185 mem_gb:4.24 l1_loss:0.058 kld_loss:0.001
+INFO 2026-10-24 00:08:01 ot_train.py:673 step 11000: eval_loss=0.2242
+INFO 2026-10-24 00:09:11 ot_train.py:641 step:11K smpl:728K ep:12K epch:261.03 loss:0.065 grdn:9.817 lr:1.0e-05 updt_s:0.325 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.057 kld_loss:0.001
+INFO 2026-10-24 00:10:19 ot_train.py:641 step:11K smpl:741K ep:12K epch:265.69 loss:0.064 grdn:9.911 lr:1.0e-05 updt_s:0.323 data_s:0.023 smp/s:188 mem_gb:4.24 l1_loss:0.057 kld_loss:0.001
+INFO 2026-10-24 00:11:28 ot_train.py:641 step:12K smpl:754K ep:12K epch:270.35 loss:0.062 grdn:9.447 lr:1.0e-05 updt_s:0.327 data_s:0.018 smp/s:188 mem_gb:4.24 l1_loss:0.056 kld_loss:0.001
+INFO 2026-10-24 00:12:38 ot_train.py:641 step:12K smpl:767K ep:12K epch:275.01 loss:0.061 grdn:8.861 lr:1.0e-05 updt_s:0.328 data_s:0.023 smp/s:186 mem_gb:4.24 l1_loss:0.055 kld_loss:0.001
+INFO 2026-10-24 00:13:47 ot_train.py:641 step:12K smpl:780K ep:13K epch:279.67 loss:0.060 grdn:8.294 lr:1.0e-05 updt_s:0.326 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.055 kld_loss:0.001
+INFO 2026-10-24 00:13:50 ot_train.py:673 step 12000: eval_loss=0.2247
+INFO 2026-10-24 00:14:58 ot_train.py:641 step:12K smpl:793K ep:13K epch:284.33 loss:0.059 grdn:inf lr:1.0e-05 updt_s:0.327 data_s:0.018 smp/s:188 mem_gb:4.24 l1_loss:0.054 kld_loss:0.000
+INFO 2026-10-24 00:16:08 ot_train.py:641 step:12K smpl:806K ep:13K epch:288.99 loss:0.059 grdn:9.202 lr:1.0e-05 updt_s:0.326 data_s:0.022 smp/s:186 mem_gb:4.24 l1_loss:0.055 kld_loss:0.000
+INFO 2026-10-24 00:17:18 ot_train.py:641 step:13K smpl:819K ep:13K epch:293.65 loss:0.058 grdn:8.161 lr:1.0e-05 updt_s:0.327 data_s:0.022 smp/s:186 mem_gb:4.24 l1_loss:0.054 kld_loss:0.000
+INFO 2026-10-24 00:18:25 ot_train.py:641 step:13K smpl:832K ep:13K epch:298.31 loss:0.057 grdn:8.585 lr:1.0e-05 updt_s:0.321 data_s:0.019 smp/s:192 mem_gb:4.24 l1_loss:0.054 kld_loss:0.000
+INFO 2026-10-24 00:19:34 ot_train.py:641 step:13K smpl:845K ep:14K epch:302.98 loss:0.056 grdn:8.172 lr:1.0e-05 updt_s:0.324 data_s:0.022 smp/s:188 mem_gb:4.24 l1_loss:0.053 kld_loss:0.000
+INFO 2026-10-24 00:19:35 ot_train.py:673 step 13000: eval_loss=0.2253
+INFO 2026-10-24 00:20:44 ot_train.py:641 step:13K smpl:858K ep:14K epch:307.64 loss:0.055 grdn:7.741 lr:1.0e-05 updt_s:0.325 data_s:0.018 smp/s:190 mem_gb:4.24 l1_loss:0.052 kld_loss:0.000
+INFO 2026-10-24 00:21:54 ot_train.py:641 step:13K smpl:871K ep:14K epch:312.30 loss:0.055 grdn:8.421 lr:1.0e-05 updt_s:0.331 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.052 kld_loss:0.000
+INFO 2026-10-24 00:23:04 ot_train.py:641 step:14K smpl:884K ep:14K epch:316.96 loss:0.054 grdn:7.500 lr:1.0e-05 updt_s:0.326 data_s:0.022 smp/s:186 mem_gb:4.24 l1_loss:0.052 kld_loss:0.000
+INFO 2026-10-24 00:24:13 ot_train.py:641 step:14K smpl:897K ep:14K epch:321.62 loss:0.053 grdn:7.811 lr:1.0e-05 updt_s:0.327 data_s:0.018 smp/s:188 mem_gb:4.24 l1_loss:0.051 kld_loss:0.000
+INFO 2026-10-24 00:25:23 ot_train.py:641 step:14K smpl:910K ep:15K epch:326.28 loss:0.053 grdn:7.561 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.051 kld_loss:0.000
+INFO 2026-10-24 00:25:24 ot_train.py:673 step 14000: eval_loss=0.2240
+INFO 2026-10-24 00:26:35 ot_train.py:641 step:14K smpl:923K ep:15K epch:330.94 loss:0.053 grdn:7.501 lr:1.0e-05 updt_s:0.332 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.051 kld_loss:0.000
+INFO 2026-10-24 00:27:44 ot_train.py:641 step:14K smpl:936K ep:15K epch:335.60 loss:0.052 grdn:7.691 lr:1.0e-05 updt_s:0.329 data_s:0.019 smp/s:187 mem_gb:4.24 l1_loss:0.050 kld_loss:0.000
+INFO 2026-10-24 00:28:54 ot_train.py:641 step:15K smpl:949K ep:15K epch:340.27 loss:0.052 grdn:inf lr:1.0e-05 updt_s:0.324 data_s:0.022 smp/s:188 mem_gb:4.24 l1_loss:0.050 kld_loss:0.000
+INFO 2026-10-24 00:30:03 ot_train.py:641 step:15K smpl:962K ep:16K epch:344.93 loss:0.051 grdn:7.082 lr:1.0e-05 updt_s:0.326 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.049 kld_loss:0.000
+INFO 2026-10-24 00:31:13 ot_train.py:641 step:15K smpl:975K ep:16K epch:349.59 loss:0.052 grdn:7.556 lr:1.0e-05 updt_s:0.333 data_s:0.018 smp/s:185 mem_gb:4.24 l1_loss:0.050 kld_loss:0.000
+INFO 2026-10-24 00:31:14 ot_train.py:673 step 15000: eval_loss=0.2244
+INFO 2026-10-24 00:31:14 ot_train.py:687 Checkpoint policy after step 15000
+INFO 2026-10-24 00:32:31 ot_train.py:641 step:15K smpl:988K ep:16K epch:354.25 loss:0.051 grdn:7.199 lr:1.0e-05 updt_s:0.363 data_s:0.036 smp/s:163 mem_gb:4.24 l1_loss:0.049 kld_loss:0.000
+INFO 2026-10-24 00:33:40 ot_train.py:641 step:15K smpl:1M ep:16K epch:358.91 loss:0.051 grdn:6.980 lr:1.0e-05 updt_s:0.320 data_s:0.022 smp/s:190 mem_gb:4.24 l1_loss:0.048 kld_loss:0.000
+INFO 2026-10-24 00:34:49 ot_train.py:641 step:16K smpl:1M ep:16K epch:363.57 loss:0.051 grdn:7.643 lr:1.0e-05 updt_s:0.331 data_s:0.018 smp/s:186 mem_gb:4.24 l1_loss:0.049 kld_loss:0.000
+INFO 2026-10-24 00:35:59 ot_train.py:641 step:16K smpl:1M ep:17K epch:368.23 loss:0.050 grdn:6.951 lr:1.0e-05 updt_s:0.328 data_s:0.022 smp/s:186 mem_gb:4.24 l1_loss:0.048 kld_loss:0.000
+INFO 2026-10-24 00:37:09 ot_train.py:641 step:16K smpl:1M ep:17K epch:372.89 loss:0.050 grdn:7.329 lr:1.0e-05 updt_s:0.328 data_s:0.022 smp/s:185 mem_gb:4.24 l1_loss:0.048 kld_loss:0.000
+INFO 2026-10-24 00:37:11 ot_train.py:673 step 16000: eval_loss=0.2188
+INFO 2026-10-24 00:38:20 ot_train.py:641 step:16K smpl:1M ep:17K epch:377.55 loss:0.050 grdn:7.877 lr:1.0e-05 updt_s:0.327 data_s:0.019 smp/s:188 mem_gb:4.24 l1_loss:0.048 kld_loss:0.000
+INFO 2026-10-24 00:39:29 ot_train.py:641 step:16K smpl:1M ep:17K epch:382.22 loss:0.049 grdn:6.843 lr:1.0e-05 updt_s:0.325 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.047 kld_loss:0.000
+INFO 2026-10-24 00:40:39 ot_train.py:641 step:17K smpl:1M ep:17K epch:386.88 loss:0.049 grdn:inf lr:1.0e-05 updt_s:0.327 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.047 kld_loss:0.000
+INFO 2026-10-24 00:41:48 ot_train.py:641 step:17K smpl:1M ep:18K epch:391.54 loss:0.049 grdn:7.074 lr:1.0e-05 updt_s:0.328 data_s:0.019 smp/s:187 mem_gb:4.24 l1_loss:0.047 kld_loss:0.000
+INFO 2026-10-24 00:42:58 ot_train.py:641 step:17K smpl:1M ep:18K epch:396.20 loss:0.049 grdn:6.589 lr:1.0e-05 updt_s:0.328 data_s:0.022 smp/s:186 mem_gb:4.24 l1_loss:0.046 kld_loss:0.000
+INFO 2026-10-24 00:42:59 ot_train.py:673 step 17000: eval_loss=0.2222
+INFO 2026-10-24 00:44:07 ot_train.py:641 step:17K smpl:1M ep:18K epch:400.86 loss:0.049 grdn:7.038 lr:1.0e-05 updt_s:0.324 data_s:0.018 smp/s:190 mem_gb:4.24 l1_loss:0.047 kld_loss:0.000
+INFO 2026-10-24 00:45:16 ot_train.py:641 step:17K smpl:1M ep:18K epch:405.52 loss:0.048 grdn:6.848 lr:1.0e-05 updt_s:0.323 data_s:0.022 smp/s:188 mem_gb:4.24 l1_loss:0.046 kld_loss:0.000
+INFO 2026-10-24 00:46:24 ot_train.py:641 step:18K smpl:1M ep:18K epch:410.18 loss:0.048 grdn:7.404 lr:1.0e-05 updt_s:0.320 data_s:0.022 smp/s:190 mem_gb:4.24 l1_loss:0.046 kld_loss:0.000
+INFO 2026-10-24 00:47:33 ot_train.py:641 step:18K smpl:1M ep:19K epch:414.84 loss:0.047 grdn:5.788 lr:1.0e-05 updt_s:0.326 data_s:0.018 smp/s:189 mem_gb:4.24 l1_loss:0.045 kld_loss:0.000
+INFO 2026-10-24 00:48:42 ot_train.py:641 step:18K smpl:1M ep:19K epch:419.51 loss:0.047 grdn:6.348 lr:1.0e-05 updt_s:0.322 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.045 kld_loss:0.000
+INFO 2026-10-24 00:48:43 ot_train.py:673 step 18000: eval_loss=0.2212
+INFO 2026-10-24 00:49:52 ot_train.py:641 step:18K smpl:1M ep:19K epch:424.17 loss:0.047 grdn:6.688 lr:1.0e-05 updt_s:0.324 data_s:0.022 smp/s:188 mem_gb:4.24 l1_loss:0.045 kld_loss:0.000
+INFO 2026-10-24 00:51:01 ot_train.py:641 step:18K smpl:1M ep:19K epch:428.83 loss:0.047 grdn:6.460 lr:1.0e-05 updt_s:0.329 data_s:0.019 smp/s:187 mem_gb:4.24 l1_loss:0.045 kld_loss:0.000
+INFO 2026-10-24 00:52:12 ot_train.py:641 step:19K smpl:1M ep:20K epch:433.49 loss:0.047 grdn:6.567 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.045 kld_loss:0.000
+INFO 2026-10-24 00:53:22 ot_train.py:641 step:19K smpl:1M ep:20K epch:438.15 loss:0.046 grdn:6.237 lr:1.0e-05 updt_s:0.328 data_s:0.022 smp/s:186 mem_gb:4.24 l1_loss:0.044 kld_loss:0.000
+INFO 2026-10-24 00:54:31 ot_train.py:641 step:19K smpl:1M ep:20K epch:442.81 loss:0.046 grdn:5.904 lr:1.0e-05 updt_s:0.329 data_s:0.019 smp/s:187 mem_gb:4.24 l1_loss:0.044 kld_loss:0.000
+INFO 2026-10-24 00:54:32 ot_train.py:673 step 19000: eval_loss=0.2196
+INFO 2026-10-24 00:55:42 ot_train.py:641 step:19K smpl:1M ep:20K epch:447.47 loss:0.046 grdn:6.375 lr:1.0e-05 updt_s:0.326 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.044 kld_loss:0.000
+INFO 2026-10-24 00:56:51 ot_train.py:641 step:19K smpl:1M ep:20K epch:452.13 loss:0.045 grdn:5.770 lr:1.0e-05 updt_s:0.326 data_s:0.023 smp/s:187 mem_gb:4.24 l1_loss:0.043 kld_loss:0.000
+INFO 2026-10-24 00:58:01 ot_train.py:641 step:20K smpl:1M ep:21K epch:456.79 loss:0.045 grdn:inf lr:1.0e-05 updt_s:0.331 data_s:0.018 smp/s:186 mem_gb:4.24 l1_loss:0.043 kld_loss:0.000
+INFO 2026-10-24 00:59:12 ot_train.py:641 step:20K smpl:1M ep:21K epch:461.46 loss:0.046 grdn:6.533 lr:1.0e-05 updt_s:0.334 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.044 kld_loss:0.000
+INFO 2026-10-24 01:00:22 ot_train.py:641 step:20K smpl:1M ep:21K epch:466.12 loss:0.045 grdn:6.138 lr:1.0e-05 updt_s:0.329 data_s:0.022 smp/s:185 mem_gb:4.24 l1_loss:0.043 kld_loss:0.000
+INFO 2026-10-24 01:00:24 ot_train.py:673 step 20000: eval_loss=0.2181
+INFO 2026-10-24 01:00:24 ot_train.py:687 Checkpoint policy after step 20000
+INFO 2026-10-24 01:01:34 ot_train.py:641 step:20K smpl:1M ep:21K epch:470.78 loss:0.045 grdn:6.179 lr:1.0e-05 updt_s:0.328 data_s:0.019 smp/s:187 mem_gb:4.24 l1_loss:0.043 kld_loss:0.000
+INFO 2026-10-24 01:02:44 ot_train.py:641 step:20K smpl:1M ep:21K epch:475.44 loss:0.045 grdn:6.212 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.043 kld_loss:0.000
+INFO 2026-10-24 01:03:55 ot_train.py:641 step:21K smpl:1M ep:22K epch:480.10 loss:0.045 grdn:6.426 lr:1.0e-05 updt_s:0.332 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.043 kld_loss:0.000
+INFO 2026-10-24 01:05:04 ot_train.py:641 step:21K smpl:1M ep:22K epch:484.76 loss:0.044 grdn:5.772 lr:1.0e-05 updt_s:0.329 data_s:0.018 smp/s:187 mem_gb:4.24 l1_loss:0.042 kld_loss:0.000
+INFO 2026-10-24 01:06:14 ot_train.py:641 step:21K smpl:1M ep:22K epch:489.42 loss:0.044 grdn:6.136 lr:1.0e-05 updt_s:0.326 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.042 kld_loss:0.000
+INFO 2026-10-24 01:06:15 ot_train.py:673 step 21000: eval_loss=0.2163
+INFO 2026-10-24 01:07:25 ot_train.py:641 step:21K smpl:1M ep:22K epch:494.08 loss:0.044 grdn:5.952 lr:1.0e-05 updt_s:0.331 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.042 kld_loss:0.000
+INFO 2026-10-24 01:08:34 ot_train.py:641 step:21K smpl:1M ep:22K epch:498.75 loss:0.044 grdn:5.991 lr:1.0e-05 updt_s:0.328 data_s:0.018 smp/s:188 mem_gb:4.24 l1_loss:0.042 kld_loss:0.000
+INFO 2026-10-24 01:09:45 ot_train.py:641 step:22K smpl:1M ep:23K epch:503.41 loss:0.044 grdn:6.202 lr:1.0e-05 updt_s:0.331 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.042 kld_loss:0.000
+INFO 2026-10-24 01:10:55 ot_train.py:641 step:22K smpl:1M ep:23K epch:508.07 loss:0.043 grdn:5.459 lr:1.0e-05 updt_s:0.333 data_s:0.019 smp/s:185 mem_gb:4.24 l1_loss:0.041 kld_loss:0.000
+INFO 2026-10-24 01:12:06 ot_train.py:641 step:22K smpl:1M ep:23K epch:512.73 loss:0.044 grdn:6.639 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.042 kld_loss:0.000
+INFO 2026-10-24 01:12:07 ot_train.py:673 step 22000: eval_loss=0.2193
+INFO 2026-10-24 01:13:17 ot_train.py:641 step:22K smpl:1M ep:23K epch:517.39 loss:0.043 grdn:5.324 lr:1.0e-05 updt_s:0.334 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.041 kld_loss:0.000
+INFO 2026-10-24 01:14:27 ot_train.py:641 step:22K smpl:1M ep:23K epch:522.05 loss:0.043 grdn:5.468 lr:1.0e-05 updt_s:0.330 data_s:0.018 smp/s:187 mem_gb:4.24 l1_loss:0.041 kld_loss:0.000
+INFO 2026-10-24 01:15:37 ot_train.py:641 step:23K smpl:1M ep:24K epch:526.71 loss:0.043 grdn:5.766 lr:1.0e-05 updt_s:0.330 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.041 kld_loss:0.000
+INFO 2026-10-24 01:16:48 ot_train.py:641 step:23K smpl:1M ep:24K epch:531.37 loss:0.043 grdn:5.859 lr:1.0e-05 updt_s:0.332 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.041 kld_loss:0.000
+INFO 2026-10-24 01:17:57 ot_train.py:641 step:23K smpl:1M ep:24K epch:536.03 loss:0.043 grdn:6.021 lr:1.0e-05 updt_s:0.325 data_s:0.019 smp/s:189 mem_gb:4.24 l1_loss:0.041 kld_loss:0.000
+INFO 2026-10-24 01:17:58 ot_train.py:673 step 23000: eval_loss=0.2153
+INFO 2026-10-24 01:19:08 ot_train.py:641 step:23K smpl:2M ep:24K epch:540.70 loss:0.043 grdn:inf lr:1.0e-05 updt_s:0.329 data_s:0.022 smp/s:185 mem_gb:4.24 l1_loss:0.041 kld_loss:0.000
+INFO 2026-10-24 01:20:17 ot_train.py:641 step:23K smpl:2M ep:25K epch:545.36 loss:0.042 grdn:5.419 lr:1.0e-05 updt_s:0.327 data_s:0.022 smp/s:186 mem_gb:4.24 l1_loss:0.040 kld_loss:0.000
+INFO 2026-10-24 01:21:26 ot_train.py:641 step:24K smpl:2M ep:25K epch:550.02 loss:0.042 grdn:5.900 lr:1.0e-05 updt_s:0.325 data_s:0.019 smp/s:189 mem_gb:4.24 l1_loss:0.040 kld_loss:0.000
+INFO 2026-10-24 01:22:35 ot_train.py:641 step:24K smpl:2M ep:25K epch:554.68 loss:0.042 grdn:5.476 lr:1.0e-05 updt_s:0.323 data_s:0.021 smp/s:189 mem_gb:4.24 l1_loss:0.040 kld_loss:0.000
+INFO 2026-10-24 01:23:44 ot_train.py:641 step:24K smpl:2M ep:25K epch:559.34 loss:0.042 grdn:5.154 lr:1.0e-05 updt_s:0.328 data_s:0.022 smp/s:186 mem_gb:4.24 l1_loss:0.040 kld_loss:0.000
+INFO 2026-10-24 01:23:46 ot_train.py:673 step 24000: eval_loss=0.2160
+INFO 2026-10-24 01:24:55 ot_train.py:641 step:24K smpl:2M ep:25K epch:564.00 loss:0.042 grdn:5.364 lr:1.0e-05 updt_s:0.327 data_s:0.018 smp/s:188 mem_gb:4.24 l1_loss:0.039 kld_loss:0.000
+INFO 2026-10-24 01:26:04 ot_train.py:641 step:24K smpl:2M ep:26K epch:568.66 loss:0.042 grdn:5.646 lr:1.0e-05 updt_s:0.323 data_s:0.022 smp/s:188 mem_gb:4.24 l1_loss:0.039 kld_loss:0.000
+INFO 2026-10-24 01:27:14 ot_train.py:641 step:25K smpl:2M ep:26K epch:573.32 loss:0.041 grdn:4.935 lr:1.0e-05 updt_s:0.328 data_s:0.022 smp/s:185 mem_gb:4.24 l1_loss:0.039 kld_loss:0.000
+INFO 2026-10-24 01:28:24 ot_train.py:641 step:25K smpl:2M ep:26K epch:577.98 loss:0.042 grdn:5.998 lr:1.0e-05 updt_s:0.333 data_s:0.018 smp/s:185 mem_gb:4.24 l1_loss:0.040 kld_loss:0.000
+INFO 2026-10-24 01:29:35 ot_train.py:641 step:25K smpl:2M ep:26K epch:582.65 loss:0.041 grdn:5.167 lr:1.0e-05 updt_s:0.332 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.039 kld_loss:0.000
+INFO 2026-10-24 01:29:36 ot_train.py:673 step 25000: eval_loss=0.2123
+INFO 2026-10-24 01:29:36 ot_train.py:687 Checkpoint policy after step 25000
+INFO 2026-10-24 01:30:46 ot_train.py:641 step:25K smpl:2M ep:26K epch:587.31 loss:0.041 grdn:5.220 lr:1.0e-05 updt_s:0.326 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.039 kld_loss:0.000
+INFO 2026-10-24 01:31:54 ot_train.py:641 step:25K smpl:2M ep:27K epch:591.97 loss:0.041 grdn:5.644 lr:1.0e-05 updt_s:0.322 data_s:0.018 smp/s:191 mem_gb:4.24 l1_loss:0.039 kld_loss:0.000
+INFO 2026-10-24 01:33:03 ot_train.py:641 step:26K smpl:2M ep:27K epch:596.63 loss:0.041 grdn:5.155 lr:1.0e-05 updt_s:0.324 data_s:0.022 smp/s:188 mem_gb:4.24 l1_loss:0.038 kld_loss:0.000
+INFO 2026-10-24 01:34:13 ot_train.py:641 step:26K smpl:2M ep:27K epch:601.29 loss:0.041 grdn:5.444 lr:1.0e-05 updt_s:0.331 data_s:0.018 smp/s:186 mem_gb:4.24 l1_loss:0.038 kld_loss:0.000
+INFO 2026-10-24 01:35:23 ot_train.py:641 step:26K smpl:2M ep:27K epch:605.95 loss:0.040 grdn:5.027 lr:1.0e-05 updt_s:0.332 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.038 kld_loss:0.000
+INFO 2026-10-24 01:35:24 ot_train.py:673 step 26000: eval_loss=0.2132
+INFO 2026-10-24 01:36:34 ot_train.py:641 step:26K smpl:2M ep:27K epch:610.61 loss:0.041 grdn:5.281 lr:1.0e-05 updt_s:0.325 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.038 kld_loss:0.000
+INFO 2026-10-24 01:37:43 ot_train.py:641 step:26K smpl:2M ep:28K epch:615.27 loss:0.040 grdn:4.862 lr:1.0e-05 updt_s:0.328 data_s:0.018 smp/s:188 mem_gb:4.24 l1_loss:0.038 kld_loss:0.000
+INFO 2026-10-24 01:38:53 ot_train.py:641 step:27K smpl:2M ep:28K epch:619.94 loss:0.040 grdn:5.135 lr:1.0e-05 updt_s:0.327 data_s:0.022 smp/s:186 mem_gb:4.24 l1_loss:0.038 kld_loss:0.000
+INFO 2026-10-24 01:40:02 ot_train.py:641 step:27K smpl:2M ep:28K epch:624.60 loss:0.040 grdn:5.193 lr:1.0e-05 updt_s:0.324 data_s:0.022 smp/s:188 mem_gb:4.24 l1_loss:0.038 kld_loss:0.000
+INFO 2026-10-24 01:41:11 ot_train.py:641 step:27K smpl:2M ep:28K epch:629.26 loss:0.040 grdn:5.012 lr:1.0e-05 updt_s:0.330 data_s:0.019 smp/s:186 mem_gb:4.24 l1_loss:0.037 kld_loss:0.000
+INFO 2026-10-24 01:41:12 ot_train.py:673 step 27000: eval_loss=0.2123
+INFO 2026-10-24 01:42:22 ot_train.py:641 step:27K smpl:2M ep:29K epch:633.92 loss:0.040 grdn:inf lr:1.0e-05 updt_s:0.327 data_s:0.022 smp/s:186 mem_gb:4.24 l1_loss:0.037 kld_loss:0.000
+INFO 2026-10-24 01:43:30 ot_train.py:641 step:27K smpl:2M ep:29K epch:638.58 loss:0.040 grdn:5.445 lr:1.0e-05 updt_s:0.322 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.038 kld_loss:0.000
+INFO 2026-10-24 01:44:40 ot_train.py:641 step:28K smpl:2M ep:29K epch:643.24 loss:0.040 grdn:5.312 lr:1.0e-05 updt_s:0.332 data_s:0.019 smp/s:186 mem_gb:4.24 l1_loss:0.038 kld_loss:0.000
+INFO 2026-10-24 01:45:49 ot_train.py:641 step:28K smpl:2M ep:29K epch:647.90 loss:0.039 grdn:4.721 lr:1.0e-05 updt_s:0.325 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.037 kld_loss:0.000
+INFO 2026-10-24 01:46:58 ot_train.py:641 step:28K smpl:2M ep:29K epch:652.56 loss:0.039 grdn:5.191 lr:1.0e-05 updt_s:0.322 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.037 kld_loss:0.000
+INFO 2026-10-24 01:46:59 ot_train.py:673 step 28000: eval_loss=0.2122
+INFO 2026-10-24 01:48:07 ot_train.py:641 step:28K smpl:2M ep:30K epch:657.22 loss:0.039 grdn:5.017 lr:1.0e-05 updt_s:0.320 data_s:0.018 smp/s:192 mem_gb:4.24 l1_loss:0.037 kld_loss:0.000
+INFO 2026-10-24 01:49:16 ot_train.py:641 step:28K smpl:2M ep:30K epch:661.89 loss:0.039 grdn:5.198 lr:1.0e-05 updt_s:0.327 data_s:0.023 smp/s:186 mem_gb:4.24 l1_loss:0.037 kld_loss:0.000
+INFO 2026-10-24 01:50:27 ot_train.py:641 step:29K smpl:2M ep:30K epch:666.55 loss:0.039 grdn:4.787 lr:1.0e-05 updt_s:0.334 data_s:0.021 smp/s:183 mem_gb:4.24 l1_loss:0.036 kld_loss:0.000
+INFO 2026-10-24 01:51:37 ot_train.py:641 step:29K smpl:2M ep:30K epch:671.21 loss:0.039 grdn:4.670 lr:1.0e-05 updt_s:0.331 data_s:0.019 smp/s:186 mem_gb:4.24 l1_loss:0.036 kld_loss:0.000
+INFO 2026-10-24 01:52:47 ot_train.py:641 step:29K smpl:2M ep:30K epch:675.87 loss:0.039 grdn:4.895 lr:1.0e-05 updt_s:0.325 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.037 kld_loss:0.000
+INFO 2026-10-24 01:52:48 ot_train.py:673 step 29000: eval_loss=0.2114
+INFO 2026-10-24 01:53:56 ot_train.py:641 step:29K smpl:2M ep:31K epch:680.53 loss:0.038 grdn:inf lr:1.0e-05 updt_s:0.323 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.036 kld_loss:0.000
+INFO 2026-10-24 01:55:04 ot_train.py:641 step:29K smpl:2M ep:31K epch:685.19 loss:0.039 grdn:inf lr:1.0e-05 updt_s:0.322 data_s:0.019 smp/s:191 mem_gb:4.24 l1_loss:0.037 kld_loss:0.000
+INFO 2026-10-24 01:56:13 ot_train.py:641 step:30K smpl:2M ep:31K epch:689.85 loss:0.038 grdn:4.776 lr:1.0e-05 updt_s:0.322 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.036 kld_loss:0.000
+INFO 2026-10-24 01:57:21 ot_train.py:641 step:30K smpl:2M ep:31K epch:694.51 loss:0.039 grdn:5.222 lr:1.0e-05 updt_s:0.322 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.036 kld_loss:0.000
+INFO 2026-10-24 01:58:30 ot_train.py:641 step:30K smpl:2M ep:31K epch:699.18 loss:0.039 grdn:5.265 lr:1.0e-05 updt_s:0.326 data_s:0.019 smp/s:189 mem_gb:4.24 l1_loss:0.036 kld_loss:0.000
+INFO 2026-10-24 01:58:31 ot_train.py:673 step 30000: eval_loss=0.2113
+INFO 2026-10-24 01:58:31 ot_train.py:687 Checkpoint policy after step 30000
+INFO 2026-10-24 01:59:41 ot_train.py:641 step:30K smpl:2M ep:32K epch:703.84 loss:0.037 grdn:4.178 lr:1.0e-05 updt_s:0.325 data_s:0.022 smp/s:188 mem_gb:4.24 l1_loss:0.035 kld_loss:0.000
+INFO 2026-10-24 02:00:49 ot_train.py:641 step:30K smpl:2M ep:32K epch:708.50 loss:0.038 grdn:4.200 lr:1.0e-05 updt_s:0.322 data_s:0.018 smp/s:191 mem_gb:4.24 l1_loss:0.035 kld_loss:0.000
+INFO 2026-10-24 02:01:59 ot_train.py:641 step:31K smpl:2M ep:32K epch:713.16 loss:0.038 grdn:4.524 lr:1.0e-05 updt_s:0.328 data_s:0.023 smp/s:185 mem_gb:4.24 l1_loss:0.035 kld_loss:0.000
+INFO 2026-10-24 02:03:07 ot_train.py:641 step:31K smpl:2M ep:32K epch:717.82 loss:0.038 grdn:4.816 lr:1.0e-05 updt_s:0.322 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.035 kld_loss:0.000
+INFO 2026-10-24 02:04:16 ot_train.py:641 step:31K smpl:2M ep:33K epch:722.48 loss:0.038 grdn:5.253 lr:1.0e-05 updt_s:0.326 data_s:0.019 smp/s:188 mem_gb:4.24 l1_loss:0.036 kld_loss:0.000
+INFO 2026-10-24 02:04:17 ot_train.py:673 step 31000: eval_loss=0.2087
+INFO 2026-10-24 02:05:26 ot_train.py:641 step:31K smpl:2M ep:33K epch:727.14 loss:0.038 grdn:4.651 lr:1.0e-05 updt_s:0.322 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.035 kld_loss:0.000
+INFO 2026-10-24 02:06:35 ot_train.py:641 step:31K smpl:2M ep:33K epch:731.80 loss:0.037 grdn:4.634 lr:1.0e-05 updt_s:0.325 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.035 kld_loss:0.000
+INFO 2026-10-24 02:07:43 ot_train.py:641 step:32K smpl:2M ep:33K epch:736.46 loss:0.038 grdn:4.905 lr:1.0e-05 updt_s:0.322 data_s:0.018 smp/s:191 mem_gb:4.24 l1_loss:0.035 kld_loss:0.000
+INFO 2026-10-24 02:08:53 ot_train.py:641 step:32K smpl:2M ep:33K epch:741.13 loss:0.037 grdn:4.430 lr:1.0e-05 updt_s:0.327 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.035 kld_loss:0.000
+INFO 2026-10-24 02:10:02 ot_train.py:641 step:32K smpl:2M ep:34K epch:745.79 loss:0.037 grdn:4.706 lr:1.0e-05 updt_s:0.325 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.035 kld_loss:0.000
+INFO 2026-10-24 02:10:04 ot_train.py:673 step 32000: eval_loss=0.2135
+INFO 2026-10-24 02:11:12 ot_train.py:641 step:32K smpl:2M ep:34K epch:750.45 loss:0.037 grdn:4.974 lr:1.0e-05 updt_s:0.326 data_s:0.018 smp/s:189 mem_gb:4.24 l1_loss:0.035 kld_loss:0.000
+INFO 2026-10-24 02:12:21 ot_train.py:641 step:32K smpl:2M ep:34K epch:755.11 loss:0.037 grdn:4.158 lr:1.0e-05 updt_s:0.322 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.034 kld_loss:0.000
+INFO 2026-10-24 02:13:30 ot_train.py:641 step:33K smpl:2M ep:34K epch:759.77 loss:0.037 grdn:4.169 lr:1.0e-05 updt_s:0.325 data_s:0.023 smp/s:187 mem_gb:4.24 l1_loss:0.034 kld_loss:0.000
+INFO 2026-10-24 02:14:38 ot_train.py:641 step:33K smpl:2M ep:34K epch:764.43 loss:0.036 grdn:4.112 lr:1.0e-05 updt_s:0.324 data_s:0.019 smp/s:190 mem_gb:4.24 l1_loss:0.034 kld_loss:0.000
+INFO 2026-10-24 02:15:47 ot_train.py:641 step:33K smpl:2M ep:35K epch:769.09 loss:0.037 grdn:4.660 lr:1.0e-05 updt_s:0.324 data_s:0.022 smp/s:188 mem_gb:4.24 l1_loss:0.034 kld_loss:0.000
+INFO 2026-10-24 02:15:48 ot_train.py:673 step 33000: eval_loss=0.2104
+INFO 2026-10-24 02:16:58 ot_train.py:641 step:33K smpl:2M ep:35K epch:773.75 loss:0.036 grdn:4.179 lr:1.0e-05 updt_s:0.324 data_s:0.022 smp/s:188 mem_gb:4.24 l1_loss:0.034 kld_loss:0.000
+INFO 2026-10-24 02:18:06 ot_train.py:641 step:33K smpl:2M ep:35K epch:778.42 loss:0.036 grdn:inf lr:1.0e-05 updt_s:0.325 data_s:0.018 smp/s:189 mem_gb:4.24 l1_loss:0.034 kld_loss:0.000
+INFO 2026-10-24 02:19:15 ot_train.py:641 step:34K smpl:2M ep:35K epch:783.08 loss:0.037 grdn:4.839 lr:1.0e-05 updt_s:0.324 data_s:0.022 smp/s:188 mem_gb:4.24 l1_loss:0.035 kld_loss:0.000
+INFO 2026-10-24 02:20:24 ot_train.py:641 step:34K smpl:2M ep:35K epch:787.74 loss:0.036 grdn:4.354 lr:1.0e-05 updt_s:0.321 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.034 kld_loss:0.000
+INFO 2026-10-24 02:21:32 ot_train.py:641 step:34K smpl:2M ep:36K epch:792.40 loss:0.037 grdn:4.639 lr:1.0e-05 updt_s:0.325 data_s:0.018 smp/s:189 mem_gb:4.24 l1_loss:0.034 kld_loss:0.000
+INFO 2026-10-24 02:21:33 ot_train.py:673 step 34000: eval_loss=0.2094
+INFO 2026-10-24 02:22:42 ot_train.py:641 step:34K smpl:2M ep:36K epch:797.06 loss:0.036 grdn:4.447 lr:1.0e-05 updt_s:0.322 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.034 kld_loss:0.000
+INFO 2026-10-24 02:23:50 ot_train.py:641 step:34K smpl:2M ep:36K epch:801.72 loss:0.036 grdn:4.288 lr:1.0e-05 updt_s:0.323 data_s:0.018 smp/s:190 mem_gb:4.24 l1_loss:0.034 kld_loss:0.000
+INFO 2026-10-24 02:24:59 ot_train.py:641 step:35K smpl:2M ep:36K epch:806.38 loss:0.036 grdn:4.361 lr:1.0e-05 updt_s:0.325 data_s:0.022 smp/s:187 mem_gb:4.24 l1_loss:0.034 kld_loss:0.000
+INFO 2026-10-24 02:26:08 ot_train.py:641 step:35K smpl:2M ep:36K epch:811.04 loss:0.036 grdn:4.188 lr:1.0e-05 updt_s:0.323 data_s:0.022 smp/s:188 mem_gb:4.24 l1_loss:0.033 kld_loss:0.000
+INFO 2026-10-24 02:27:15 ot_train.py:641 step:35K smpl:2M ep:37K epch:815.70 loss:0.036 grdn:4.477 lr:1.0e-05 updt_s:0.319 data_s:0.019 smp/s:193 mem_gb:4.24 l1_loss:0.033 kld_loss:0.000
+INFO 2026-10-24 02:27:16 ot_train.py:673 step 35000: eval_loss=0.2089
+INFO 2026-10-24 02:27:16 ot_train.py:687 Checkpoint policy after step 35000
+INFO 2026-10-24 02:28:26 ot_train.py:641 step:35K smpl:2M ep:37K epch:820.37 loss:0.036 grdn:4.177 lr:1.0e-05 updt_s:0.321 data_s:0.022 smp/s:189 mem_gb:4.24 l1_loss:0.033 kld_loss:0.000
+INFO 2026-10-24 02:29:34 ot_train.py:641 step:35K smpl:2M ep:37K epch:825.03 loss:0.036 grdn:inf lr:1.0e-05 updt_s:0.323 data_s:0.022 smp/s:188 mem_gb:4.24 l1_loss:0.034 kld_loss:0.000
+INFO 2026-10-24 02:30:44 ot_train.py:641 step:36K smpl:2M ep:37K epch:829.69 loss:0.035 grdn:4.128 lr:1.0e-05 updt_s:0.332 data_s:0.018 smp/s:186 mem_gb:4.24 l1_loss:0.033 kld_loss:0.000
+INFO 2026-10-24 02:31:55 ot_train.py:641 step:36K smpl:2M ep:38K epch:834.35 loss:0.035 grdn:4.275 lr:1.0e-05 updt_s:0.334 data_s:0.022 smp/s:182 mem_gb:4.24 l1_loss:0.033 kld_loss:0.000
+INFO 2026-10-24 02:33:06 ot_train.py:641 step:36K smpl:2M ep:38K epch:839.01 loss:0.035 grdn:3.975 lr:1.0e-05 updt_s:0.335 data_s:0.022 smp/s:182 mem_gb:4.24 l1_loss:0.033 kld_loss:0.000
+INFO 2026-10-24 02:33:08 ot_train.py:673 step 36000: eval_loss=0.2097
+INFO 2026-10-24 02:34:18 ot_train.py:641 step:36K smpl:2M ep:38K epch:843.67 loss:0.035 grdn:4.036 lr:1.0e-05 updt_s:0.333 data_s:0.018 smp/s:185 mem_gb:4.24 l1_loss:0.033 kld_loss:0.000
+INFO 2026-10-24 02:35:29 ot_train.py:641 step:36K smpl:2M ep:38K epch:848.33 loss:0.035 grdn:4.197 lr:1.0e-05 updt_s:0.336 data_s:0.022 smp/s:182 mem_gb:4.24 l1_loss:0.033 kld_loss:0.000
+INFO 2026-10-24 02:36:40 ot_train.py:641 step:37K smpl:2M ep:38K epch:852.99 loss:0.036 grdn:4.370 lr:1.0e-05 updt_s:0.337 data_s:0.022 smp/s:181 mem_gb:4.24 l1_loss:0.033 kld_loss:0.000
+INFO 2026-10-24 02:37:51 ot_train.py:641 step:37K smpl:2M ep:39K epch:857.66 loss:0.035 grdn:3.950 lr:1.0e-05 updt_s:0.336 data_s:0.018 smp/s:183 mem_gb:4.24 l1_loss:0.033 kld_loss:0.000
+INFO 2026-10-24 02:39:03 ot_train.py:641 step:37K smpl:2M ep:39K epch:862.32 loss:0.035 grdn:4.361 lr:1.0e-05 updt_s:0.339 data_s:0.022 smp/s:180 mem_gb:4.24 l1_loss:0.033 kld_loss:0.000
+INFO 2026-10-24 02:39:04 ot_train.py:673 step 37000: eval_loss=0.2091
+INFO 2026-10-24 02:40:16 ot_train.py:641 step:37K smpl:2M ep:39K epch:866.98 loss:0.035 grdn:4.036 lr:1.0e-05 updt_s:0.337 data_s:0.022 smp/s:181 mem_gb:4.24 l1_loss:0.032 kld_loss:0.000
+INFO 2026-10-24 02:41:27 ot_train.py:641 step:37K smpl:2M ep:39K epch:871.64 loss:0.035 grdn:inf lr:1.0e-05 updt_s:0.337 data_s:0.018 smp/s:183 mem_gb:4.24 l1_loss:0.033 kld_loss:0.000
+INFO 2026-10-24 02:42:38 ot_train.py:641 step:38K smpl:2M ep:39K epch:876.30 loss:0.035 grdn:4.111 lr:1.0e-05 updt_s:0.337 data_s:0.022 smp/s:181 mem_gb:4.24 l1_loss:0.032 kld_loss:0.000
+INFO 2026-10-24 02:43:50 ot_train.py:641 step:38K smpl:2M ep:40K epch:880.96 loss:0.035 grdn:4.009 lr:1.0e-05 updt_s:0.338 data_s:0.022 smp/s:181 mem_gb:4.24 l1_loss:0.032 kld_loss:0.000
+INFO 2026-10-24 02:45:01 ot_train.py:641 step:38K smpl:2M ep:40K epch:885.62 loss:0.034 grdn:3.817 lr:1.0e-05 updt_s:0.338 data_s:0.018 smp/s:182 mem_gb:4.24 l1_loss:0.032 kld_loss:0.000
+INFO 2026-10-24 02:45:02 ot_train.py:673 step 38000: eval_loss=0.2051
+INFO 2026-10-24 02:46:14 ot_train.py:641 step:38K smpl:2M ep:40K epch:890.28 loss:0.035 grdn:4.474 lr:1.0e-05 updt_s:0.338 data_s:0.022 smp/s:181 mem_gb:4.24 l1_loss:0.033 kld_loss:0.000
+INFO 2026-10-24 02:47:25 ot_train.py:641 step:38K smpl:2M ep:40K epch:894.94 loss:0.034 grdn:3.970 lr:1.0e-05 updt_s:0.335 data_s:0.022 smp/s:182 mem_gb:4.24 l1_loss:0.032 kld_loss:0.000
+INFO 2026-10-24 02:48:36 ot_train.py:641 step:39K smpl:3M ep:40K epch:899.61 loss:0.034 grdn:4.185 lr:1.0e-05 updt_s:0.336 data_s:0.019 smp/s:183 mem_gb:4.24 l1_loss:0.032 kld_loss:0.000
+INFO 2026-10-24 02:49:48 ot_train.py:641 step:39K smpl:3M ep:41K epch:904.27 loss:0.034 grdn:3.983 lr:1.0e-05 updt_s:0.337 data_s:0.022 smp/s:181 mem_gb:4.24 l1_loss:0.032 kld_loss:0.000
+INFO 2026-10-24 02:50:59 ot_train.py:641 step:39K smpl:3M ep:41K epch:908.93 loss:0.034 grdn:3.991 lr:1.0e-05 updt_s:0.338 data_s:0.018 smp/s:182 mem_gb:4.24 l1_loss:0.032 kld_loss:0.000
+INFO 2026-10-24 02:51:00 ot_train.py:673 step 39000: eval_loss=0.2062
+INFO 2026-10-24 02:52:12 ot_train.py:641 step:39K smpl:3M ep:41K epch:913.59 loss:0.034 grdn:3.952 lr:1.0e-05 updt_s:0.341 data_s:0.022 smp/s:179 mem_gb:4.24 l1_loss:0.032 kld_loss:0.000
+INFO 2026-10-24 02:53:24 ot_train.py:641 step:39K smpl:3M ep:41K epch:918.25 loss:0.034 grdn:inf lr:1.0e-05 updt_s:0.339 data_s:0.022 smp/s:180 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 02:54:36 ot_train.py:641 step:40K smpl:3M ep:42K epch:922.91 loss:0.034 grdn:3.660 lr:1.0e-05 updt_s:0.339 data_s:0.019 smp/s:181 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 02:55:48 ot_train.py:641 step:40K smpl:3M ep:42K epch:927.57 loss:0.034 grdn:3.889 lr:1.0e-05 updt_s:0.340 data_s:0.022 smp/s:180 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 02:56:59 ot_train.py:641 step:40K smpl:3M ep:42K epch:932.23 loss:0.034 grdn:4.053 lr:1.0e-05 updt_s:0.336 data_s:0.022 smp/s:182 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 02:57:01 ot_train.py:673 step 40000: eval_loss=0.2086
+INFO 2026-10-24 02:57:01 ot_train.py:687 Checkpoint policy after step 40000
+INFO 2026-10-24 02:58:12 ot_train.py:641 step:40K smpl:3M ep:42K epch:936.89 loss:0.034 grdn:3.998 lr:1.0e-05 updt_s:0.337 data_s:0.019 smp/s:183 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 02:59:23 ot_train.py:641 step:40K smpl:3M ep:42K epch:941.56 loss:0.034 grdn:3.868 lr:1.0e-05 updt_s:0.336 data_s:0.022 smp/s:182 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 03:00:34 ot_train.py:641 step:41K smpl:3M ep:43K epch:946.22 loss:0.034 grdn:4.254 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 03:01:45 ot_train.py:641 step:41K smpl:3M ep:43K epch:950.88 loss:0.034 grdn:3.780 lr:1.0e-05 updt_s:0.334 data_s:0.018 smp/s:184 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 03:02:55 ot_train.py:641 step:41K smpl:3M ep:43K epch:955.54 loss:0.034 grdn:3.892 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 03:02:56 ot_train.py:673 step 41000: eval_loss=0.2055
+INFO 2026-10-24 03:04:07 ot_train.py:641 step:41K smpl:3M ep:43K epch:960.20 loss:0.034 grdn:4.149 lr:1.0e-05 updt_s:0.331 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 03:05:17 ot_train.py:641 step:41K smpl:3M ep:43K epch:964.86 loss:0.033 grdn:inf lr:1.0e-05 updt_s:0.333 data_s:0.018 smp/s:185 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 03:06:28 ot_train.py:641 step:42K smpl:3M ep:44K epch:969.52 loss:0.033 grdn:3.876 lr:1.0e-05 updt_s:0.331 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 03:07:38 ot_train.py:641 step:42K smpl:3M ep:44K epch:974.18 loss:0.033 grdn:3.894 lr:1.0e-05 updt_s:0.332 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 03:08:49 ot_train.py:641 step:42K smpl:3M ep:44K epch:978.85 loss:0.033 grdn:3.659 lr:1.0e-05 updt_s:0.333 data_s:0.019 smp/s:185 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 03:08:50 ot_train.py:673 step 42000: eval_loss=0.2077
+INFO 2026-10-24 03:10:00 ot_train.py:641 step:42K smpl:3M ep:44K epch:983.51 loss:0.033 grdn:3.579 lr:1.0e-05 updt_s:0.334 data_s:0.022 smp/s:182 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:11:12 ot_train.py:641 step:42K smpl:3M ep:44K epch:988.17 loss:0.033 grdn:3.831 lr:1.0e-05 updt_s:0.335 data_s:0.022 smp/s:182 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 03:12:22 ot_train.py:641 step:43K smpl:3M ep:45K epch:992.83 loss:0.033 grdn:3.640 lr:1.0e-05 updt_s:0.336 data_s:0.019 smp/s:183 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:13:33 ot_train.py:641 step:43K smpl:3M ep:45K epch:997.49 loss:0.033 grdn:3.766 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:14:43 ot_train.py:641 step:43K smpl:3M ep:45K epch:1002.15 loss:0.033 grdn:3.925 lr:1.0e-05 updt_s:0.331 data_s:0.018 smp/s:186 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 03:14:44 ot_train.py:673 step 43000: eval_loss=0.2030
+INFO 2026-10-24 03:15:54 ot_train.py:641 step:43K smpl:3M ep:45K epch:1006.81 loss:0.033 grdn:3.762 lr:1.0e-05 updt_s:0.331 data_s:0.021 smp/s:184 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:17:05 ot_train.py:641 step:43K smpl:3M ep:46K epch:1011.47 loss:0.033 grdn:3.690 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:18:15 ot_train.py:641 step:44K smpl:3M ep:46K epch:1016.13 loss:0.033 grdn:inf lr:1.0e-05 updt_s:0.333 data_s:0.018 smp/s:185 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:19:26 ot_train.py:641 step:44K smpl:3M ep:46K epch:1020.80 loss:0.033 grdn:4.035 lr:1.0e-05 updt_s:0.334 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.031 kld_loss:0.000
+INFO 2026-10-24 03:20:37 ot_train.py:641 step:44K smpl:3M ep:46K epch:1025.46 loss:0.033 grdn:4.045 lr:1.0e-05 updt_s:0.334 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:20:39 ot_train.py:673 step 44000: eval_loss=0.2051
+INFO 2026-10-24 03:21:49 ot_train.py:641 step:44K smpl:3M ep:46K epch:1030.12 loss:0.032 grdn:3.405 lr:1.0e-05 updt_s:0.334 data_s:0.019 smp/s:184 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:23:00 ot_train.py:641 step:44K smpl:3M ep:47K epch:1034.78 loss:0.032 grdn:3.236 lr:1.0e-05 updt_s:0.334 data_s:0.022 smp/s:182 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:24:11 ot_train.py:641 step:45K smpl:3M ep:47K epch:1039.44 loss:0.033 grdn:3.646 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:25:21 ot_train.py:641 step:45K smpl:3M ep:47K epch:1044.10 loss:0.033 grdn:3.761 lr:1.0e-05 updt_s:0.332 data_s:0.018 smp/s:186 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:26:33 ot_train.py:641 step:45K smpl:3M ep:47K epch:1048.76 loss:0.032 grdn:3.667 lr:1.0e-05 updt_s:0.334 data_s:0.022 smp/s:182 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:26:34 ot_train.py:673 step 45000: eval_loss=0.2071
+INFO 2026-10-24 03:26:34 ot_train.py:687 Checkpoint policy after step 45000
+INFO 2026-10-24 03:27:45 ot_train.py:641 step:45K smpl:3M ep:47K epch:1053.42 loss:0.033 grdn:3.536 lr:1.0e-05 updt_s:0.332 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:28:59 ot_train.py:641 step:45K smpl:3M ep:48K epch:1058.09 loss:0.033 grdn:3.717 lr:1.0e-05 updt_s:0.329 data_s:0.042 smp/s:175 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:30:10 ot_train.py:641 step:46K smpl:3M ep:48K epch:1062.75 loss:0.032 grdn:inf lr:1.0e-05 updt_s:0.335 data_s:0.022 smp/s:182 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:31:21 ot_train.py:641 step:46K smpl:3M ep:48K epch:1067.41 loss:0.032 grdn:3.468 lr:1.0e-05 updt_s:0.335 data_s:0.022 smp/s:182 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:32:32 ot_train.py:641 step:46K smpl:3M ep:48K epch:1072.07 loss:0.032 grdn:3.802 lr:1.0e-05 updt_s:0.337 data_s:0.019 smp/s:183 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:32:33 ot_train.py:673 step 46000: eval_loss=0.2057
+INFO 2026-10-24 03:33:45 ot_train.py:641 step:46K smpl:3M ep:48K epch:1076.73 loss:0.032 grdn:3.468 lr:1.0e-05 updt_s:0.336 data_s:0.022 smp/s:181 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:34:56 ot_train.py:641 step:46K smpl:3M ep:49K epch:1081.39 loss:0.032 grdn:3.373 lr:1.0e-05 updt_s:0.334 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:36:07 ot_train.py:641 step:47K smpl:3M ep:49K epch:1086.05 loss:0.032 grdn:3.518 lr:1.0e-05 updt_s:0.337 data_s:0.019 smp/s:183 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:37:18 ot_train.py:641 step:47K smpl:3M ep:49K epch:1090.71 loss:0.032 grdn:3.985 lr:1.0e-05 updt_s:0.336 data_s:0.022 smp/s:181 mem_gb:4.24 l1_loss:0.030 kld_loss:0.000
+INFO 2026-10-24 03:38:29 ot_train.py:641 step:47K smpl:3M ep:49K epch:1095.37 loss:0.032 grdn:3.718 lr:1.0e-05 updt_s:0.334 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:38:32 ot_train.py:673 step 47000: eval_loss=0.2042
+INFO 2026-10-24 03:39:42 ot_train.py:641 step:47K smpl:3M ep:50K epch:1100.04 loss:0.032 grdn:3.607 lr:1.0e-05 updt_s:0.335 data_s:0.019 smp/s:184 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:40:53 ot_train.py:641 step:47K smpl:3M ep:50K epch:1104.70 loss:0.032 grdn:3.397 lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:42:03 ot_train.py:641 step:48K smpl:3M ep:50K epch:1109.36 loss:0.031 grdn:inf lr:1.0e-05 updt_s:0.332 data_s:0.019 smp/s:185 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:43:14 ot_train.py:641 step:48K smpl:3M ep:50K epch:1114.02 loss:0.032 grdn:3.620 lr:1.0e-05 updt_s:0.331 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:44:25 ot_train.py:641 step:48K smpl:3M ep:50K epch:1118.68 loss:0.031 grdn:3.524 lr:1.0e-05 updt_s:0.337 data_s:0.022 smp/s:181 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:44:26 ot_train.py:673 step 48000: eval_loss=0.2048
+INFO 2026-10-24 03:45:37 ot_train.py:641 step:48K smpl:3M ep:51K epch:1123.34 loss:0.031 grdn:3.088 lr:1.0e-05 updt_s:0.335 data_s:0.018 smp/s:184 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:46:48 ot_train.py:641 step:48K smpl:3M ep:51K epch:1128.00 loss:0.031 grdn:3.513 lr:1.0e-05 updt_s:0.335 data_s:0.022 smp/s:182 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:47:59 ot_train.py:641 step:49K smpl:3M ep:51K epch:1132.66 loss:0.031 grdn:3.432 lr:1.0e-05 updt_s:0.331 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:49:10 ot_train.py:641 step:49K smpl:3M ep:51K epch:1137.33 loss:0.031 grdn:3.536 lr:1.0e-05 updt_s:0.334 data_s:0.019 smp/s:184 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:50:21 ot_train.py:641 step:49K smpl:3M ep:51K epch:1141.99 loss:0.031 grdn:3.257 lr:1.0e-05 updt_s:0.337 data_s:0.022 smp/s:181 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:50:22 ot_train.py:673 step 49000: eval_loss=0.2042
+INFO 2026-10-24 03:51:34 ot_train.py:641 step:49K smpl:3M ep:52K epch:1146.65 loss:0.031 grdn:3.376 lr:1.0e-05 updt_s:0.338 data_s:0.022 smp/s:181 mem_gb:4.24 l1_loss:0.028 kld_loss:0.000
+INFO 2026-10-24 03:52:44 ot_train.py:641 step:49K smpl:3M ep:52K epch:1151.31 loss:0.031 grdn:3.437 lr:1.0e-05 updt_s:0.335 data_s:0.018 smp/s:184 mem_gb:4.24 l1_loss:0.028 kld_loss:0.000
+INFO 2026-10-24 03:53:55 ot_train.py:641 step:50K smpl:3M ep:52K epch:1155.97 loss:0.031 grdn:inf lr:1.0e-05 updt_s:0.333 data_s:0.022 smp/s:183 mem_gb:4.24 l1_loss:0.029 kld_loss:0.000
+INFO 2026-10-24 03:55:06 ot_train.py:641 step:50K smpl:3M ep:52K epch:1160.63 loss:0.031 grdn:3.248 lr:1.0e-05 updt_s:0.331 data_s:0.022 smp/s:184 mem_gb:4.24 l1_loss:0.028 kld_loss:0.000
+INFO 2026-10-24 03:56:16 ot_train.py:641 step:50K smpl:3M ep:52K epch:1165.29 loss:0.031 grdn:3.155 lr:1.0e-05 updt_s:0.333 data_s:0.019 smp/s:185 mem_gb:4.24 l1_loss:0.028 kld_loss:0.000
+INFO 2026-10-24 03:56:17 ot_train.py:673 step 50000: eval_loss=0.2034
+INFO 2026-10-24 03:56:17 ot_train.py:687 Checkpoint policy after step 50000
+INFO 2026-10-24 03:56:18 ot_train.py:770 End of training
+[act] end Sat Oct 24 03:56:23 AM PDT 2026 exit=0
