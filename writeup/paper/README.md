@@ -3,11 +3,11 @@
 | File | What |
 |---|---|
 | `main.tex` | The paper: "Tactile FLORA: Fingertip Force as Text Improves a Vision-Language Reward Model's Grasp Judgments". Every number comes from `../tactile-flora-report.md`, `../hrdexdb/README.md` and `../baxter-rollouts/README.md`. |
-| `main.pdf` | Compiled output (10 pages: 9 body and references, 1 appendix) in the `preprint` style. |
-| `references.bib` | Bibliography. Entries marked `note = {verify}` have unconfirmed fields (FLORA, HRDexDB, Qwen3.5, LeRobot). |
+| `main.pdf` | Compiled output (13 pages including references and appendix) in the `preprint` style. |
+| `references.bib` | Bibliography. All entries verified against their primary pages (FLORA technical report, arXiv listings, PMLR/RSS/CVPR proceedings); Qwen3.5 has no standalone technical report and is cited by its release post. |
 | `neurips_2023.sty` | NeurIPS style file. The 2024 and 2025 copies were not downloadable from media.neurips.cc at the time of writing (404), so the 2023 file is used; swap it for the current year's and update the `\usepackage` line. |
 | `environ.sty`, `trimspaces.sty`, `multirow` | `environ` and `trimspaces` are dependencies of the style file, copied from CTAN because the small TeX Live image lacks them. `multirow` is not used. |
-| `figures/` | `force_traces.png` (per-rollout force and closure) and `ep0000_success.png` (poster of the ep0000 side-by-side video), copied from `../baxter-rollouts/`. |
+| `figures/` | `flora_architecture.png` (from `docs/figures/`), `hrdexdb_auroc.png` and `baxter_auroc.png` (from `../slides/figures/`), `test_standing_frame_4_success.png` (from `../hrdexdb/videos/`), `force_traces.png` and `ep0000_success.png` (from `../baxter-rollouts/`). |
 
 ## Compile
 
