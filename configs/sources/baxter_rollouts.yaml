@@ -1,0 +1,14 @@
+name: baxter_rollouts
+root: data/raw/baxter_rollouts
+license_allowed: [apache-2.0]
+max_windows: 0
+max_episodes: 0
+eval_only: true
+expected_label_rate: 1.0
+split_rules:
+  by: session
+  note: eval only; every rollout is a benchmark episode
+# HRDexDB-trained adapters only saw "pad R" lines, so the left gripper's pads are shown as R.
+baxter_rollouts_arm: R
+baxter_rollouts_cameras: [head]
+seed: 0

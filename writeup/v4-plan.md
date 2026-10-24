@@ -124,3 +124,83 @@ These are legitimate because dev is held out from training, and they need no ret
 - The dead v3 chain (jobs 6340 to 6343) still needs cancelling.
 - `jobs/eval-train.sbatch` passes a `--skip-released` flag the eval script does not define; fix
   before reusing the train-set eval.
+
+## Status, 2026-10-22 evening: Track A gate failed for inspire_f1, v4 pivoted to rotated folds
+
+The inspire_f1 download (587 trials, 13 GB) and loader are done, and the signal audit the gate
+asked for was run on all 586 labeled trials (`data/acceptance/hrdexdb-expanded-v4/f1-signal-audit.json`):
+
+| Force-only, object-grouped 5-fold CV | clips | failures | AUROC | majority |
+|---|---:|---:|---:|---:|
+| inspire_dftp (the hand already used) | 618 | 231 | 0.738 | 62.6% |
+| inspire_f1 | 586 | 164 | 0.729 | 72.0% |
+| inspire_f1, trials with sensor contact only | 439 | 98 | 0.716 | 77.7% |
+
+f1 is not higher signal, and 97 of its 422 successful grasps register no fingertip force at all
+(peak under 10 raw units), concentrated on bowls, baskets, funnels and dish racks where the
+contact lands off the sensors. A force model trained on it would learn that "no force" is
+compatible with success. Cross-hand transfer of scale-free force features is AUROC 0.63, so the
+two hands do not even share a signature. Decision: f1 is not used for force training.
+
+v4 keeps the DFTP signal that produced the v3 gain and attacks the power problem directly with
+two rotated object folds (`scripts/cluster/prepare_hrdexdb_folds.py`): v3's training objects
+are split in two hash-ordered halves, fold B holds out one half and fold C the other, each
+trained on everything else with v3's recipe, normalization and classifier refitted on that
+fold's training trials. This adds 350 new object-disjoint held-out clips (fold B 177, fold C
+173) on top of v3's 251, every v3 training object evaluated out-of-object exactly once.
+
+Training also gained a loss on the score digit alone and an early stop on it (mean over 10
+updates below 0.03 after at least 2 epochs), so an arm that has memorized its training digits
+stops instead of running all 4 epochs.
+
+| Job | Step | Depends on | Limit |
+|---|---|---|---|
+| 6368 | fold B force SFT (424 clips) | running since 21:20 | 10 h |
+| 6369 | fold B control SFT | 6368 | 10 h |
+| 6370, 6371 | fold B dev and test eval (released, control, force real, force shuffled) | chained | 6 h each |
+| 6372 | fold B report | 6371 | 1 h |
+| 6373 to 6377 | fold C, same chain | after 6372 | |
+
+Everything runs on the `long` partition so nothing preempts anything. Expected: fold B numbers
+between 05:00 and 11:00 on 2026-10-23 depending on the early stop, fold C 8 to 14 h after that.
+
+## Status, 2026-10-22 22:35: v4 folds cancelled, v5 recipe arms running
+
+The fold chain was cancelled after a defect was found in the early-stop monitor (it measured the
+end-of-turn token, not the score digit, so every arm would have stopped at exactly two epochs with
+the learning rate half-annealed). With about twelve GPU hours available, the budget went to two
+recipe changes on the v3 split, where the v2 control and the v3 tactile arm already exist on the
+same 251 held-out clips:
+
+| Arm | Change under test | Jobs | Eval cells |
+|---|---|---|---|
+| v5a-dropout | modality dropout: 30% of training clips also appear with mid-gray video and the real force block (455 samples) | 6378 → 6379 → 6380 | dev real + video_blank, test real |
+| v5b-chart | the same dropout plus the force trace rendered as a 96 px chart appended as one temporal group (297 visual tokens instead of 288) | 6381 → 6382 → 6383, behind 6380 | dev chart_text + chart, test chart_text |
+
+Why these two: the force-only classifier beats both fine-tuned VLMs on test (76.5% vs 72.2%),
+and the tactile VLM given force alone scores 53.7% on dev, so the VLM under-reads the block it
+is given. Dropout forces the force path to carry the answer on its own; the chart presents the
+trace in a form the vision encoder already reads.
+
+Also measured today, no GPU: the stacked head (tactile score + control score + classifier
+logit, fit on dev, applied once to test) reaches dev 88.2% out-of-object and test 76.5%,
+against the tactile VLM's 85.3% and 72.2% (`eval/expanded-v3-force/stack-result.md` under the v3
+base). Arm joint torque and object pose were downloaded and audited and both rejected as
+signals: torque alone is AUROC 0.63 and lowers the pooled force classifier, and the trial
+protocol is lift-briefly-and-replace, so pose-derived hold labels do not apply.
+
+### Recovery and reporting, 2026-10-22 22:48
+
+The six GPU jobs survived the server restart. The evaluator now resolves each arm's own
+frozen training plan; its previous hard-coded shared-plan path was absent in the v5 base
+and would have stopped the first evaluation. Per-arm receipts remain separate. CPU job
+6384 waits for successful completion of 6383, requires all six planned cells, and writes
+`data/acceptance/hrdexdb-expanded-v5/paired-comparison.md`. The comparison rejects missing
+clips, duplicate windows, changed labels/identities and invalid scores; it preserves the
+4.0 success threshold and marks statistical comparisons as unadjusted.
+
+The v5a plan predates the chart commit: eight current core-file hashes differ from its
+frozen hashes, although its data/config hashes match. v5b's hashes all match. This recovery
+did not change training code or inputs, and the original plans were retained. The audit
+and evaluator repair hashes are saved as `evaluation-repair.json` under the v5 base.
+

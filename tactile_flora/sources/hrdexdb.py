@@ -43,6 +43,9 @@ verified 2026-10-21 from the HF API and file headers (docs/research/datasets.md 
   angles run 1000 (open) to 0 (closed), verified 2026-10-22 on all 601 retained expanded
   clips (median correlation of the joint mean with total force -0.87, negative in 98.7%).
   The legacy representation keeps the inverted proxy so earlier runs stay reproducible.
+- Hand scale (``SourceConfig.hrdexdb_hand_scale``): optional per-hand multiplier on the raw
+  force so that hands with different sensor units share one normalization; recorded in
+  ``meta["hand_scale"]``. Fitted on training trials only by the preparing script.
 - Force representation (``SourceConfig.hrdexdb_force_representation``): "legacy" takes
   absolute raw values and the two channels with the largest MEAN, which is dominated by
   per-channel resting offsets (inspire_dftp channel medians about 13/144/-1/56/110/29 raw
@@ -96,7 +99,10 @@ _TACTILE_FILES = {"allegro_v5": "tactile", "inspire_dftp": "force", "inspire_f1"
 # hand -> hand position file stem (default "position")
 _POSITION_FILES = {"inspire_f1": "right_joint_states"}
 # Inspire hands report larger joint values when open; the closure proxy is flipped for them.
-_LARGER_IS_OPEN = {"inspire_dftp": "inspire_angle_1000_open", "inspire_f1": "inspire_f1_larger_is_open"}
+_LARGER_IS_OPEN = {
+    "inspire_dftp": "inspire_angle_1000_open",
+    "inspire_f1": "inspire_f1_larger_is_open",
+}
 _UNSUPPORTED = {
     "robotiq_2f85": "it has no tactile or force file",
     "human": "there is no robot, hence no tactile or force stream",
@@ -333,11 +339,14 @@ class HrdexdbAdapter:
         fps = self._fps.get(episode_id, DEFAULT_FPS)
         stem = _TACTILE_FILES[hand]
         tactile = load_npy(trial / "raw" / "hand" / f"{stem}.npy")
-        if hand == "inspire_f1":
-            signed = f1_normal_force(tactile)  # already float; no uint16 bit patterns
-        else:
-            signed = _signed_force(tactile)
+        # inspire_f1 values are already floats; no uint16 bit patterns to decode.
+        signed = f1_normal_force(tactile) if hand == "inspire_f1" else _signed_force(tactile)
         signed = signed.reshape(len(signed), -1)
+        hand_scale = float(self.cfg.hrdexdb_hand_scale.get(hand, 1.0))
+        if hand_scale != 1.0:
+            signed = (
+                signed * hand_scale
+            )  # unit alignment across hands; linear, so it commutes with the tare
         t_raw = _read_time(trial, stem, len(signed), fps)
         tared = self.cfg.hrdexdb_force_representation == "tared"
         offsets: np.ndarray | None = None
@@ -419,6 +428,7 @@ class HrdexdbAdapter:
                     else "raw sensor units (undocumented), signed-int16 decoded then abs"
                 ),
                 "force_representation": self.cfg.hrdexdb_force_representation,
+                "hand_scale": hand_scale,
                 "force_offsets": None if offsets is None else [float(v) for v in offsets],
                 "gripper_is_proxy": True,
                 "gripper_convention": gripper_convention,

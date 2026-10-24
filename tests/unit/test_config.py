@@ -27,6 +27,7 @@ SOURCES = [
     "hrdexdb",
     "softvtbench",
     "baxter",
+    "baxter_rollouts",
 ]
 
 
@@ -86,3 +87,21 @@ def test_cli_help_lists_every_subcommand() -> None:
         out = runner.invoke(app, [group, "--help"]).output
         for sub in subs:
             assert sub in out
+
+
+def test_modality_dropout_defaults_and_validation() -> None:
+    import pytest
+
+    from tactile_flora.config import ModalityDropout, TrainConfig, load_config
+
+    train_yaml = Path("configs/train.yaml")
+    cfg = load_config(train_yaml, TrainConfig) if train_yaml.exists() else None
+    dumped = ModalityDropout().model_dump()
+    assert dumped == {"video_blank": 0.0, "force_omitted": 0.0, "replace": False}
+    if cfg is not None:
+        assert cfg.modality_dropout == ModalityDropout()
+        bad = cfg.model_dump() | {"force_mode": "omitted", "modality_dropout": {"video_blank": 0.5}}
+        with pytest.raises(ValueError, match="needs a force block"):
+            TrainConfig.model_validate(bad)
+        with pytest.raises(ValueError):
+            ModalityDropout.model_validate({"video_blank": 0.5, "extra": 1})

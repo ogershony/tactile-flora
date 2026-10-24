@@ -1,0 +1,30 @@
+# Force config of the v3 HRDexDB tactile adapter (hrdexdb-expanded-v3/config/force.yaml) with
+# repo-relative paths: the force-only classifier fitted on HRDexDB training clips sits next to
+# this file; tokenizer_json is filled in by prepare_baxter_rollouts.py --tokenizer-json (else
+# the conservative character estimate is used for the token budget).
+resample:
+  half_window_s: 0.125
+  frame_period_s: 0.25
+  group_period_s: 0.5
+  raw_rate_hz: 100.0
+  contact_sigma: 3.0
+  contact_min_frac: 0.05
+render:
+  header: 'Force (normalized: 0 free space, 1 median grasp, max 3):'
+  decimals: 2
+  max_tokens: 3000
+  clip_max: 3.0
+  tokenizer_json: null
+  summary: true
+  classifier_json: configs/eval/baxter_rollouts/force-classifier.json
+events:
+  grasp_g: 0.6
+  grasp_f: 0.5
+  grasp_window_s: 0.5
+  slip_df: -2.0
+  slip_min_s: 0.1
+  slip_g_tol: 0.02
+  contact_loss_s: 0.3
+  regrasp_window_s: 3.0
+  crush_f: 2.0
+  off_axis_delta: 0.6

@@ -172,6 +172,13 @@ revision-pinned checkpoint cache.
 
 ## Two-GPU FSDP training path
 
+For HRDexDB recipe arms sharing a data root, `evaluate_hrdexdb_clean.py --force-run NAME`
+loads `training-plan-NAME.json` when present, otherwise the legacy `training-plan.json`.
+`--plan PATH` selects a frozen plan explicitly. A worker validates only its own adapter;
+per-arm evaluation provenance is written separately. This supports the queued v5 experiments
+without modifying their frozen training plans. Their CPU comparison job writes
+`data/acceptance/hrdexdb-expanded-v5/paired-comparison.md` after all GPU evaluations succeed.
+
 `smoke_fsdp.py` exercises the production `HFBackend`, FSDP wrapping, the answer-only training
 loop, distributed loss accounting, LoRA gathering, and adapter reload. It deliberately trains
 on random text or synthetic video rather than accepted dataset labels. Prepare a deterministic

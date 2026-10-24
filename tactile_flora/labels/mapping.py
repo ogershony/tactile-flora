@@ -33,7 +33,9 @@ from tactile_flora.schema import Episode, Label, ResampledForce, Span
 
 # Registered sources that are evaluation-only: their labels are their own (human or native) and
 # never get mapped, programmatic or pseudo labels added.
-EVAL_ONLY_SOURCES: frozenset[str] = frozenset({"baxter", "hrdexdb", "softvtbench"})
+EVAL_ONLY_SOURCES: frozenset[str] = frozenset(
+    {"baxter", "baxter_rollouts", "hrdexdb", "softvtbench"}
+)
 
 
 # Training sources with a mapper in ``map_native_labels``.

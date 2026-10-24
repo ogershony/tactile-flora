@@ -1,4 +1,55 @@
-# Status report (2026-10-22)
+# Status report (2026-10-23)
+
+## Relaunch, 2026-10-23 morning
+
+Last night's v5 arm A training (`6395`, `normal` partition, 128 GB) ran out of its 4 h limit
+on optimizer step ~80 of 87 and saved no adapter: the run has 455 samples per epoch (350 clips
+plus 105 video-blank dropout variants), so three epochs need about 4.3 h with model load. The
+dependent evaluation, arm B and report jobs became unsatisfiable. Both arms are relaunched
+with **two epochs** (58 updates) and a new `max_wall_minutes: 215` training budget: the loop
+stops after the first update that overruns the budget and still saves the adapter. Stop
+decisions (budget and the existing score-loss early stop) are now reduced across both ranks.
+The timed-out plan, pipeline files and partial run are archived under
+`data/acceptance/hrdexdb-expanded-v5/attempts/timeout-6395/`.
+
+New chain, all on `normal`: arm A `6428` training -> `6429` development -> `6430` test;
+arm B `6431` training (afterany 6430) -> `6432` development -> `6433` test; CPU report
+`6434` (afterok 6433) writes `paired-comparison.md`. Fifteen dead jobs from the earlier
+chains (6340-6343, 6384, 6390-6394, 6396-6400) are still pending and must be cancelled by hand.
+Pre-relaunch validation: trainer, config, plan and comparison tests pass; Ruff and Pyright pass.
+
+## Recovery update, 2026-10-22 22:48 PDT
+
+Two v5 recipe experiments on the existing object-disjoint DFTP split are already submitted:
+modality dropout (`6378` training → `6379` development → `6380` test), followed by dropout
+plus a force chart (`6381` → `6382` → `6383`). Job 6378 is running on both MI210s on
+`matthew`; its first five optimizer updates are finite. The v5 arms have no evaluation
+results yet. Their frozen plans, inputs and jobs were retained through the server restart.
+
+The queued evaluator would have failed because it required `training-plan.json`, whereas
+v5 stores one `training-plan-<arm>.json` per arm. It now resolves the selected arm's plan
+(or explicit `--plan`), validates only the selected worker's adapter, and writes separate
+per-arm evaluation provenance. Legacy shared plans still work. The comparison script now
+rejects incomplete/duplicate populations, changed identities or truth, and invalid scores;
+it supports a saved Markdown report and requires both splits when requested.
+
+CPU report job **6384**, dependent on successful completion of 6383, checks all six planned
+evaluation cells and writes `data/acceptance/hrdexdb-expanded-v5/paired-comparison.md`.
+It compares both arms against the existing v2 video control and v3 tactile model using the
+fixed threshold, exact McNemar tests and object bootstrap intervals. Multiple comparisons
+are explicitly described as unadjusted. No checkpoint or threshold selection was added.
+
+Provenance limitation: eight v5a core-file hashes differ from its frozen plan after the
+pre-existing chart implementation commit; its data/config hashes still match. This disk
+audit does not establish which source bytes the running process imported. v5b's core and
+data/config hashes match its frozen plan. Recovery changed no core model files or learning
+inputs. Details and evaluator repair hashes: `data/acceptance/hrdexdb-expanded-v5/evaluation-repair.json`.
+
+Validation after the repair: **401 tests passed**; Pyright and Ruff checks for the changed
+Python files pass. See [the experiment plan](../writeup/v4-plan.md) for the preceding recipe
+decisions and cancelled fold experiments.
+
+## Earlier expanded development results
 
 Expanded v2 development results are complete (Slurm 6330, 136 object-disjoint clips, zero
 parse failures): released FLORA 66.2% without and with force; control SFT 82.4% / AUROC 0.899;

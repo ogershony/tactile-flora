@@ -17,7 +17,8 @@ from typing import Any
 from pydantic import BaseModel
 
 from tactile_flora.prompts import templates as T
-from tactile_flora.schema import Window
+from tactile_flora.schema import ResampledForce, Window
+from tactile_flora.video.force_chart import CHART_FRAMES
 from tactile_flora.video.mosaic import MOSAIC_CELL_PX, mosaic_layout
 
 DENSE_FPS = 4.0
@@ -33,6 +34,12 @@ class VideoSpec(BaseModel):
     roles: list[str]  # row-major cell order, scene first (upper left)
     cell_px: int = MOSAIC_CELL_PX
     blank: bool = False
+    chart: ResampledForce | None = None  # force chart appended as one temporal group
+
+    @property
+    def n_video_frames(self) -> int:
+        """Decoded camera frames (the chart placeholders excluded)."""
+        return len(self.frame_times) - (CHART_FRAMES if self.chart is not None else 0)
 
 
 class PromptBundle(BaseModel):
@@ -45,17 +52,23 @@ class PromptBundle(BaseModel):
     answer_prefix: str = ""
 
 
-def _assemble(system: str, clip_line: str, force_block: str | None) -> tuple[str, str]:
-    """Place the force block and force sentence; this is the ONLY function that does.
+def _assemble(
+    system: str, clip_line: str, force_block: str | None, chart: bool = False
+) -> tuple[str, str]:
+    """Place the force block, force sentence and chart sentence; the ONLY function that does.
 
     ``clip_line`` is the user-template text after ``<video>``. Returns (system,
     user_text_after_video). No block means neither header nor sentence. With a block, the
     sentence is a separate trailing system line and the block is its own line directly after
-    the video item, before the trailing text.
+    the video item, before the trailing text. With ``chart`` the chart sentence is one more
+    trailing system line.
     """
-    if force_block is None:
-        return system, clip_line
-    return f"{system}\n{T.FORCE_SENTENCE}", f"\n{force_block}{clip_line}"
+    after = clip_line if force_block is None else f"\n{force_block}{clip_line}"
+    if force_block is not None:
+        system = f"{system}\n{T.FORCE_SENTENCE}"
+    if chart:
+        system = f"{system}\n{T.CHART_SENTENCE}"
+    return system, after
 
 
 def build_prompt(
@@ -68,11 +81,14 @@ def build_prompt(
     camera_roles: Sequence[str] = ("scene",),
     fps: float | None = None,
     frame_indices: Sequence[int] | None = None,
+    force_chart: ResampledForce | None = None,
 ) -> PromptBundle:
     """Build the prompt for one window; the single source of truth for training and eval.
 
     ``fps`` is the source video fps for the timestamp tokens (default 4.0 for dense). If
-    ``frame_indices`` is omitted they are round(t * fps), floored at 0.
+    ``frame_indices`` is omitted they are round(t * fps), floored at 0. ``force_chart``
+    (outcome prompts only) appends one temporal group of chart frames: the frame times and
+    indices are extended by repeating their last entry ``CHART_FRAMES`` times.
     """
     layout, roles = mosaic_layout(camera_roles)
     rate = fps if fps is not None else DENSE_FPS
@@ -84,6 +100,11 @@ def build_prompt(
     )
     if len(idx) != len(times):
         raise ValueError("frame_indices must match frame_times")
+    if force_chart is not None:
+        if window.prompt_kind != "outcome":
+            raise ValueError("the force chart is defined for outcome prompts only")
+        times = times + [times[-1]] * CHART_FRAMES
+        idx = idx + [idx[-1]] * CHART_FRAMES
     task = " ".join(task.split())
     if window.prompt_kind == "dense":
         system = T.DENSE_SYSTEM
@@ -92,7 +113,7 @@ def build_prompt(
         system = T.OUTCOME_SYSTEM_RATIONALE if with_rationale else T.OUTCOME_SYSTEM_SCORE_ONLY
         user = T.OUTCOME_USER.format(task=task)
     before, _, clip = user.partition(T.VIDEO_MARKER)
-    system, after = _assemble(system, clip, force_block)
+    system, after = _assemble(system, clip, force_block, chart=force_chart is not None)
     video = VideoSpec(
         frame_times=times,
         frame_indices=idx,
@@ -100,6 +121,7 @@ def build_prompt(
         layout=layout,
         roles=roles,
         blank=video_blank,
+        chart=force_chart,
     )
     return PromptBundle(
         system=system, user_text_before_video=before, user_text_after_video=after, video=video

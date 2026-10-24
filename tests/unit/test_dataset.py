@@ -94,3 +94,55 @@ def test_answer_labels_rejects_non_prefix() -> None:
         answer_labels([1, 2], [1, 9, 3])
     with pytest.raises(ValueError):
         answer_labels([1, 2], [1, 2])
+
+
+def test_video_blank_dropout_duplicates_with_the_same_block(tmp_path: Path) -> None:
+    from tactile_flora.config import ModalityDropout
+    from tactile_flora.train.dataset import select_dropout, variant_counts
+
+    mp = write_manifest(tmp_path / "m.parquet")
+    samples = build_samples(
+        mp, "real", FORCE_CFG, tmp_path, tokenizer=StubTokenizer(),
+        windows_source=windows_source, dropout=ModalityDropout(video_blank=1.0),
+    )  # fmt: skip
+    assert variant_counts(samples) == {"base": 3, "video_blank": 3}
+    by_id: dict[str, dict[str, object]] = {}
+    for s in samples:
+        by_id.setdefault(s.window_id, {})[s.variant] = s
+    for variants in by_id.values():
+        base, blank = variants["base"], variants["video_blank"]
+        assert base.video.blank is False and blank.video.blank is True  # type: ignore[attr-defined]
+        assert base.force_block == blank.force_block  # type: ignore[attr-defined]
+        assert base.input_ids == blank.input_ids  # type: ignore[attr-defined]
+        assert base.labels == blank.labels  # type: ignore[attr-defined]
+    assert [s.n_tokens for s in samples] == sorted(s.n_tokens for s in samples)
+    # Selection is exact, seeded and order independent.
+    ids = [s.window_id for s in samples if s.variant == "base"]
+    assert len(select_dropout(ids, 0.3, 0, "video_blank")) == round(0.3 * 3)
+    assert select_dropout(ids, 0.5, 7, "x") == select_dropout(ids[::-1], 0.5, 7, "x")
+    assert select_dropout(ids, 0.5, 7, "x") != select_dropout(ids, 0.5, 8, "x") or len(ids) < 3
+
+
+def test_force_omitted_dropout_matches_the_control_prompt(tmp_path: Path) -> None:
+    from tactile_flora.config import ModalityDropout
+
+    mp = write_manifest(tmp_path / "m.parquet")
+    mixed = build_samples(
+        mp, "real", FORCE_CFG, tmp_path, tokenizer=StubTokenizer(),
+        windows_source=windows_source, dropout=ModalityDropout(force_omitted=1.0, replace=True),
+    )  # fmt: skip
+    control = {s.window_id: s for s in _build(tmp_path, "omitted")}
+    assert all(s.variant == "force_omitted" for s in mixed) and len(mixed) == 3
+    for s in mixed:
+        assert s.force_block is None and s.input_ids == control[s.window_id].input_ids
+
+
+def test_video_blank_dropout_needs_a_block(tmp_path: Path) -> None:
+    from tactile_flora.config import ModalityDropout
+
+    mp = write_manifest(tmp_path / "m.parquet")
+    with pytest.raises(ValueError, match="needs a force block"):
+        build_samples(
+            mp, "omitted", FORCE_CFG, tmp_path, tokenizer=StubTokenizer(),
+            windows_source=windows_source, dropout=ModalityDropout(video_blank=1.0),
+        )  # fmt: skip

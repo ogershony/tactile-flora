@@ -353,4 +353,3 @@ def test_inspire_f1_refuses_pickles_that_reference_other_globals(tmp_path: Path)
         f1_normal_force(np.array([1.0], dtype=object))
     with pytest.raises(ValueError, match="lacks thumb_normal_force"):
         f1_normal_force(np.array([{}], dtype=object))
-

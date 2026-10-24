@@ -11,9 +11,9 @@ from pathlib import Path
 from typing import Any, Literal, TypeVar
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-ForceMode = Literal["real", "omitted", "zero", "shuffled", "video_blank"]
+ForceMode = Literal["real", "omitted", "zero", "shuffled", "video_blank", "chart", "chart_text"]
 
 
 class _Strict(BaseModel):
@@ -45,6 +45,15 @@ class SourceConfig(_Strict):
     # and inspire_dftp closure sign-corrected (Inspire angles are 1000 open, 0 closed).
     hrdexdb_force_representation: Literal["legacy", "tared"] = "legacy"
     hrdexdb_tare_s: float = Field(default=1.0, gt=0)
+    # Per-hand multiplier applied to the raw force before taring, so hands whose sensors report
+    # different units share one set of normalization constants (fitted on training trials
+    # only, e.g. {"inspire_f1": 2.9} brings the F1 median grasp onto the DFTP scale).
+    hrdexdb_hand_scale: dict[str, float] = Field(default_factory=dict)
+    # Baxter rollouts (LeRobot v3): the one instrumented gripper's pads are presented under this
+    # arm letter ("R" matches the HRDexDB-trained adapters, which only saw ``pad R`` lines),
+    # and only the listed cameras (by their short video key: head, wrist) become VideoRefs.
+    baxter_rollouts_arm: Literal["L", "R"] = "L"
+    baxter_rollouts_cameras: list[str] = Field(default_factory=lambda: ["head"])
     seed: int
 
 
@@ -109,6 +118,20 @@ class LoraConfig(_Strict):
     target_modules: list[str]
 
 
+class ModalityDropout(_Strict):
+    """Per-sample modality dropout for training (defaults reproduce the plain recipe).
+
+    ``video_blank``: fraction of training rows that ALSO get a copy with mid-gray video and the
+    real force block, so the force path must carry the answer on its own. ``force_omitted``:
+    fraction that also get a copy without the force block. ``replace`` swaps the copies in for
+    the originals instead of adding them. Selection is seeded and independent of row order.
+    """
+
+    video_blank: float = Field(default=0.0, ge=0, le=1)
+    force_omitted: float = Field(default=0.0, ge=0, le=1)
+    replace: bool = False
+
+
 class TrainConfig(_Strict):
     """LoRA SFT run configuration (configs/train/*.yaml)."""
 
@@ -123,6 +146,25 @@ class TrainConfig(_Strict):
     effective_batch: int
     lora: LoraConfig
     output_dir: str
+    # Optional early stop on the training loss of the score digit (the answer token before
+    # end-of-turn): stop once at least ``early_stop_min_epochs`` are done and the mean score
+    # loss over the last ``early_stop_window`` optimizer steps is below
+    # ``early_stop_score_loss``. None keeps the fixed epoch count.
+    early_stop_score_loss: float | None = Field(default=None, gt=0)
+    early_stop_window: int = Field(default=10, ge=1)
+    early_stop_min_epochs: int = Field(default=2, ge=0)
+    # Optional wall-clock budget measured from the start of ``train`` (model load included):
+    # once exceeded, the loop stops after the current optimizer step and the adapter is saved,
+    # so a Slurm time limit cannot discard a nearly finished run. None trains every epoch.
+    max_wall_minutes: float | None = Field(default=None, gt=0)
+    modality_dropout: ModalityDropout = Field(default_factory=ModalityDropout)
+
+    @model_validator(mode="after")
+    def _dropout_needs_a_block(self) -> TrainConfig:
+        d = self.modality_dropout
+        if self.force_mode == "omitted" and (d.video_blank or d.force_omitted):
+            raise ValueError("modality_dropout needs a force block; force_mode is omitted")
+        return self
 
 
 class BenchmarkSpec(_Strict):

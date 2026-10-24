@@ -41,7 +41,6 @@ from collections.abc import Callable, Collection, Iterable, Iterator, Sequence
 from pathlib import Path
 from typing import Any, Protocol
 
-import numpy as np
 import yaml
 
 from tactile_flora.config import ForceConfig, TrainConfig
@@ -55,9 +54,11 @@ from tactile_flora.train.dataset import (
     build_samples,
     estimate_wallclock,
     token_histogram,
+    variant_counts,
 )
 from tactile_flora.verify import full_git_hash, holdout_path, manifest
-from tactile_flora.video.mosaic import clip_frames, source_frame_count, video_metadata
+from tactile_flora.video.force_chart import clip_array as chart_clip_array
+from tactile_flora.video.mosaic import source_frame_count, video_metadata
 from tactile_flora.video.readers import SourceRootReader
 
 log = logging.getLogger("tactile_flora.train")
@@ -125,6 +126,41 @@ def _answer_loss(logits: Any, labels: Any, kept: int | None) -> Any:
     )
 
 
+def _score_loss(
+    logits: Any, labels: Any, kept: int | None, score_ids: Sequence[int] | None = None
+) -> Any | None:
+    """Cross-entropy at the score digit alone.
+
+    The outcome answer is a constant template plus one digit, so the mean answer loss reaches
+    its floor once the template is memorized; this term tracks whether the digit is still being
+    learned. With ``score_ids`` (the token ids of "1".."5") the digit is the LAST answer label
+    among them, which skips the end-of-turn and newline tokens the chat template appends.
+    Without them the second-to-last answer token is used (stub tokenizers in tests). Samples
+    without a qualifying position are skipped; None when none qualify.
+    """
+    torch = _torch()
+    if kept is not None:
+        labels = labels[:, -kept:]
+    values = []
+    for b in range(labels.size(0)):
+        idx = (labels[b] != IGNORE_INDEX).nonzero().flatten()
+        if score_ids is not None:
+            idx = idx[torch.isin(labels[b][idx], torch.tensor(list(score_ids), device=idx.device))]
+            if len(idx) < 1:
+                continue
+            pos = int(idx[-1])
+        else:
+            if len(idx) < 2:
+                continue
+            pos = int(idx[-2])
+        values.append(
+            torch.nn.functional.cross_entropy(
+                logits[b, pos - 1].float().unsqueeze(0), labels[b, pos].unsqueeze(0)
+            )
+        )
+    return torch.stack(values).mean() if values else None
+
+
 def _first_answer(labels: Any) -> int:
     idx = (labels[0] != IGNORE_INDEX).nonzero()
     return int(idx[0, 0])
@@ -144,6 +180,9 @@ def train_steps(
     keep_logits: bool = False,
     params: Sequence[Any] | None = None,
     autocast_bf16: bool = False,
+    early_stop: tuple[float, int, int] | None = None,
+    score_token_ids: Sequence[int] | None = None,
+    wall_budget: tuple[float, float] | None = None,
 ) -> list[float]:
     """Run the loop over ``batches`` (one micro-batch each); return the loss of every step.
 
@@ -151,18 +190,23 @@ def train_steps(
     closes a short global batch so accumulation cannot cross an epoch boundary.
     ``keep_logits`` passes ``logits_to_keep`` so only the answer suffix is projected to the
     vocabulary (HF models). With ``run_dir`` it writes loss.csv and log.jsonl.
+    ``wall_budget`` is ``(time.monotonic() at the start, budget in seconds)``: the loop stops
+    after the first optimizer step that ends past the budget. Both this and ``early_stop`` are
+    decided jointly across ranks (any rank asking to stop stops all), so no rank is left
+    waiting in a collective.
     """
     torch = _torch()
     model.train()
     clip_params = list(params) if params is not None else list(model.parameters())
     losses: list[float] = []
+    score_losses: list[float] = []
     csv_fh = jsonl_fh = None
     writer: Any = None
     if run_dir is not None:
         run_dir.mkdir(parents=True, exist_ok=True)
         csv_fh = open(run_dir / "loss.csv", "w", newline="", encoding="utf-8")  # noqa: SIM115
         writer = csv.writer(csv_fh)
-        writer.writerow(["step", "loss", "lr"])
+        writer.writerow(["step", "loss", "lr", "score_loss"])
         jsonl_fh = open(run_dir / "log.jsonl", "w", encoding="utf-8")  # noqa: SIM115
     it: Iterator[dict[str, Any]] = iter(batches)
     step = 0
@@ -179,6 +223,7 @@ def train_steps(
                 break
             optimizer.zero_grad(set_to_none=True)
             total = 0.0
+            score_total = 0.0
             for batch in group:
                 if device is not None:
                     batch = {k: v.to(device) if hasattr(v, "to") else v for k, v in batch.items()}
@@ -201,8 +246,11 @@ def train_steps(
                     out = model(**inputs)
                     logits = getattr(out, "logits", out)
                     loss = _answer_loss(logits, labels, kept) * weight / len(group)
+                    score = _score_loss(logits.detach(), labels, kept, score_token_ids)
                 loss.backward()
                 total += float(loss.detach())
+                if score is not None:
+                    score_total += float(score) * weight / len(group)
                 tokens += int(labels.size(1))
             clip = getattr(model, "clip_grad_norm_", None)
             if callable(clip):
@@ -214,8 +262,9 @@ def train_steps(
             scheduler.step()
             step += 1
             losses.append(total)
+            score_losses.append(score_total)
             if writer is not None and csv_fh is not None:
-                writer.writerow([step, f"{total:.6f}", f"{lr:.3e}"])
+                writer.writerow([step, f"{total:.6f}", f"{lr:.3e}", f"{score_total:.6f}"])
                 csv_fh.flush()
             if jsonl_fh is not None and step % log_every == 0:
                 now = time.monotonic()
@@ -225,6 +274,7 @@ def train_steps(
                 rec = {
                     "step": step,
                     "loss": total,
+                    "score_loss": score_total,
                     "lr": lr,
                     "tok_s": tokens / max(now - t_last, 1e-9),
                     "gpu_mem_gb": mem,
@@ -233,11 +283,46 @@ def train_steps(
                 jsonl_fh.flush()
                 log.info("step %d loss %.4f lr %.2e tok/s %.0f", step, total, lr, rec["tok_s"])
                 t_last, tokens = now, 0
+            stop: dict[str, Any] | None = None
+            if early_stop is not None:
+                floor, window, min_steps = early_stop
+                recent = score_losses[-window:]
+                if step >= min_steps and len(recent) >= window and sum(recent) / window < floor:
+                    stop = {
+                        "early_stop": step,
+                        "mean_score_loss": sum(recent) / window,
+                        "floor": floor,
+                        "window": window,
+                    }
+            if stop is None and wall_budget is not None:
+                started, budget_s = wall_budget
+                elapsed = time.monotonic() - started
+                if elapsed > budget_s:
+                    stop = {"wall_budget_stop": step, "elapsed_s": elapsed, "budget_s": budget_s}
+            if _any_rank(stop is not None, device):
+                if stop is None:  # another rank asked; record that this one followed
+                    stop = {"peer_stop": step}
+                log.info("stopping at step %d: %s", step, json.dumps(stop))
+                if jsonl_fh is not None:
+                    jsonl_fh.write(json.dumps(stop) + "\n")
+                    jsonl_fh.flush()
+                break
     finally:
         for fh in (csv_fh, jsonl_fh):
             if fh is not None:
                 fh.close()
     return losses
+
+
+def _any_rank(flag: bool, device: Any) -> bool:
+    """Return whether any rank set ``flag`` (a plain bool outside a torch.distributed group)."""
+    torch = _torch()
+    dist = getattr(torch, "distributed", None)
+    if dist is None or not dist.is_available() or not dist.is_initialized():
+        return flag
+    t = torch.tensor([int(flag)], device=device if device is not None else "cpu")
+    dist.all_reduce(t, op=dist.ReduceOp.MAX)
+    return bool(int(t.item()))
 
 
 def ordered_groups(
@@ -305,6 +390,7 @@ def train(
     report_version: str | None = None,
 ) -> Path:
     """Run (or dry-run) one SFT run and return its run directory."""
+    started = time.monotonic()  # the wall budget counts model load and sample building too
     version = report_version or full_git_hash()
     mp = _check_preconditions(cfg, data_root, allow_stale_manifest, version)
     run_dir = Path(cfg.output_dir) / (run_name or f"sft-{cfg.force_mode}")
@@ -313,19 +399,26 @@ def train(
     tok = tokenizer or QwenTokenizerAdapter(cfg.base_model)
     samples = build_samples(
         mp, cfg.force_mode, force_cfg, data_root, tokenizer=tok, windows_source=windows_source,
-        seed=cfg.seed, eval_only_sources=eval_only_sources,
+        seed=cfg.seed, eval_only_sources=eval_only_sources, dropout=cfg.modality_dropout,
     )  # fmt: skip
     hist = token_histogram(samples)
+    variants = variant_counts(samples)
     eta_s = estimate_wallclock(samples, s_per_window) * cfg.epochs
     if rank == 0:
-        print(f"samples: {len(samples)}  force_mode: {cfg.force_mode}")
+        print(f"samples: {len(samples)}  force_mode: {cfg.force_mode}  variants: {variants}")
         print("tokens: " + "  ".join(f"{k}={v:.0f}" for k, v in hist.items()))
         print(f"estimated wall-clock: {eta_s / 3600:.2f} h at {s_per_window:g} s/window")
     if dry_run:
         if rank == 0:
             (run_dir / "dry_run.json").write_text(
                 json.dumps(
-                    {"n_samples": len(samples), "histogram": hist, "eta_s": eta_s}, indent=2
+                    {
+                        "n_samples": len(samples),
+                        "variants": variants,
+                        "histogram": hist,
+                        "eta_s": eta_s,
+                    },
+                    indent=2,
                 ),
                 encoding="utf-8",
             )
@@ -351,6 +444,13 @@ def train(
     accum = max(1, math.ceil(cfg.effective_batch / backend.world_size))
     total_steps = len(groups) * cfg.epochs
     scheduler = make_scheduler(optimizer, total_steps, cfg.warmup_frac)
+    early_stop = None
+    if cfg.early_stop_score_loss is not None:
+        early_stop = (
+            cfg.early_stop_score_loss,
+            cfg.early_stop_window,
+            len(groups) * cfg.early_stop_min_epochs,
+        )
     train_steps(
         backend.model,
         _batches(groups, backend, cfg.epochs),
@@ -363,6 +463,9 @@ def train(
         keep_logits=isinstance(backend, HFBackend),
         params=params,
         autocast_bf16=isinstance(backend, HFBackend),
+        early_stop=early_stop,
+        score_token_ids=getattr(tok, "score_token_ids", lambda: None)(),
+        wall_budget=(started, cfg.max_wall_minutes * 60) if cfg.max_wall_minutes else None,
     )
     adapter_dir = run_dir / "adapter"
     if backend.rank == 0:
@@ -459,11 +562,7 @@ class HFBackend:
         """Default video_loader: the (T, H, W, 3) uint8 mosaic clip of ``sample``."""
         if sample.episode is None:
             raise ValueError(f"{sample.window_id}: sample has no episode to read video from")
-        v = sample.video
-        frames = clip_frames(
-            sample.episode, self.reader, v.frame_times, v.roles, blank=v.blank, cell_px=v.cell_px
-        )
-        return np.stack(frames)
+        return chart_clip_array(sample.episode, sample.video, self.reader)
 
     def make_batch(self, sample: Sample) -> dict[str, Any]:
         """Run the processor on the sample's chat and decoded clip; mask all but the answer."""

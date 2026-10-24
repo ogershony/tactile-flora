@@ -25,14 +25,19 @@ from tactile_flora.verify.windowing import (
 BASE = Path("data/acceptance/hrdexdb-clean-v1")
 
 
-def planned_report_version(base: Path, cfg: TrainConfig) -> str | None:
+def planned_report_version(
+    base: Path, cfg: TrainConfig, plan_path: Path | None = None
+) -> str | None:
     """Keep an active Slurm experiment pinned when unrelated commits advance HEAD."""
-    path = base / "training-plan.json"
+    path = plan_path or base / "training-plan.json"
     if not path.exists():
         return None
     plan = json.loads(path.read_text())
     job = os.environ.get("SLURM_JOB_ID")
-    if job is None or str(plan.get("slurm_training_job")) != job:
+    planned = {str(plan.get("slurm_training_job"))} | {
+        str(j) for j in plan.get("slurm_training_jobs", [])
+    }
+    if job is None or job not in planned:
         return None
     if cfg.model_dump() not in plan["configs"].values():
         raise ValueError("configuration differs from the active training plan")
@@ -57,6 +62,9 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--config", type=Path)
     parser.add_argument("--run-name", default="hrdexdb-outcome-sft")
+    parser.add_argument(
+        "--plan", type=Path, help="training plan to pin against (default base/training-plan.json)"
+    )
     parser.add_argument(
         "--force-config",
         type=Path,
@@ -119,7 +127,7 @@ def main() -> None:
         run_name=args.run_name,
         windows_source=windows_source,
         eval_only_sources=set(),  # the manifest has a fixed train split, object-disjoint from val
-        report_version=planned_report_version(args.base, cfg),
+        report_version=planned_report_version(args.base, cfg, args.plan),
     )
     print(f"training complete: {run_dir}")
 
