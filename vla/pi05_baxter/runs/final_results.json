@@ -1,0 +1,21 @@
+{
+  "joint_mae_rad": 0.030074331909418106,
+  "step0_mae_rad": 0.0070966919884085655,
+  "final_mae_rad": 0.04978626221418381,
+  "gripper_mae": 0.06147845834493637,
+  "jump_rate": 0.0,
+  "hold_joint_mae_rad": 0.041565634310245514,
+  "hold_gripper_mae": 0.09360785782337189,
+  "n_chunks": 141,
+  "rollout_frames": 406,
+  "rollout_jump_rate": 0.0,
+  "rollout_step0_dev_rad": 0.030892461024481673,
+  "steps": 5000,
+  "best_step": 5000,
+  "train_hours": 3.38,
+  "heldout_episodes": [
+    5,
+    14
+  ],
+  "checkpoint": "runs/pi05_baxter_r32_rel10/checkpoints/005000 (local, not committed)"
+}

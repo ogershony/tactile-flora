@@ -1,5 +1,7 @@
 # tactile-flora
 
+> **GPT-6 Astra Robotics Hardware Hackathon (2026-10-24):** start at [`writeup/hackathon/README.md`](writeup/hackathon/README.md) for the project writeup and the [showcase video](writeup/hackathon/video/tactile_flora_hackathon.mp4). Fine-tuned FLORA judge: failure AUROC 0.783 → 0.956 on 428 locked trials. pi0.5 on Baxter: [`vla/pi05_baxter/`](vla/pi05_baxter/README.md).
+
 Adds a fingertip-force channel to NVIDIA's FLORA-Rewarder (Qwen3.5-27B) by rendering force as text in the prompt, fine-tunes it with LoRA on public force datasets (PHANTOM/HapticWAM, SharpaDex, RH20T, REASSEMBLE, AIRoA MoMa), and evaluates it on labeled tactile sets (HRDexDB, SoftVTBench, a RoboReward subsample) and on a Baxter robot with home-built FSR fingertips. A matched no-force control run and a set of force ablations (omitted, zero, real, shuffled, video_blank) test whether the model actually reads the channel.
 
 Specification: `docs/spec.md`. Deviations from it: `docs/deviations.md`. Run status and owner to-do list: `docs/status.md`. Dataset and prompt research: `docs/research/`.

@@ -1,0 +1,1 @@
+{"tokenizer_class": "GemmaTokenizer", "add_bos_token": true, "add_eos_token": false, "padding_side": "right"}

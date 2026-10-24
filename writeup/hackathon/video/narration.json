@@ -1,0 +1,47 @@
+{
+  "voice_note": "Calm, clear technical presenter. Numbers are read as written.",
+  "segments": [
+    {
+      "id": "cold_open",
+      "text": "This is our Baxter picking up a red cube. Force pads under its fingers report contact two hundred times a second. When the gripper closes, the signal jumps from ninety-two counts to over four hundred.",
+      "visual": "Successful ACT rollout (rollouts ep 0), head camera at half speed, wrist camera inset, the 200 Hz pad trace drawing in sync underneath."
+    },
+    {
+      "id": "title",
+      "text": "Tactile Flora. Teaching robots to tell when they failed.",
+      "visual": "Title card over a dimmed freeze frame of the lifted cube."
+    },
+    {
+      "id": "problem",
+      "text": "Learned policies fail quietly. Our ACT policy succeeded once in ten runs on the real robot. Eight of the nine failures were safety aborts: a new action chunk started more than a quarter radian from where the arm actually was. Someone has to watch every run, and the camera often misses the moment that matters, because the gripper hides the contact.",
+      "visual": "Four failed rollouts looping in a grid, the real run log with stop reasons, the 1 of 10 tally."
+    },
+    {
+      "id": "built",
+      "text": "So we built three pieces. Force pads on Baxter's gripper, streamed at two hundred hertz. Tactile Flora: NVIDIA's twenty-seven billion parameter video reward model, which we fine-tuned to judge success from video plus force. And a Pi zero point five policy, fine-tuned for this arm.",
+      "visual": "System diagram: sense, judge, act, each card lighting up with its own footage."
+    },
+    {
+      "id": "reward",
+      "text": "We fine-tuned Flora on over eighteen hundred real manipulation clips and tested it once, on four hundred twenty-eight locked trials with fifty-nine unseen objects. Failure-detection AUROC rose from 0.783 to 0.956. Failure recall went from thirty-four to eighty-four percent, while still passing ninety-eight percent of successes. On Reassemble, AUROC rose from 0.648 to 0.919.",
+      "visual": "HRDexDB footage beside an ROC chart that builds curve by curve, then the headline numbers."
+    },
+    {
+      "id": "force",
+      "text": "Then the honest surprise. At Flora's native video resolution, force added nothing measurable: a matched model without force scored 0.964. When the model saw ninety-six pixel thumbnails, force added 0.043. Touch matters where vision is starved. And force alone, with no video, already reaches 0.75 to 0.82.",
+      "visual": "A v3 clip where force fixed the call, then the force gain at 96 px versus native resolution, and the force-only classifier."
+    },
+    {
+      "id": "policy",
+      "text_template": "We fine-tuned Pi zero point five overnight on a laptop GPU, from eighteen kinesthetic demonstrations. The vision-language backbone stays frozen, matching its knowledge-insulation training, and low-rank adapters train the action expert. Actions are relative to the current joint state, so every chunk is anchored to where the arm actually is. On two held-out demonstrations, {result_sentence}",
+      "result_sentence_template": "its one-second chunks are off by {joint_mae_rad:.3f} radians on average, against {hold_joint_mae_rad:.3f} for holding still, and {jump_phrase}.",
+      "result_sentence_pending": "we measure how closely its one-second chunks follow the demonstrator, and how often one would trip the jump check.",
+      "visual": "Kinesthetic demo footage, the fine-tuning recipe, held-out predicted vs demonstrated joint trajectories, result cards."
+    },
+    {
+      "id": "close",
+      "text": "Tactile Flora gives a robot a judge that catches its failures, and a sense of touch where its eyes fall short. Code, data, and results are open at github dot com slash ogershony slash tactile flora.",
+      "visual": "Closing card with the three results and the repository URL."
+    }
+  ]
+}
