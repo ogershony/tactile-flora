@@ -3,7 +3,7 @@
 | File | What |
 |---|---|
 | `main.tex` | The paper: "Tactile FLORA: Fingertip Force as Text Improves a Vision-Language Reward Model's Grasp Judgments". Every number comes from `../tactile-flora-report.md`, `../hrdexdb/README.md` and `../baxter-rollouts/README.md`. |
-| `main.pdf` | Compiled output (9 pages: 8 body and references, 1 appendix) in the `preprint` style. |
+| `main.pdf` | Compiled output (10 pages: 9 body and references, 1 appendix) in the `preprint` style. |
 | `references.bib` | Bibliography. Entries marked `note = {verify}` have unconfirmed fields (FLORA, HRDexDB, Qwen3.5, LeRobot). |
 | `neurips_2023.sty` | NeurIPS style file. The 2024 and 2025 copies were not downloadable from media.neurips.cc at the time of writing (404), so the 2023 file is used; swap it for the current year's and update the `\usepackage` line. |
 | `environ.sty`, `trimspaces.sty`, `multirow` | `environ` and `trimspaces` are dependencies of the style file, copied from CTAN because the small TeX Live image lacks them. `multirow` is not used. |

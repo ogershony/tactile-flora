@@ -111,19 +111,19 @@ Our contributions are:
 
 \paragraph{Vision-language reward models.} FLORA~\cite{flora2026} fine-tunes Qwen3.5 models into
 a segmenter, a captioner and a reward model that scores task outcome and dense execution quality
-from video; related video reward models and benchmarks include RoboReward and Robometer
-\todo{add citations}. These models are vision-only. We keep FLORA's reward model and add one
+from video; related video reward models and benchmarks include RoboReward~\cite{lee2026roboreward} and
+Robometer~\cite{liang2026robometer}, and vision-language models have been used as success
+detectors since SuccessVQA~\cite{du2023successvqa}. These models are vision-only. We keep FLORA's reward model and add one
 sensor channel to its prompt.
 
 \paragraph{Tactile sensing for grasp outcome.} Fingertip force has long been used to detect
-grasp success, slip and contact loss~\todo{cite classic slip-detection and grasp-stability work},
+grasp success, slip and contact loss~\cite{veiga2015slip,yuan2017gelsight,calandra2017feeling},
 and recent datasets pair tactile streams with manipulation video~\cite{hrdexdb2026}. Our
 force-only probes agree with that literature: force statistics alone separate HRDexDB grasp
 outcomes at AUROC 0.76 to 0.80, a real but moderate signal, weaker than video alone (0.90).
 
 \paragraph{Sensor data as text for language models.} Serializing time series and sensor readings
-as text for a language model is a known technique~\todo{cite LLM time-series and sensor-prompting
-work}. Our contribution is not the idea but the demonstration that a video reward model can learn
+as text for a language model is a known technique~\cite{gruver2023llmtime,jin2024timellm,xu2024penetrative}. Our contribution is not the idea but the demonstration that a video reward model can learn
 to combine such a block with video under LoRA, and the controls that show it does.
 
 \section{Method}
@@ -532,7 +532,8 @@ result into a measured one, and higher-resolution video to find out how much of 
 survives a stronger visual channel.
 
 \begin{ack}
-\todo{Acknowledgements: compute (SDSC), lab, funding.}
+We thank Rahul Chandra and the UCSD Supercomputing Club for the cluster on which every model in
+this paper was fine-tuned and evaluated.
 \end{ack}
 
 \bibliographystyle{plainnat}
