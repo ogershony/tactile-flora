@@ -32,6 +32,16 @@ from tactile_flora.video.readers import SourceRootReader
 BASE = Path("data/acceptance/baxter-rollouts-v1")
 V3 = Path("data/acceptance/hrdexdb-expanded-v3")
 BENCHMARK = "baxter_rollouts"
+RELEASED_MODEL = "nvidia/Flora-Rewarder"
+RELEASED_REVISION = "7de68d22c4a9decec5ddb7f86ddcaee8f82d3367"  # the snapshot v3 was trained on
+
+
+def default_model_id() -> str:
+    """Return the v3 plan's local snapshot when present, else the Hub id (set HF_TOKEN)."""
+    plan = V3 / "training-plan.json"
+    if plan.is_file():
+        return str(json.loads(plan.read_text())["base_model"])
+    return RELEASED_MODEL
 
 
 def _conditions(args: argparse.Namespace) -> list[tuple[str, list[str]]]:
@@ -64,7 +74,11 @@ def main() -> None:
         help="Fine-tuned tactile adapter directory ('' to skip).",
     )
     parser.add_argument("--force-modes", default="real,shuffled,omitted")
-    parser.add_argument("--model-id", default="", help="Base model path; default: v3 plan.")
+    parser.add_argument(
+        "--model-id",
+        default="",
+        help=f"Base model path or Hub id (default: the v3 plan's snapshot, else {RELEASED_MODEL}).",
+    )
     parser.add_argument("--backend", choices=["hf", "stub"], default="hf")
     parser.add_argument("--worker", type=int, help=argparse.SUPPRESS)
     parser.add_argument("--seed", type=int, default=0)

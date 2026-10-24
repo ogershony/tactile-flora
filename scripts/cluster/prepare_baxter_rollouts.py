@@ -4,9 +4,10 @@ Copies the dataset under ``<base>/raw``, writes the operator's outcome labels as
 ``raw/labels.json``, fits force normalization constants on the rollouts themselves (there is no
 training split: every episode is a benchmark episode), builds the outcome manifest and the
 source, force and eval configs, and records a representation audit with the force block each
-episode will show. The force config is copied from the reference HRDexDB experiment so the
-force-only classifier, tokenizer and rendering stay what the fine-tuned adapters were trained
-with.
+episode will show. The force config (``configs/eval/baxter_rollouts/force.yaml``, the v3
+HRDexDB one with its force-only classifier) keeps rendering what the fine-tuned adapters were
+trained with; paths are made absolute in the copy written under ``<base>/config`` so the
+evaluation cells are self-describing.
 """
 
 from __future__ import annotations
@@ -34,7 +35,7 @@ from tactile_flora.verify import full_git_hash, manifest
 from tactile_flora.verify.windowing import episode_windows
 
 BASE = Path("data/acceptance/baxter-rollouts-v1")
-REFERENCE = Path("data/acceptance/hrdexdb-expanded-v3")
+FORCE_CONFIG = Path("configs/eval/baxter_rollouts/force.yaml")
 BENCHMARK = "baxter_rollouts"
 
 
@@ -47,7 +48,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", type=Path, required=True, help="Downloaded dataset dir.")
     parser.add_argument("--base", type=Path, default=BASE)
-    parser.add_argument("--reference", type=Path, default=REFERENCE)
+    parser.add_argument(
+        "--force-config",
+        type=Path,
+        default=FORCE_CONFIG,
+        help="Force config (resampling, rendering, classifier) the adapters were trained with.",
+    )
+    parser.add_argument(
+        "--tokenizer-json",
+        type=Path,
+        help="tokenizer.json of the base model for exact token budgets (default: estimate).",
+    )
     parser.add_argument(
         "--success-episodes",
         default="",
@@ -106,7 +117,20 @@ def main() -> None:
     (config_dir / "baxter_rollouts.yaml").write_text(
         yaml.safe_dump(source_cfg.model_dump(mode="json"), sort_keys=False)
     )
-    force_cfg = load_config(args.reference / "config/force.yaml", ForceConfig)
+    force_cfg = load_config(args.force_config, ForceConfig)
+    classifier = force_cfg.render.classifier_json
+    force_cfg = force_cfg.model_copy(
+        update={
+            "render": force_cfg.render.model_copy(
+                update={
+                    "tokenizer_json": (
+                        str(args.tokenizer_json.resolve()) if args.tokenizer_json else None
+                    ),
+                    "classifier_json": str(Path(classifier).resolve()) if classifier else None,
+                }
+            )
+        }
+    )
     (base / "config/force.yaml").write_text(
         yaml.safe_dump(force_cfg.model_dump(mode="json"), sort_keys=False)
     )
@@ -215,7 +239,7 @@ def main() -> None:
         "labels": labels,
         "source_config": source_cfg.model_dump(mode="json"),
         "force_config": force_cfg.model_dump(mode="json"),
-        "force_config_reference": str(args.reference / "config/force.yaml"),
+        "force_config_reference": str(args.force_config),
         "normalization": {**consts.model_dump(mode="json"), "norm_version": consts.version()},
         "classifier_json": force_cfg.render.classifier_json,
         "classifier_sha256": (
