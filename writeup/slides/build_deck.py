@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parents[2]
 HERE = ROOT / "writeup" / "slides"
 FIG = HERE / "figures"
 OUT = HERE / "tactile-flora.pptx"
-VIDEOS = ROOT / "writeup" / "videos"
+VIDEOS = ROOT / "writeup" / "hrdexdb" / "videos"
 BAXTER = ROOT / "writeup" / "baxter-rollouts"
 
 # Palette: ink on white, one blue accent (tactile), one warm accent (force), dark slate ends.
@@ -360,7 +360,10 @@ def build() -> None:
     )
     d.text(
         s,
-        ["Oren Gershony and collaborators, Triton Droids / SDSC", DATE],
+        [
+            "Oren Gershony, Aaryan Patel, Kenan Blair and Parth Trivedi  ·  Triton Droids, UC San Diego",
+            DATE,
+        ],
         0.9,
         5.4,
         11.5,
@@ -723,11 +726,11 @@ def build() -> None:
     d.table(s, rows, 8.9, 2.0, 3.9, [1.4, 0.83, 0.83, 0.84], size=13, bold_col=None)
     d.text(
         s,
-        "MAE on dev (0 to 100): 150 released, 71 video only, 53 tactile.",
+        "MAE on dev (mean |score − truth| on the 1 to 5 scale, times 100): 150 released, 71 video only, 53 tactile.",
         8.9,
         3.6,
         3.9,
-        0.8,
+        0.9,
         size=13,
         color=INK,
     )
@@ -788,7 +791,7 @@ def build() -> None:
         s,
         [
             "+12.8 accuracy points and +0.27 AUROC pooled",
-            "dev MAE 150 to 53 on the 0 to 100 scale",
+            "dev MAE 150 to 53 (mean absolute error on the 1 to 5 scale, times 100)",
             "251 clips cannot certify a 3-point accuracy gain; about 1,000 would",
         ],
         7.05,
@@ -803,7 +806,7 @@ def build() -> None:
     s = d.slide()
     d.title(s, "The model reads the force: shuffle it and the gain disappears")
     rows = [
-        ["Tactile adapter on dev (136)", "Accuracy", "AUROC", "MAE"],
+        ["Tactile adapter on dev (136)", "Accuracy", "AUROC", "MAE ×100"],
         ["Real force", "85.3%", "0.926", "53"],
         ["Shuffled force (another clip's block)", "73.5%", "0.824", "109"],
         ["Video blanked (force only)", "53.7%", "0.775", "121"],
