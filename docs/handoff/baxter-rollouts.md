@@ -1,8 +1,12 @@
 # Handoff: evaluate baseline, fine-tuned and fine-tuned tactile FLORA on the Baxter rollouts
 
+**Status 2026-10-24:** this run completed on the SDSC node matthew (Slurm job 6490, 8 min);
+the results are in `writeup/baxter-rollouts.md`. The steps below remain the way to reproduce
+it elsewhere, or to re-run with a different adapter.
+
 Instructions for a Claude Code session on a machine with GPU compute. Everything below was
-prepared and dry-run (stub backend, CPU) on the login node on 2026-10-24; only the GPU
-inference step is left. Read this whole page before running anything.
+prepared and dry-run (stub backend, CPU) on the login node on 2026-10-24. Read this whole
+page before running anything.
 
 ## The task, as the user stated it
 
