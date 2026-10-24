@@ -8,7 +8,7 @@
 #SBATCH --mem=24G
 #SBATCH --time=00:40:00
 #SBATCH -o /home/%u/.cache/lerobot-slurm/%j-act-smoke.out
-source "${TACTILE_FLORA_ROOT:-$HOME/tactile-flora}/scripts/baxter_act/slurm_common.sh"
+source "${TACTILE_FLORA_ROOT:-$HOME/tactile-flora}/baxter/act/slurm_common.sh"
 rm -rf outputs/act_baxter_smoke
 lerobot-train \
   --dataset.repo_id=OG7407/baxter-cube-pick-left \

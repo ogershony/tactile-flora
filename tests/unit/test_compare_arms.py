@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 pytest.importorskip("sklearn")
-from writeup.compare_arms import align, load, paired  # noqa: E402
+from writeup.hrdexdb.compare_arms import align, load, paired  # noqa: E402
 
 
 def cell(tmp_path: Path) -> pd.DataFrame:

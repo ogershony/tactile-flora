@@ -7,9 +7,9 @@ fingertip-force trace the tactile model read, plus a poster PNG and a row in cli
 
 Run from the repository root with the login-node venv:
 
-    .venv/bin/python writeup/make_videos.py            # all wins
-    .venv/bin/python writeup/make_videos.py --limit 1  # smoke test
-    .venv/bin/python writeup/make_videos.py --losses   # also render clips the control wins
+    .venv/bin/python writeup/hrdexdb/make_videos.py            # all wins
+    .venv/bin/python writeup/hrdexdb/make_videos.py --limit 1  # smoke test
+    .venv/bin/python writeup/hrdexdb/make_videos.py --losses   # also render clips the control wins
 
 Inputs are the finished evaluation cells under data/acceptance/hrdexdb-expanded-{v2,v3}/eval
 and the v2 raw download; nothing is recomputed with the model.
@@ -35,10 +35,10 @@ from tactile_flora.eval.metrics import SUCCESS_THRESHOLD  # noqa: E402
 from tactile_flora.labels.windows import outcome_frame_indices  # noqa: E402
 from tactile_flora.sources.hrdexdb import HrdexdbAdapter  # noqa: E402
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 V3 = ROOT / "data/acceptance/hrdexdb-expanded-v3"
 V2 = ROOT / "data/acceptance/hrdexdb-expanded-v2"
-OUT = ROOT / "writeup"
+OUT = ROOT / "writeup" / "hrdexdb"
 FORCE_PRED = V3 / "eval/expanded-v3-force/hrdexdb_aligned_{split}/real/predictions.parquet"
 CTRL_PRED = V2 / "eval/expanded-v2-control/hrdexdb_aligned_{split}/omitted/predictions.parquet"
 SPLIT_NAME = {"val": "dev", "test": "test"}
@@ -96,7 +96,9 @@ def _force_stats(fa: np.ndarray, fb: np.ndarray, t: np.ndarray, grasp: float, ta
     }
 
 
-def render(row: pd.Series, adapter: HrdexdbAdapter, grasp: float, tau: float, out_dir: Path) -> dict:
+def render(
+    row: pd.Series, adapter: HrdexdbAdapter, grasp: float, tau: float, out_dir: Path
+) -> dict:
     ep = adapter.load(row.episode_id)
     cam = ep.cameras["scene"]
     arm = ep.force.arms["R"]
@@ -118,16 +120,25 @@ def render(row: pd.Series, adapter: HrdexdbAdapter, grasp: float, tau: float, ou
     fig = plt.figure(figsize=(W / 100, H / 100), dpi=100)
     fig.patch.set_facecolor("white")
     fig.text(
-        0.5, 0.965,
+        0.5,
+        0.965,
         f"Ground truth: {truth_word}    object: {obj.replace('_', ' ')}    "
         f"HRDexDB {row.episode_id}    split: {row.split}",
-        ha="center", va="center", fontsize=13, weight="bold",
+        ha="center",
+        va="center",
+        fontsize=13,
+        weight="bold",
     )
     panels = []
     for i, (title, pred, e, ok) in enumerate(
         [
             ("Fine-tuned FLORA (video only)", row.ctrl_pred, row.ctrl_E, ctrl_ok),
-            ("Fine-tuned tactile FLORA (video + fingertip force)", row.force_pred, row.force_E, force_ok),
+            (
+                "Fine-tuned tactile FLORA (video + fingertip force)",
+                row.force_pred,
+                row.force_E,
+                force_ok,
+            ),
         ]
     ):
         ax = fig.add_axes([0.02 + 0.49 * i, 0.36, 0.47, 0.56])
@@ -135,15 +146,28 @@ def render(row: pd.Series, adapter: HrdexdbAdapter, grasp: float, tau: float, ou
         ax.set_title(title, fontsize=12, pad=4)
         colour = green if ok else red
         ax.text(
-            0.5, -0.045,
+            0.5,
+            -0.045,
             f"predicts {_label(pred)}   (expected score {e:.2f} / 5)   {'correct' if ok else 'wrong'}",
-            transform=ax.transAxes, ha="center", va="top", fontsize=12, color=colour, weight="bold",
+            transform=ax.transAxes,
+            ha="center",
+            va="top",
+            fontsize=12,
+            color=colour,
+            weight="bold",
         )
         panels.append(ax)
     axf = fig.add_axes([0.06, 0.07, 0.91, 0.2])
     axf.plot(t, fa / grasp, color="#1f77b4", lw=1.4, label="pad A (most loaded fingertip)")
     axf.plot(t, fb / grasp, color="#ff7f0e", lw=1.4, label="pad B")
-    axf.plot(t, grip * max(0.3, float((fa + fb).max() / grasp)), color="grey", lw=0.9, ls=":", label="hand closure (scaled)")
+    axf.plot(
+        t,
+        grip * max(0.3, float((fa + fb).max() / grasp)),
+        color="grey",
+        lw=0.9,
+        ls=":",
+        label="hand closure (scaled)",
+    )
     axf.axhline(tau / grasp, color="k", lw=0.6, ls="--")
     axf.plot(seen, np.full_like(seen, -0.03), "|", color="k", ms=5, label="frames the models saw")
     axf.set_xlim(0, float(t[-1]))
@@ -152,8 +176,14 @@ def render(row: pd.Series, adapter: HrdexdbAdapter, grasp: float, tau: float, ou
     axf.set_ylabel("force\n(1 = median grasp)", fontsize=9)
     axf.set_title(
         f"Tared fingertip force read by the tactile model   |   peak {stats['peak_force_norm']}x median grasp, "
-        f"contact {stats['hold_s']} s" + (f", last contact at {stats['last_contact_s']} s" if stats['last_contact_s'] is not None else ", no contact"),
-        fontsize=10, loc="left",
+        f"contact {stats['hold_s']} s"
+        + (
+            f", last contact at {stats['last_contact_s']} s"
+            if stats["last_contact_s"] is not None
+            else ", no contact"
+        ),
+        fontsize=10,
+        loc="left",
     )
     axf.legend(loc="upper right", fontsize=8, ncol=4, frameon=False)
     cursor = axf.axvline(0, color="red", lw=1.2)

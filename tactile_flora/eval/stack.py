@@ -171,7 +171,7 @@ def stack_metrics(p: np.ndarray, label: Sequence[int]) -> dict[str, float]:
 
 
 def load_source_cfg(base: Path) -> SourceConfig:
-    """The HRDexDB source config of an experiment base."""
+    """Load the HRDexDB source config of an experiment base."""
     return load_config(base / "config/sources/hrdexdb.yaml", SourceConfig)
 
 

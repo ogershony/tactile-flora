@@ -3,7 +3,7 @@ r"""Paired comparison of evaluation cells on the v3 split (dev 136 clips, test 1
 Prints accuracy, AUROC, paired wins/losses with an exact McNemar test and an object-level
 bootstrap for every cell against the v2 control and against the v3 tactile arm.
 
-    .venv/bin/python writeup/compare_arms.py \\
+    .venv/bin/python writeup/hrdexdb/compare_arms.py \\
         --cell "v5a dropout" data/acceptance/hrdexdb-expanded-v5/eval/v5a-dropout \\
         --cell "v5b chart" data/acceptance/hrdexdb-expanded-v5/eval/v5b-chart
 """

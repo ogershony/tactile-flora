@@ -5,12 +5,12 @@ Date: 2026-10-24. Branch `hrdexdb-v3-force-representation`. Data:
 (LeRobot v3, 10 episodes). Everything on disk is under
 `data/acceptance/baxter-rollouts-v1/` (copy of the dataset, labels, manifest, normalization,
 representation audit, the six evaluation cells and `evaluation-result.json`; copies of the
-result and audit JSON are in `baxter-rollouts/`). The per-rollout force figure is
-`baxter-rollouts/force_traces.png`.
+result and audit JSON are in ``). The per-rollout force figure is
+`force_traces.png`.
 
 ## Which models
 
-The three models are the ones compared on HRDexDB in `writeup/comparison.md`: released FLORA,
+The three models are the ones compared on HRDexDB in `writeup/hrdexdb/README.md`: released FLORA,
 the fine-tuned video-only control, and the v3 fine-tuned tactile adapter:
 
 | Name in this write-up | Checkpoint | Inputs | Training |
@@ -40,7 +40,7 @@ guard at 2.7 s.
 | ep0002-0004, 0008, 0009 | failure | fail (auto) | 6.8-20 s | gripper closes fully on nothing (closure 1.0), zero force, arm lifts empty |
 | ep0005-0007 | failure | fail (auto) | 2.7-2.8 s | stopped while closing, zero force |
 
-![Force and closure traces](baxter-rollouts/force_traces.png)
+![Force and closure traces](force_traces.png)
 
 So the force channel carries one clean success signature (ep0000), one marginal one (ep0001,
 a single contact frame at the very end), and eight clips with no contact at all. The video
@@ -79,8 +79,8 @@ at the 0.5 cut because it calls everything a failure.
 
 Six cells, job 6490 on two MI210s (8 min 12 s in total; the model loads in about 90 s from
 the local cache and each clip takes 6 to 7 s). `parse_failed` and `no_logprobs` are 0 in every
-cell. Raw outputs: `baxter-rollouts/evaluation-result.json`; the tables below are printed by
-`baxter-rollouts/summarize.py` into `baxter-rollouts/tables.md`, which also lists every
+cell. Raw outputs: `evaluation-result.json`; the tables below are printed by
+`summarize.py` into `tables.md`, which also lists every
 rationale.
 
 ### Headline
@@ -156,24 +156,24 @@ force") and lowers the failures, but it will not raise a success it believes it 
 
 ### Videos
 
-`baxter-rollouts/make_videos.py` renders every rollout where the tactile model sits further on
+`make_videos.py` renders every rollout where the tactile model sits further on
 the correct side than the video-only model by at least 0.1 in E[s] (seven of ten; the other
 three are failures both models score 1.02 to 1.05). Each mp4 shows the head camera twice, once
 per model with that model's expected score and its rank among the ten clips, above the
 normalized fingertip force the tactile model read (both pads, gripper closure, the contact
 threshold as a dashed line, tick marks for the 64 frames both models saw). A panel is green when
 that model ranks the clip on the correct side of the other class: a success above every failure,
-a failure below both successes. Per-clip numbers are in `baxter-rollouts/clips.json`.
+a failure below both successes. Per-clip numbers are in `clips.json`.
 
 | # | Episode | Truth | Video-only FLORA (E[s], rank) | Tactile FLORA (E[s], rank) | Margin | Peak force | Contact | Closure at end | Length | Video |
 |---:|---|---|---|---|---:|---:|---|---:|---:|---|
-| 1 | ep0000 | SUCCESS | 1.34, 6th | **2.41, 1st** | 1.07 | 1.02x | 2.94 s, last at 5.59 s | 0.64 | 5.6 s | [mp4](baxter-rollouts/videos/ep0000_success.mp4) · [poster](baxter-rollouts/videos/ep0000_success.png) |
-| 2 | ep0003 | FAILURE | 1.99, 1st | **1.09, 3rd** | 0.90 | none | none | 1.00 | 6.8 s | [mp4](baxter-rollouts/videos/ep0003_failure.mp4) · [poster](baxter-rollouts/videos/ep0003_failure.png) |
-| 3 | ep0008 | FAILURE | 1.75, 2nd | **1.04, 6th** | 0.71 | none | none | 1.00 | 13.9 s | [mp4](baxter-rollouts/videos/ep0008_failure.mp4) · [poster](baxter-rollouts/videos/ep0008_failure.png) |
-| 4 | ep0004 | FAILURE | 1.60, 3rd | **1.02, 10th** | 0.58 | none | none | 1.00 | 20.0 s | [mp4](baxter-rollouts/videos/ep0004_failure.mp4) · [poster](baxter-rollouts/videos/ep0004_failure.png) |
-| 5 | ep0001 | SUCCESS | 1.05, 8th | **1.60, 2nd** | 0.55 | 0.94x | 0.13 s, last at 2.76 s | 0.64 | 2.8 s | [mp4](baxter-rollouts/videos/ep0001_success.mp4) · [poster](baxter-rollouts/videos/ep0001_success.png) |
-| 6 | ep0009 | FAILURE | 1.55, 4th | **1.07, 4th** | 0.48 | none | none | 1.00 | 15.9 s | [mp4](baxter-rollouts/videos/ep0009_failure.mp4) · [poster](baxter-rollouts/videos/ep0009_failure.png) |
-| 7 | ep0002 | FAILURE | 1.40, 5th | **1.05, 5th** | 0.35 | none | none | 0.99 | 7.9 s | [mp4](baxter-rollouts/videos/ep0002_failure.mp4) · [poster](baxter-rollouts/videos/ep0002_failure.png) |
+| 1 | ep0000 | SUCCESS | 1.34, 6th | **2.41, 1st** | 1.07 | 1.02x | 2.94 s, last at 5.59 s | 0.64 | 5.6 s | [mp4](videos/ep0000_success.mp4) · [poster](videos/ep0000_success.png) |
+| 2 | ep0003 | FAILURE | 1.99, 1st | **1.09, 3rd** | 0.90 | none | none | 1.00 | 6.8 s | [mp4](videos/ep0003_failure.mp4) · [poster](videos/ep0003_failure.png) |
+| 3 | ep0008 | FAILURE | 1.75, 2nd | **1.04, 6th** | 0.71 | none | none | 1.00 | 13.9 s | [mp4](videos/ep0008_failure.mp4) · [poster](videos/ep0008_failure.png) |
+| 4 | ep0004 | FAILURE | 1.60, 3rd | **1.02, 10th** | 0.58 | none | none | 1.00 | 20.0 s | [mp4](videos/ep0004_failure.mp4) · [poster](videos/ep0004_failure.png) |
+| 5 | ep0001 | SUCCESS | 1.05, 8th | **1.60, 2nd** | 0.55 | 0.94x | 0.13 s, last at 2.76 s | 0.64 | 2.8 s | [mp4](videos/ep0001_success.mp4) · [poster](videos/ep0001_success.png) |
+| 6 | ep0009 | FAILURE | 1.55, 4th | **1.07, 4th** | 0.48 | none | none | 1.00 | 15.9 s | [mp4](videos/ep0009_failure.mp4) · [poster](videos/ep0009_failure.png) |
+| 7 | ep0002 | FAILURE | 1.40, 5th | **1.05, 5th** | 0.35 | none | none | 0.99 | 7.9 s | [mp4](videos/ep0002_failure.mp4) · [poster](videos/ep0002_failure.png) |
 
 Rank 1 is the highest expected score of the ten. Closure 1.0 means the gripper closed on
 nothing; 0.64 means it stopped on the cube. In the two successes the tactile model is the only

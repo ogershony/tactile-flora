@@ -1,4 +1,4 @@
-"""Fit the stacked head on the dev split and score the test split; write stack-result.{json,md}.
+r"""Fit the stacked head on the dev split and score the test split; write stack-result.{json,md}.
 
 The stack is a logistic regression over three numbers per clip: the tactile VLM's expected
 score, the video-only VLM's expected score and the force-only classifier's logit. It is fit on

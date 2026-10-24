@@ -6,7 +6,7 @@ Run from the repository root with a venv that has python-pptx, matplotlib and pi
 
 Charts are rendered with matplotlib into writeup/slides/figures/ and placed as images; the
 diagram and timeline are native shapes. Every number is copied from the report (and from
-comparison.md / baxter-rollouts.md, which the report cites); nothing is recomputed here.
+hrdexdb/README.md / baxter-rollouts.md, which the report cites); nothing is recomputed here.
 """
 
 from __future__ import annotations
@@ -73,8 +73,14 @@ def fig_hrdexdb() -> Path:
         bars = ax.bar(xs, auroc[m], bw, color=colors[i], label=m, zorder=3)
         for b, v in zip(bars, auroc[m], strict=True):
             ax.text(
-                b.get_x() + b.get_width() / 2, v + 0.012, f"{v:.3f}", ha="center", va="bottom",
-                fontsize=10, color=hex_(INK), fontfamily="DejaVu Sans",
+                b.get_x() + b.get_width() / 2,
+                v + 0.012,
+                f"{v:.3f}",
+                ha="center",
+                va="bottom",
+                fontsize=10,
+                color=hex_(INK),
+                fontfamily="DejaVu Sans",
             )
     ax.axhline(0.5, color="#9AA0A6", lw=0.9, ls="--", zorder=2)
     ax.text(-0.42, 0.507, "chance", fontsize=9, color="#6B7280", ha="left", va="bottom")
@@ -108,7 +114,7 @@ def fig_baxter() -> Path:
     fig, ax = plt.subplots(figsize=(8.4, 4.0), dpi=200)
     fig.patch.set_facecolor("white")
     ys = list(range(len(rows)))[::-1]
-    for y, (name, v, force) in zip(ys, rows, strict=True):
+    for y, (_name, v, force) in zip(ys, rows, strict=True):
         ax.barh(y, v, 0.58, color=hex_(BLUE) if force else hex_(GREY), zorder=3)
         lx = v + 0.015 if not (0.40 < v + 0.015 < 0.50) else 0.515
         ax.text(lx, y, f"{v:.3f}", va="center", ha="left", fontsize=11, color=hex_(INK))
@@ -121,7 +127,11 @@ def fig_baxter() -> Path:
     for s in ("top", "right", "bottom"):
         ax.spines[s].set_visible(False)
     ax.spines["left"].set_color("#D6DDE5")
-    ax.set_xlabel("AUROC over the 2 successes x 8 failures (ten Baxter rollouts)", fontsize=10, color=hex_(MUTED))
+    ax.set_xlabel(
+        "AUROC over the 2 successes x 8 failures (ten Baxter rollouts)",
+        fontsize=10,
+        color=hex_(MUTED),
+    )
     fig.tight_layout()
     fig.savefig(out, facecolor="white")
     plt.close(fig)
@@ -146,12 +156,28 @@ class Deck:
             bg.fore_color.rgb = DARK
         else:
             self.text(s, f"Tactile FLORA  ·  {DATE}", 0.6, 7.0, 6, 0.3, size=10, color=MUTED)
-            self.text(s, str(self.n), 12.2, 7.0, 0.53, 0.3, size=10, color=MUTED, align=PP_ALIGN.RIGHT)
+            self.text(
+                s, str(self.n), 12.2, 7.0, 0.53, 0.3, size=10, color=MUTED, align=PP_ALIGN.RIGHT
+            )
         return s
 
     def text(
-        self, s, txt, x, y, w, h, *, size=16, bold=False, color=INK, font=BODY_FONT,
-        align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP, italic=False, name=None,
+        self,
+        s,
+        txt,
+        x,
+        y,
+        w,
+        h,
+        *,
+        size=16,
+        bold=False,
+        color=INK,
+        font=BODY_FONT,
+        align=PP_ALIGN.LEFT,
+        anchor=MSO_ANCHOR.TOP,
+        italic=False,
+        name=None,
     ):
         tb = s.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
         tb.name = name or f"text {txt[:20]}"
@@ -182,7 +208,7 @@ class Deck:
         for i, it in enumerate(items):
             p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
             p.space_after = Pt(gap)
-            lead, rest = (it if isinstance(it, tuple) else ("", it))
+            lead, rest = it if isinstance(it, tuple) else ("", it)
             r0 = p.add_run()
             r0.text = "•  "
             r0.font.size, r0.font.name, r0.font.color.rgb = Pt(size), BODY_FONT, BLUE
@@ -198,12 +224,24 @@ class Deck:
 
     def title(self, s, txt, *, dark=False, size=32):
         return self.text(
-            s, txt, 0.6, 0.45, 12.1, 0.95, size=size, bold=True, font=HEAD_FONT,
-            color=WHITE if dark else INK, anchor=MSO_ANCHOR.MIDDLE, name="title",
+            s,
+            txt,
+            0.6,
+            0.45,
+            12.1,
+            0.95,
+            size=size,
+            bold=True,
+            font=HEAD_FONT,
+            color=WHITE if dark else INK,
+            anchor=MSO_ANCHOR.MIDDLE,
+            name="title",
         )
 
     def card(self, s, x, y, w, h, fill=CARD, name="card"):
-        sh = s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
+        sh = s.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h)
+        )
         sh.name = name
         sh.adjustments[0] = 0.08
         sh.fill.solid()
@@ -230,16 +268,33 @@ class Deck:
         return sh
 
     def arrow(self, s, x1, y1, x2, y2, color=MUTED):
-        c = s.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(x1), Inches(y1), Inches(x2), Inches(y2))
+        c = s.shapes.add_connector(
+            MSO_CONNECTOR.STRAIGHT, Inches(x1), Inches(y1), Inches(x2), Inches(y2)
+        )
         c.line.color.rgb = color
         c.line.width = Pt(1.75)
         ln = c.line._get_or_add_ln()
-        tail = ln.makeelement("{http://schemas.openxmlformats.org/drawingml/2006/main}tailEnd", {"type": "triangle", "w": "med", "len": "med"})
+        tail = ln.makeelement(
+            "{http://schemas.openxmlformats.org/drawingml/2006/main}tailEnd",
+            {"type": "triangle", "w": "med", "len": "med"},
+        )
         ln.append(tail)
         return c
 
     def stat(self, s, big, label, x, y, w, *, color=BLUE, big_size=48, dark=False):
-        self.text(s, big, x, y, w, 0.9, size=big_size, bold=True, color=color, font=HEAD_FONT, anchor=MSO_ANCHOR.BOTTOM)
+        self.text(
+            s,
+            big,
+            x,
+            y,
+            w,
+            0.9,
+            size=big_size,
+            bold=True,
+            color=color,
+            font=HEAD_FONT,
+            anchor=MSO_ANCHOR.BOTTOM,
+        )
         self.text(s, label, x, y + 0.95, w, 0.7, size=13, color=LIGHT if dark else MUTED)
 
     def table(self, s, rows, x, y, w, col_w, *, size=13, header=True, row_h=0.36, bold_col=None):
@@ -263,12 +318,18 @@ class Deck:
                 r = p.add_run()
                 r.text = str(val)
                 r.font.size, r.font.name = Pt(size), BODY_FONT
-                r.font.bold = (header and i == 0) or (bold_col is not None and j == bold_col and i > 0)
-                r.font.color.rgb = BLUE if (bold_col is not None and j == bold_col and i > 0) else INK
+                r.font.bold = (header and i == 0) or (
+                    bold_col is not None and j == bold_col and i > 0
+                )
+                r.font.color.rgb = (
+                    BLUE if (bold_col is not None and j == bold_col and i > 0) else INK
+                )
         return t
 
     def image(self, s, path, x, y, w=None, h=None, name=None):
-        pic = s.shapes.add_picture(str(path), Inches(x), Inches(y), Inches(w) if w else None, Inches(h) if h else None)
+        pic = s.shapes.add_picture(
+            str(path), Inches(x), Inches(y), Inches(w) if w else None, Inches(h) if h else None
+        )
         pic.name = name or Path(path).name
         return pic
 
@@ -287,50 +348,197 @@ def build() -> None:
     # 1 title (dark)
     s = d.slide(dark=True)
     d.text(s, "Tactile FLORA", 0.9, 1.9, 9.3, 1.2, size=54, bold=True, color=WHITE, font=HEAD_FONT)
-    d.text(s, "Fingertip force as text for a vision-language reward model", 0.9, 3.1, 9.3, 0.8, size=26, color=LIGHT)
-    d.text(s, ["Oren Gershony and collaborators, Triton Droids / SDSC", DATE], 0.9, 5.4, 11.5, 0.9, size=16, color=LIGHT)
+    d.text(
+        s,
+        "Fingertip force as text for a vision-language reward model",
+        0.9,
+        3.1,
+        9.3,
+        0.8,
+        size=26,
+        color=LIGHT,
+    )
+    d.text(
+        s,
+        ["Oren Gershony and collaborators, Triton Droids / SDSC", DATE],
+        0.9,
+        5.4,
+        11.5,
+        0.9,
+        size=16,
+        color=LIGHT,
+    )
     d.card(s, 10.4, 1.6, 2.0, 2.0, fill=BLUE, name="motif")
-    d.text(s, "F", 10.4, 1.6, 2.0, 2.0, size=72, bold=True, color=WHITE, font=HEAD_FONT, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    d.text(
+        s,
+        "F",
+        10.4,
+        1.6,
+        2.0,
+        2.0,
+        size=72,
+        bold=True,
+        color=WHITE,
+        font=HEAD_FONT,
+        align=PP_ALIGN.CENTER,
+        anchor=MSO_ANCHOR.MIDDLE,
+    )
     d.notes(s, "Deck built from writeup/tactile-flora-report.md on 2026-10-24.")
 
     # 2 problem
     s = d.slide()
     d.title(s, "A vision-only reward model cannot see what the fingers feel")
-    d.text(s, "FLORA-Rewarder (NVIDIA, Qwen3.5-27B) watches a video mosaic and scores task success 1 to 5. It has no contact channel.", 0.6, 1.5, 7.2, 1.0, size=16)
+    d.text(
+        s,
+        "FLORA-Rewarder (NVIDIA, Qwen3.5-27B) watches a video mosaic and scores task success 1 to 5. It has no contact channel.",
+        0.6,
+        1.5,
+        7.2,
+        1.0,
+        size=16,
+    )
     items = [
-        ("Grasp or no grasp.", "An empty gripper closes, lifts and moves exactly like a loaded one."),
-        ("Hold or touch.", "A brief contact looks like a grasp on camera; the force says it ended early."),
+        (
+            "Grasp or no grasp.",
+            "An empty gripper closes, lifts and moves exactly like a loaded one.",
+        ),
+        (
+            "Hold or touch.",
+            "A brief contact looks like a grasp on camera; the force says it ended early.",
+        ),
         ("Weak grip, re-grasp, slip.", "Visually unremarkable, obvious in the force trace."),
         ("Small views.", "At 96 px per camera a cube is a few pixels wide; the lift is invisible."),
     ]
     d.bullets(s, items, 0.6, 2.6, 7.2, 3.8, size=16, gap=12)
     d.card(s, 8.3, 1.5, 4.45, 5.2)
-    d.text(s, "Released FLORA on a Baxter success", 8.55, 1.7, 4.0, 0.4, size=13, bold=True, color=MUTED)
-    d.text(s, "“the cube remained on the table in the final frames”", 8.55, 2.2, 4.0, 1.3, size=20, italic=True, font=HEAD_FONT)
-    d.text(s, "The cube was 20 cm in the air, held for 2.9 s.", 8.55, 3.7, 4.0, 0.6, size=14, color=MUTED)
-    d.text(s, "Rationale from the released model on rollout ep0000 (writeup/baxter-rollouts.md).", 8.55, 5.9, 4.0, 0.6, size=11, color=MUTED)
+    d.text(
+        s,
+        "Released FLORA on a Baxter success",
+        8.55,
+        1.7,
+        4.0,
+        0.4,
+        size=13,
+        bold=True,
+        color=MUTED,
+    )
+    d.text(
+        s,
+        "“the cube remained on the table in the final frames”",
+        8.55,
+        2.2,
+        4.0,
+        1.3,
+        size=20,
+        italic=True,
+        font=HEAD_FONT,
+    )
+    d.text(
+        s,
+        "The cube was 20 cm in the air, held for 2.9 s.",
+        8.55,
+        3.7,
+        4.0,
+        0.6,
+        size=14,
+        color=MUTED,
+    )
+    d.text(
+        s,
+        "Rationale from the released model on rollout ep0000 (writeup/baxter-rollouts/README.md).",
+        8.55,
+        5.9,
+        4.0,
+        0.6,
+        size=11,
+        color=MUTED,
+    )
 
     # 3 idea: diagram
     s = d.slide()
     d.title(s, "The idea: render force as text, put it in the prompt, fine-tune with LoRA")
     y0 = 2.0
     d.box(s, ["Cameras", "scene video"], 0.6, y0, 2.2, 1.0, name="cams")
-    d.box(s, ["64-frame mosaic", "released FLORA sampling, 96 px cells"], 3.5, y0, 2.9, 1.0, name="mosaic")
+    d.box(
+        s,
+        ["64-frame mosaic", "released FLORA sampling, 96 px cells"],
+        3.5,
+        y0,
+        2.9,
+        1.0,
+        name="mosaic",
+    )
     d.arrow(s, 2.8, y0 + 0.5, 3.5, y0 + 0.5)
     y1 = 4.1
-    d.box(s, ["Fingertip force", "FSR pads / Inspire hand, 50 to 200 Hz"], 0.6, y1, 2.2, 1.0, fill=RGBColor(0xFB, 0xE9, 0xDF), name="sensor")
-    d.box(s, ["Resample", "to the 64 frame times"], 3.5, y1, 1.75, 1.0, fill=RGBColor(0xFB, 0xE9, 0xDF), name="resample")
-    d.box(s, ["Normalize", "0 free space, 1 median grasp"], 5.45, y1, 1.75, 1.0, fill=RGBColor(0xFB, 0xE9, 0xDF), name="normalize")
-    d.box(s, ["Text block", "per-frame lines + summary + classifier P"], 7.4, y1, 2.3, 1.0, fill=RGBColor(0xFB, 0xE9, 0xDF), name="block")
+    d.box(
+        s,
+        ["Fingertip force", "FSR pads / Inspire hand, 50 to 200 Hz"],
+        0.6,
+        y1,
+        2.2,
+        1.0,
+        fill=RGBColor(0xFB, 0xE9, 0xDF),
+        name="sensor",
+    )
+    d.box(
+        s,
+        ["Resample", "to the 64 frame times"],
+        3.5,
+        y1,
+        1.75,
+        1.0,
+        fill=RGBColor(0xFB, 0xE9, 0xDF),
+        name="resample",
+    )
+    d.box(
+        s,
+        ["Normalize", "0 free space, 1 median grasp"],
+        5.45,
+        y1,
+        1.75,
+        1.0,
+        fill=RGBColor(0xFB, 0xE9, 0xDF),
+        name="normalize",
+    )
+    d.box(
+        s,
+        ["Text block", "per-frame lines + summary + classifier P"],
+        7.4,
+        y1,
+        2.3,
+        1.0,
+        fill=RGBColor(0xFB, 0xE9, 0xDF),
+        name="block",
+    )
     d.arrow(s, 2.8, y1 + 0.5, 3.5, y1 + 0.5)
     d.arrow(s, 5.25, y1 + 0.5, 5.45, y1 + 0.5)
     d.arrow(s, 7.2, y1 + 0.5, 7.4, y1 + 0.5)
-    d.box(s, ["FLORA-Rewarder", "Qwen3.5-27B + LoRA r32", "vision encoder frozen"], 10.3, 2.9, 2.45, 1.4, fill=BLUE, color=WHITE, bold=True, name="flora")
+    d.box(
+        s,
+        ["FLORA-Rewarder", "Qwen3.5-27B + LoRA r32", "vision encoder frozen"],
+        10.3,
+        2.9,
+        2.45,
+        1.4,
+        fill=BLUE,
+        color=WHITE,
+        bold=True,
+        name="flora",
+    )
     d.arrow(s, 6.4, y0 + 0.5, 10.3, 3.35)
     d.arrow(s, 9.7, y1 + 0.5, 10.3, 3.85)
     d.box(s, ["Score 1 to 5", "E[s], success at 4.0"], 10.3, 5.0, 2.45, 0.9, name="score")
     d.arrow(s, 11.52, 4.3, 11.52, 5.0)
-    d.text(s, "Everything released stays: weights, prompts, frame sampling. One addition: a force block after the video, introduced by one sentence that names its columns. Matched control: same training with the block omitted.", 0.6, 5.7, 9.2, 1.1, size=14, color=MUTED)
+    d.text(
+        s,
+        "Everything released stays: weights, prompts, frame sampling. One addition: a force block after the video, introduced by one sentence that names its columns. Matched control: same training with the block omitted.",
+        0.6,
+        5.7,
+        9.2,
+        1.1,
+        size=14,
+        color=MUTED,
+    )
 
     # 4 force block
     s = d.slide()
@@ -349,54 +557,157 @@ def build() -> None:
     items = [
         ("F", "total grip force; D pad asymmetry; dF its rate"),
         ("g", "hand closure, 0 open to 1 closed; c contact flag (F above 5% of grasp)"),
-        ("summary", "label-free: contact segments, longest and total contact, peak, hold time and force, late/early hold ratio, low-force fraction"),
-        ("P(success)", "a 120-tree, depth-2 gradient-boosted classifier over 31 force statistics, fitted on the 350 training clips; training clips see out-of-fold values"),
+        (
+            "summary",
+            "label-free: contact segments, longest and total contact, peak, hold time and force, late/early hold ratio, low-force fraction",
+        ),
+        (
+            "P(success)",
+            "a 120-tree, depth-2 gradient-boosted classifier over 31 force statistics, fitted on the 350 training clips; training clips see out-of-fold values",
+        ),
         ("budget", "at most 3,000 tokens per clip (largest seen: 2,700)"),
     ]
     d.bullets(s, items, 8.5, 1.5, 4.3, 5.0, size=13, gap=8)
-    d.text(s, "HRDexDB training clip inspire_dftp/cactus2/0, abbreviated. Per-trial tare, two most loaded pads, sign-corrected closure.", 0.6, 4.8, 7.6, 0.6, size=12, color=MUTED)
+    d.text(
+        s,
+        "HRDexDB training clip inspire_dftp/cactus2/0, abbreviated. Per-trial tare, two most loaded pads, sign-corrected closure.",
+        0.6,
+        4.8,
+        7.6,
+        0.6,
+        size=12,
+        color=MUTED,
+    )
     d.card(s, 0.6, 5.6, 7.6, 1.1)
-    d.text(s, "Why text: no new encoder, no change to the released model; the resampler keeps the raw slice so an encoder can be added later.", 0.85, 5.75, 7.1, 0.85, size=14, anchor=MSO_ANCHOR.MIDDLE)
+    d.text(
+        s,
+        "Why text: no new encoder, no change to the released model; the resampler keeps the raw slice so an encoder can be added later.",
+        0.85,
+        5.75,
+        7.1,
+        0.85,
+        size=14,
+        anchor=MSO_ANCHOR.MIDDLE,
+    )
 
     # 5 controls
     s = d.slide()
     d.title(s, "Every claim is checked against two controls and two diagnostics")
     cards = [
-        ("Matched no-force fine-tune", "Same base, same 350 clips, same seed, epochs, learning rate, batch and LoRA; block omitted. A gain over it is a force gain, not a fine-tuning gain.", BLUE),
-        ("Shuffled force", "The tactile model with each clip's block replaced by another clip's. A gain that survives shuffling is not a force gain.", BLUE),
-        ("Force removed", "The tactile adapter with no block at all: does it still rank by what it learned from video?", MUTED),
+        (
+            "Matched no-force fine-tune",
+            "Same base, same 350 clips, same seed, epochs, learning rate, batch and LoRA; block omitted. A gain over it is a force gain, not a fine-tuning gain.",
+            BLUE,
+        ),
+        (
+            "Shuffled force",
+            "The tactile model with each clip's block replaced by another clip's. A gain that survives shuffling is not a force gain.",
+            BLUE,
+        ),
+        (
+            "Force removed",
+            "The tactile adapter with no block at all: does it still rank by what it learned from video?",
+            MUTED,
+        ),
         ("Video blanked", "Frames mid-gray, force only: what the force carries on its own.", MUTED),
     ]
     for i, (h, body, col) in enumerate(cards):
         x = 0.6 + i * 3.1
         d.card(s, x, 1.6, 2.9, 4.4)
         d.card(s, x + 0.25, 1.85, 0.5, 0.5, fill=col, name=f"dot{i}")
-        d.text(s, str(i + 1), x + 0.25, 1.85, 0.5, 0.5, size=16, bold=True, color=WHITE, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+        d.text(
+            s,
+            str(i + 1),
+            x + 0.25,
+            1.85,
+            0.5,
+            0.5,
+            size=16,
+            bold=True,
+            color=WHITE,
+            align=PP_ALIGN.CENTER,
+            anchor=MSO_ANCHOR.MIDDLE,
+        )
         d.text(s, h, x + 0.25, 2.5, 2.45, 0.9, size=18, bold=True, font=HEAD_FONT)
         d.text(s, body, x + 0.25, 3.45, 2.45, 2.4, size=14, color=INK)
-    d.text(s, "Held-out sets are object-disjoint from training, split by object hash before any model ran, and scored once with fixed settings (threshold 4.0, no checkpoint selection).", 0.6, 6.25, 12.1, 0.6, size=13, color=MUTED)
+    d.text(
+        s,
+        "Held-out sets are object-disjoint from training, split by object hash before any model ran, and scored once with fixed settings (threshold 4.0, no checkpoint selection).",
+        0.6,
+        6.25,
+        12.1,
+        0.6,
+        size=13,
+        color=MUTED,
+    )
 
     # 6 timeline
     s = d.slide()
     d.title(s, "Four stages: each one fixed what the previous one showed was wrong")
     steps = [
-        ("Pilot", "32 / 16 HRDexDB clips", "No force benefit. Audit: tiny sample, unaligned sensor and video clocks.", MUTED),
-        ("Expanded v2", "618 clips, aligned clocks, frozen object-disjoint splits 350 / 136 / 115", "Still no benefit: 82.4% vs 81.6%. Block found nearly uninformative.", MUTED),
-        ("Bugs found", "Inverted closure sign, force saturated at 37.5 units, contact flag always on", "Classifier on rendered lines: AUROC 0.57; on raw tared force: 0.78.", ORANGE),
-        ("v3 (primary)", "Tared, peak-ranked, sign-corrected, summary line, classifier P", "85.3% / AUROC 0.926 on dev; 72.2% / 0.800 on test.", BLUE),
-        ("Baxter", "FSR fingertips, 50 demos, ACT policy, 10 rollouts", "Zero-shot: force takes AUROC from 0.31 to 1.0.", BLUE),
+        (
+            "Pilot",
+            "32 / 16 HRDexDB clips",
+            "No force benefit. Audit: tiny sample, unaligned sensor and video clocks.",
+            MUTED,
+        ),
+        (
+            "Expanded v2",
+            "618 clips, aligned clocks, frozen object-disjoint splits 350 / 136 / 115",
+            "Still no benefit: 82.4% vs 81.6%. Block found nearly uninformative.",
+            MUTED,
+        ),
+        (
+            "Bugs found",
+            "Inverted closure sign, force saturated at 37.5 units, contact flag always on",
+            "Classifier on rendered lines: AUROC 0.57; on raw tared force: 0.78.",
+            ORANGE,
+        ),
+        (
+            "v3 (primary)",
+            "Tared, peak-ranked, sign-corrected, summary line, classifier P",
+            "85.3% / AUROC 0.926 on dev; 72.2% / 0.800 on test.",
+            BLUE,
+        ),
+        (
+            "Baxter",
+            "FSR fingertips, 50 demos, ACT policy, 10 rollouts",
+            "Zero-shot: force takes AUROC from 0.31 to 1.0.",
+            BLUE,
+        ),
     ]
     xs = [0.6 + i * 2.5 for i in range(5)]
     for i, (h, what, res, col) in enumerate(steps):
         x = xs[i]
         d.card(s, x, 2.3, 0.5, 0.5, fill=col, name=f"step{i}")
-        d.text(s, str(i + 1), x, 2.3, 0.5, 0.5, size=14, bold=True, color=WHITE, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+        d.text(
+            s,
+            str(i + 1),
+            x,
+            2.3,
+            0.5,
+            0.5,
+            size=14,
+            bold=True,
+            color=WHITE,
+            align=PP_ALIGN.CENTER,
+            anchor=MSO_ANCHOR.MIDDLE,
+        )
         if i < 4:
             d.arrow(s, x + 0.6, 2.55, x + 2.4, 2.55, color=LIGHT)
         d.text(s, h, x, 3.0, 2.3, 0.5, size=18, bold=True, font=HEAD_FONT)
         d.text(s, what, x, 3.5, 2.3, 1.3, size=13, color=MUTED)
         d.text(s, res, x, 4.9, 2.3, 1.3, size=13)
-    d.text(s, "Training: released FLORA base, four epochs, seed 17, LoRA r32/a64, lr 2e-5, batch 16, 88 updates, two AMD MI210s. Only the force representation changed between v2 and v3.", 0.6, 6.3, 12.1, 0.6, size=12, color=MUTED)
+    d.text(
+        s,
+        "Training: released FLORA base, four epochs, seed 17, LoRA r32/a64, lr 2e-5, batch 16, 88 updates, two AMD MI210s. Only the force representation changed between v2 and v3.",
+        0.6,
+        6.3,
+        12.1,
+        0.6,
+        size=12,
+        color=MUTED,
+    )
 
     # 7 HRDexDB headline
     s = d.slide()
@@ -410,29 +721,83 @@ def build() -> None:
         ["Tactile", "85.3%", "72.2%", "79.3%"],
     ]
     d.table(s, rows, 8.9, 2.0, 3.9, [1.4, 0.83, 0.83, 0.84], size=13, bold_col=None)
-    d.text(s, "MAE on dev (0 to 100): 150 released, 71 video only, 53 tactile.", 8.9, 3.6, 3.9, 0.8, size=13, color=INK)
-    d.text(s, "251 clips over 32 objects never seen in training. Pooled: +12.8 accuracy points and +0.27 AUROC over released FLORA; +2.8 points and +0.043 AUROC over the matched video-only fine-tune.", 8.9, 4.5, 3.9, 2.0, size=13, color=MUTED)
+    d.text(
+        s,
+        "MAE on dev (0 to 100): 150 released, 71 video only, 53 tactile.",
+        8.9,
+        3.6,
+        3.9,
+        0.8,
+        size=13,
+        color=INK,
+    )
+    d.text(
+        s,
+        "251 clips over 32 objects never seen in training. Pooled: +12.8 accuracy points and +0.27 AUROC over released FLORA; +2.8 points and +0.043 AUROC over the matched video-only fine-tune.",
+        8.9,
+        4.5,
+        3.9,
+        2.0,
+        size=13,
+        color=MUTED,
+    )
 
     # 8 statistics
     s = d.slide()
-    d.title(s, "The ranking gain over the video-only fine-tune is significant; the accuracy gain is not")
+    d.title(
+        s, "The ranking gain over the video-only fine-tune is significant; the accuracy gain is not"
+    )
     d.stat(s, "+0.043", "AUROC, tactile minus video-only, pooled over 251 clips", 0.6, 1.6, 3.6)
-    d.stat(s, "+0.001 to +0.080", "object-level bootstrap 95% interval, p about 0.02", 4.5, 1.6, 4.4, big_size=36)
-    d.stat(s, "26 vs 19", "clips fixed vs clips broken relative to the video-only model", 9.2, 1.6, 3.6, color=INK)
+    d.stat(
+        s,
+        "+0.001 to +0.080",
+        "object-level bootstrap 95% interval, p about 0.02",
+        4.5,
+        1.6,
+        4.4,
+        big_size=36,
+    )
+    d.stat(
+        s,
+        "26 vs 19",
+        "clips fixed vs clips broken relative to the video-only model",
+        9.2,
+        1.6,
+        3.6,
+        color=INK,
+    )
     d.card(s, 0.6, 3.9, 5.9, 2.6)
     d.text(s, "Per split", 0.85, 4.05, 5.4, 0.4, size=14, bold=True, color=MUTED)
-    d.bullets(s, [
-        "dev: +0.026 AUROC (not significant); 12 wins, 8 losses",
-        "test: +0.067 AUROC (p about 0.04); 14 wins, 11 losses",
-        "accuracy +2.8 points overall, exact McNemar p = 0.37",
-    ], 0.85, 4.5, 5.4, 1.9, size=14, gap=6)
+    d.bullets(
+        s,
+        [
+            "dev: +0.026 AUROC (not significant); 12 wins, 8 losses",
+            "test: +0.067 AUROC (p about 0.04); 14 wins, 11 losses",
+            "accuracy +2.8 points overall, exact McNemar p = 0.37",
+        ],
+        0.85,
+        4.5,
+        5.4,
+        1.9,
+        size=14,
+        gap=6,
+    )
     d.card(s, 6.8, 3.9, 5.9, 2.6)
     d.text(s, "Against released FLORA", 7.05, 4.05, 5.4, 0.4, size=14, bold=True, color=MUTED)
-    d.bullets(s, [
-        "+12.8 accuracy points and +0.27 AUROC pooled",
-        "dev MAE 150 to 53 on the 0 to 100 scale",
-        "251 clips cannot certify a 3-point accuracy gain; about 1,000 would",
-    ], 7.05, 4.5, 5.4, 1.9, size=14, gap=6)
+    d.bullets(
+        s,
+        [
+            "+12.8 accuracy points and +0.27 AUROC pooled",
+            "dev MAE 150 to 53 on the 0 to 100 scale",
+            "251 clips cannot certify a 3-point accuracy gain; about 1,000 would",
+        ],
+        7.05,
+        4.5,
+        5.4,
+        1.9,
+        size=14,
+        gap=6,
+    )
 
     # 9 force is read
     s = d.slide()
@@ -445,13 +810,39 @@ def build() -> None:
         ["Video-only fine-tune, for reference", "82.4%", "0.899", "71"],
     ]
     d.table(s, rows, 0.6, 1.6, 7.6, [4.0, 1.2, 1.2, 1.2], size=14, row_h=0.42)
-    d.stat(s, "25 : 9", "paired clips lost : won when the force is shuffled, p = 0.009", 8.7, 1.5, 4.0, color=ORANGE)
+    d.stat(
+        s,
+        "25 : 9",
+        "paired clips lost : won when the force is shuffled, p = 0.009",
+        8.7,
+        1.5,
+        4.0,
+        color=ORANGE,
+    )
     d.card(s, 0.6, 4.2, 12.1, 2.3)
-    d.bullets(s, [
-        ("Shuffling costs 12 points.", "A gain that survived shuffling would not be a force gain; this one does not survive it."),
-        ("Force alone is weak.", "With the video blanked the model still ranks above chance (0.775) but calls almost everything a failure."),
-        ("Both channels are used.", "Neither video nor force alone reaches 0.926; the fine-tuned model combines them."),
-    ], 0.85, 4.4, 11.6, 2.0, size=14, gap=8)
+    d.bullets(
+        s,
+        [
+            (
+                "Shuffling costs 12 points.",
+                "A gain that survived shuffling would not be a force gain; this one does not survive it.",
+            ),
+            (
+                "Force alone is weak.",
+                "With the video blanked the model still ranks above chance (0.775) but calls almost everything a failure.",
+            ),
+            (
+                "Both channels are used.",
+                "Neither video nor force alone reaches 0.926; the fine-tuned model combines them.",
+            ),
+        ],
+        0.85,
+        4.4,
+        11.6,
+        2.0,
+        size=14,
+        gap=8,
+    )
 
     # 10 where it helps
     s = d.slide()
@@ -465,32 +856,84 @@ def build() -> None:
     d.table(s, rows, 0.6, 1.6, 12.1, [6.7, 1.8, 1.8, 1.8], size=14, row_h=0.45, bold_col=2)
     d.card(s, 0.6, 4.0, 5.9, 2.5)
     d.text(s, "What the wins look like", 0.85, 4.15, 5.4, 0.4, size=14, bold=True, color=MUTED)
-    d.text(s, "The video-only model under-calls successes whose hold is visually unremarkable (long, steady contact above the median force) and over-calls failures where the hand closes convincingly but the force shows a weak grip, a re-grasp, or contact that ends early.", 0.85, 4.55, 5.4, 1.9, size=13)
+    d.text(
+        s,
+        "The video-only model under-calls successes whose hold is visually unremarkable (long, steady contact above the median force) and over-calls failures where the hand closes convincingly but the force shows a weak grip, a re-grasp, or contact that ends early.",
+        0.85,
+        4.55,
+        5.4,
+        1.9,
+        size=13,
+    )
     d.card(s, 6.8, 4.0, 5.9, 2.5)
     d.text(s, "Stacking check", 7.05, 4.15, 5.4, 0.4, size=14, bold=True, color=MUTED)
-    d.text(s, "A force-only classifier alone scores 76.5% / 0.777 on test, level with both VLMs on accuracy; a logistic stack of video score, tactile score and classifier reaches 88.2% / 0.928 on dev. The VLM, not the sensor, is the bottleneck.", 7.05, 4.55, 5.4, 1.9, size=13)
+    d.text(
+        s,
+        "A force-only classifier alone scores 76.5% / 0.777 on test, level with both VLMs on accuracy; a logistic stack of video score, tactile score and classifier reaches 88.2% / 0.928 on dev. The VLM, not the sensor, is the bottleneck.",
+        7.05,
+        4.55,
+        5.4,
+        1.9,
+        size=13,
+    )
 
     # 11 a win
     s = d.slide()
     d.title(s, "A win: standing frame #4, a success the camera scored 1.27")
-    d.image(s, VIDEOS / "test_standing_frame_4_success.png", 0.6, 1.5, w=8.4, name="standing frame poster")
+    d.image(
+        s,
+        VIDEOS / "test_standing_frame_4_success.png",
+        0.6,
+        1.5,
+        w=8.4,
+        name="standing frame poster",
+    )
     d.card(s, 9.3, 1.5, 3.45, 4.75)
     d.text(s, "HRDexDB test clip", 9.55, 1.65, 3.0, 0.4, size=13, bold=True, color=MUTED)
     d.text(s, "1.27", 9.55, 2.05, 1.4, 0.7, size=34, bold=True, color=RED, font=HEAD_FONT)
     d.text(s, "video only: failure", 9.55, 2.75, 3.0, 0.4, size=13, color=MUTED)
     d.text(s, "4.19", 9.55, 3.2, 1.4, 0.7, size=34, bold=True, color=GREEN, font=HEAD_FONT)
     d.text(s, "tactile: success (truth)", 9.55, 3.9, 3.0, 0.4, size=13, color=MUTED)
-    d.text(s, "Force: peak 2.5x the median grasp, 16.4 s of contact, last contact at 23.7 s of 28.2 s.", 9.55, 4.4, 3.0, 1.7, size=13)
-    d.text(s, "All 26 such clips are rendered as side-by-side videos in writeup/videos/; the 19 the video-only model wins are listed in writeup/comparison.md.", 0.6, 6.35, 8.4, 0.6, size=12, color=MUTED)
+    d.text(
+        s,
+        "Force: peak 2.5x the median grasp, 16.4 s of contact, last contact at 23.7 s of 28.2 s.",
+        9.55,
+        4.4,
+        3.0,
+        1.7,
+        size=13,
+    )
+    d.text(
+        s,
+        "All 26 such clips are rendered as side-by-side videos in writeup/hrdexdb/videos/; the 19 the video-only model wins are listed in writeup/hrdexdb/README.md.",
+        0.6,
+        6.35,
+        8.4,
+        0.6,
+        size=12,
+        color=MUTED,
+    )
 
     # 12 Baxter setup
     s = d.slide()
     d.title(s, "Baxter: our own fingertips, our own policy, zero-shot evaluation")
     cards = [
-        ("Sensor", "Four thin-film FSR pads in a 3.3 V divider, Teensy 4.0 at 200 Hz, 12-bit ADC, clock-fitted into ROS. Left gripper only; raw counts, resting offset 92."),
-        ("Demos", "50 hand-guided left-arm cube picks, 15 fps head and wrist cameras at 640 x 360, no tactile. Cut at the first sign of the gripper re-opening."),
-        ("Policy", "ACT (LeRobot 0.6.1): chunk 30, 15 action steps, ResNet-18, VAE; 50k steps on five RTX 2080 Ti. Rollouts use the 30k checkpoint (held-out L1 0.028)."),
-        ("Rollouts", "Ten live runs at 30 Hz with joint-jump guard, fingertip box and speed cap, tactile recorded. Operator labels: ep0000 and ep0001 succeeded, eight failed."),
+        (
+            "Sensor",
+            "Four thin-film FSR pads in a 3.3 V divider, Teensy 4.0 at 200 Hz, 12-bit ADC, clock-fitted into ROS. Left gripper only; raw counts, resting offset 92.",
+        ),
+        (
+            "Demos",
+            "50 hand-guided left-arm cube picks, 15 fps head and wrist cameras at 640 x 360, no tactile. Cut at the first sign of the gripper re-opening.",
+        ),
+        (
+            "Policy",
+            "ACT (LeRobot 0.6.1): chunk 30, 15 action steps, ResNet-18, VAE; 50k steps on five RTX 2080 Ti. Rollouts use the 30k checkpoint (held-out L1 0.028).",
+        ),
+        (
+            "Rollouts",
+            "Ten live runs at 30 Hz with joint-jump guard, fingertip box and speed cap, tactile recorded. Operator labels: ep0000 and ep0001 succeeded, eight failed.",
+        ),
     ]
     for i, (h, body) in enumerate(cards):
         x = 0.6 + i * 3.1
@@ -498,17 +941,69 @@ def build() -> None:
         d.text(s, h, x + 0.2, 1.6, 2.5, 0.4, size=16, bold=True, font=HEAD_FONT)
         d.text(s, body, x + 0.2, 2.05, 2.5, 1.9, size=12)
     d.image(s, BAXTER / "force_traces.png", 0.6, 4.2, w=6.4, name="force traces")
-    d.text(s, "Force and closure the tactile model read, per rollout", 7.3, 4.3, 5.4, 0.4, size=14, bold=True, color=MUTED)
-    d.text(s, "Only ep0000 shows a clean grasp signature: closure stops at 0.64 on the cube and force holds at the grasp level for 2.9 s. ep0001 has one contact frame at the very end. The eight failures closed on nothing (closure 1.0, force 0), and five of them then lift the empty gripper exactly as a success would.", 7.3, 4.75, 5.4, 1.9, size=13)
+    d.text(
+        s,
+        "Force and closure the tactile model read, per rollout",
+        7.3,
+        4.3,
+        5.4,
+        0.4,
+        size=14,
+        bold=True,
+        color=MUTED,
+    )
+    d.text(
+        s,
+        "Only ep0000 shows a clean grasp signature: closure stops at 0.64 on the cube and force holds at the grasp level for 2.9 s. ep0001 has one contact frame at the very end. The eight failures closed on nothing (closure 1.0, force 0), and five of them then lift the empty gripper exactly as a success would.",
+        7.3,
+        4.75,
+        5.4,
+        1.9,
+        size=13,
+    )
 
     # 13 Baxter result
     s = d.slide()
     d.title(s, "Baxter: the force block takes the ranking from below chance to perfect")
     d.image(s, f_bax, 0.6, 1.45, w=8.2, name="baxter auroc chart")
-    d.stat(s, "0.31 → 1.00", "AUROC, fine-tuned FLORA without and with the force block", 9.1, 1.5, 3.7, big_size=36)
-    d.stat(s, "0.375 → 1.00", "released FLORA without and with the block, no training at all", 9.1, 3.3, 3.7, big_size=36)
-    d.text(s, "Every condition has accuracy 0.80, the majority class: no model scores a success at or above 4.0, so the signal is the ranking. Shuffled force 0.25, force removed 0.44, force-only classifier 0.50.", 9.1, 5.1, 3.7, 1.6, size=12, color=MUTED)
-    d.text(s, "Ten clips, two successes: 16 ordered pairs. A direction, not a significance result. Slurm job 6490, two MI210s, 8 min.", 0.6, 6.5, 8.2, 0.5, size=11, color=MUTED)
+    d.stat(
+        s,
+        "0.31 → 1.00",
+        "AUROC, fine-tuned FLORA without and with the force block",
+        9.1,
+        1.5,
+        3.7,
+        big_size=36,
+    )
+    d.stat(
+        s,
+        "0.375 → 1.00",
+        "released FLORA without and with the block, no training at all",
+        9.1,
+        3.3,
+        3.7,
+        big_size=36,
+    )
+    d.text(
+        s,
+        "Every condition has accuracy 0.80, the majority class: no model scores a success at or above 4.0, so the signal is the ranking. Shuffled force 0.25, force removed 0.44, force-only classifier 0.50.",
+        9.1,
+        5.1,
+        3.7,
+        1.6,
+        size=12,
+        color=MUTED,
+    )
+    d.text(
+        s,
+        "Ten clips, two successes: 16 ordered pairs. A direction, not a significance result. Slurm job 6490, two MI210s, 8 min.",
+        0.6,
+        6.5,
+        8.2,
+        0.5,
+        size=11,
+        color=MUTED,
+    )
 
     # 14 Baxter per-episode
     s = d.slide()
@@ -522,42 +1017,124 @@ def build() -> None:
         ["ep0008 empty lift", "1.75, 2nd", "1.04, 6th"],
     ]
     d.table(s, rows, 8.8, 1.45, 3.95, [1.55, 1.3, 1.1], size=12, row_h=0.38, bold_col=2)
-    d.text(s, "Expected score and rank among the ten clips. The tactile model's lowest success (1.60) sits 0.51 above its highest failure (1.09).", 8.8, 3.5, 3.95, 1.0, size=12, color=MUTED)
-    d.text(s, "ep0003 and ep0008 are the video-only model's two top scores: the arm closes, lifts and moves exactly as in a success. With its force block removed the tactile adapter also puts them on top (2.97, 2.31).", 8.8, 4.6, 3.95, 1.6, size=12)
-    d.text(s, "Side-by-side videos for the seven clips where the tactile model wins by at least 0.1: writeup/baxter-rollouts/videos/.", 0.6, 6.4, 7.9, 0.5, size=11, color=MUTED)
+    d.text(
+        s,
+        "Expected score and rank among the ten clips. The tactile model's lowest success (1.60) sits 0.51 above its highest failure (1.09).",
+        8.8,
+        3.5,
+        3.95,
+        1.0,
+        size=12,
+        color=MUTED,
+    )
+    d.text(
+        s,
+        "ep0003 and ep0008 are the video-only model's two top scores: the arm closes, lifts and moves exactly as in a success. With its force block removed the tactile adapter also puts them on top (2.97, 2.31).",
+        8.8,
+        4.6,
+        3.95,
+        1.6,
+        size=12,
+    )
+    d.text(
+        s,
+        "Side-by-side videos for the seven clips where the tactile model wins by at least 0.1: writeup/baxter-rollouts/videos/.",
+        0.6,
+        6.4,
+        7.9,
+        0.5,
+        size=11,
+        color=MUTED,
+    )
 
     # 15 caveats
     s = d.slide()
     d.title(s, "Caveats")
     items = [
-        ("Sample size.", "251 held-out clips cannot certify a 3-point accuracy gain; the AUROC gain is the significant one. Baxter: ten clips, two positives, no significance claim."),
-        ("Control provenance.", "The video-only comparison is the v2 control adapter; the v3 control retrain was preempted. Inputs are identical, so only training noise is unmeasured."),
-        ("A small classifier rides in the block.", "Its probability is one line the VLM reads; the raw force lines stay. It cannot explain Baxter (its own AUROC there is 0.5)."),
-        ("Undertrained.", "Loss floors by update 20 of 88: the target is a template plus one digit. Both fine-tunes are data-limited."),
-        ("96 px views.", "All video models saw tiny thumbnails; higher resolution would help every one of them and may shrink the force gain."),
-        ("Baxter specifics.", "Normalization fitted on the ten test clips (label-free); ep0001 rests on one line of the block; uncalibrated FSR counts; left pads shown as the right-hand pads the adapter knew."),
+        (
+            "Sample size.",
+            "251 held-out clips cannot certify a 3-point accuracy gain; the AUROC gain is the significant one. Baxter: ten clips, two positives, no significance claim.",
+        ),
+        (
+            "Control provenance.",
+            "The video-only comparison is the v2 control adapter; the v3 control retrain was preempted. Inputs are identical, so only training noise is unmeasured.",
+        ),
+        (
+            "A small classifier rides in the block.",
+            "Its probability is one line the VLM reads; the raw force lines stay. It cannot explain Baxter (its own AUROC there is 0.5).",
+        ),
+        (
+            "Undertrained.",
+            "Loss floors by update 20 of 88: the target is a template plus one digit. Both fine-tunes are data-limited.",
+        ),
+        (
+            "96 px views.",
+            "All video models saw tiny thumbnails; higher resolution would help every one of them and may shrink the force gain.",
+        ),
+        (
+            "Baxter specifics.",
+            "Normalization fitted on the ten test clips (label-free); ep0001 rests on one line of the block; uncalibrated FSR counts; left pads shown as the right-hand pads the adapter knew.",
+        ),
     ]
     d.bullets(s, items, 0.6, 1.5, 12.1, 5.3, size=14, gap=10)
 
     # 16 conclusion (dark)
     s = d.slide(dark=True)
-    d.text(s, "Tactile FLORA outperforms regular FLORA at judging grasps", 0.9, 0.7, 11.5, 1.0, size=34, bold=True, color=WHITE, font=HEAD_FONT)
+    d.text(
+        s,
+        "Tactile FLORA outperforms regular FLORA at judging grasps",
+        0.9,
+        0.7,
+        11.5,
+        1.0,
+        size=34,
+        bold=True,
+        color=WHITE,
+        font=HEAD_FONT,
+    )
     cols = [
         ("vs released FLORA", "+12.8 pts, +0.27 AUROC on HRDexDB; 0.375 to 1.0 on Baxter"),
-        ("vs video-only fine-tune", "+2.8 pts, +0.043 AUROC (p about 0.02); +6 pts where video is unsure; 0.31 to 1.0 on Baxter"),
-        ("the force is causal", "shuffled: 25 lost / 9 won (p = 0.009), Baxter 0.25; removed: 0.44"),
+        (
+            "vs video-only fine-tune",
+            "+2.8 pts, +0.043 AUROC (p about 0.02); +6 pts where video is unsure; 0.31 to 1.0 on Baxter",
+        ),
+        (
+            "the force is causal",
+            "shuffled: 25 lost / 9 won (p = 0.009), Baxter 0.25; removed: 0.44",
+        ),
     ]
     for i, (h, body) in enumerate(cols):
         x = 0.9 + i * 4.0
-        d.text(s, h, x, 2.0, 3.7, 0.5, size=18, bold=True, color=BLUE if i < 2 else ORANGE, font=HEAD_FONT)
+        d.text(
+            s,
+            h,
+            x,
+            2.0,
+            3.7,
+            0.5,
+            size=18,
+            bold=True,
+            color=BLUE if i < 2 else ORANGE,
+            font=HEAD_FONT,
+        )
         d.text(s, body, x, 2.55, 3.7, 1.6, size=15, color=LIGHT)
     d.text(s, "What's next", 0.9, 4.5, 11.5, 0.5, size=18, bold=True, color=WHITE, font=HEAD_FONT)
-    d.bullets(s, [
-        "More held-out clips (about 1,000) to certify the accuracy gain, and a second training seed",
-        "Higher-resolution video input, then re-measure how much force still adds",
-        "Calibrated fingertip sensors on both Baxter grippers and more rollouts, including induced slips",
-        "More embodiments: the same text block works for any force stream",
-    ], 0.9, 5.05, 11.5, 2.0, size=15, color=LIGHT, gap=4)
+    d.bullets(
+        s,
+        [
+            "More held-out clips (about 1,000) to certify the accuracy gain, and a second training seed",
+            "Higher-resolution video input, then re-measure how much force still adds",
+            "Calibrated fingertip sensors on both Baxter grippers and more rollouts, including induced slips",
+            "More embodiments: the same text block works for any force stream",
+        ],
+        0.9,
+        5.05,
+        11.5,
+        2.0,
+        size=15,
+        color=LIGHT,
+        gap=4,
+    )
 
     d.save()
     print(OUT, d.n, "slides")

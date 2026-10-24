@@ -13,7 +13,7 @@
 # Preemption on `long` requeues the job; on restart it resumes from checkpoints/last of RUN.
 # Knobs: RUN (output dir name), STEPS, BS (per-GPU batch), NGPU (must match --gres).
 # Group limit on account tritondroids is cpu=32, mem=96G, rtx2080ti=8 shared with the HOPE jobs, hence 5 GPUs x 13 = 65 global batch.
-source "${TACTILE_FLORA_ROOT:-$HOME/tactile-flora}/scripts/baxter_act/slurm_common.sh"
+source "${TACTILE_FLORA_ROOT:-$HOME/tactile-flora}/baxter/act/slurm_common.sh"
 RUN="${RUN:-act_baxter_cube_left}"
 STEPS="${STEPS:-50000}"
 BS="${BS:-13}"

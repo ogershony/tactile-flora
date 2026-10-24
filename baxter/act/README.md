@@ -3,7 +3,7 @@
 Folded in from `~/baxter_teleop` on 2026-10-24. These scripts trained the LeRobot ACT policy
 `OG7407/baxter-act-cube-left` on the teleop dataset `OG7407/baxter-cube-pick-left` (50 episodes,
 15 fps, left arm, "pick up the red cube"); live rollouts of that policy are the benchmark
-`OG7407/baxter-cube-pick-left-rollouts` evaluated in `writeup/baxter-rollouts.md`.
+`OG7407/baxter-cube-pick-left-rollouts` evaluated in `writeup/baxter-rollouts/README.md`.
 
 Only the scripts and the final checkpoint's small artefacts are in git. The working directory
 (`BAXTER_ACT_HOME`, default `~/baxter_teleop`) holds the lerobot 0.6.1 venv, `outputs/<run>/`
@@ -23,10 +23,10 @@ The sbatch scripts source `slurm_common.sh` from `TACTILE_FLORA_ROOT` (default `
 so run them from this checkout on the SDSC cluster:
 
 ```sh
-sbatch scripts/baxter_act/smoke.sbatch
-sbatch scripts/baxter_act/train.sbatch
-scripts/baxter_act/progress.sh <jobid> ~/baxter_teleop/outputs/act_baxter_cube_left
-HF_WRITE_TOKEN=... scripts/baxter_act/publish.sh ~/baxter_teleop/outputs/act_baxter_cube_left 50000 act_baxter_cube_left_final
+sbatch baxter/act/smoke.sbatch
+sbatch baxter/act/train.sbatch
+baxter/act/progress.sh <jobid> ~/baxter_teleop/outputs/act_baxter_cube_left
+HF_WRITE_TOKEN=... baxter/act/publish.sh ~/baxter_teleop/outputs/act_baxter_cube_left 50000 act_baxter_cube_left_final
 ```
 
 ## The published checkpoint

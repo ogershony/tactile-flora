@@ -1,8 +1,8 @@
 # Tactile FLORA: adding fingertip force to a vision-language reward model
 
 Experiment report. Date 2026-10-24. Branch `hrdexdb-v3-force-representation`. Authors: Oren
-Gershony and collaborators (Triton Droids / SDSC). Companion files: `comparison.md` (HRDexDB
-results and the 26 win videos), `baxter-rollouts.md` (the Baxter robot evaluation and its videos),
+Gershony and collaborators (Triton Droids / SDSC). Companion files: `hrdexdb/README.md` (HRDexDB
+results and the 26 win videos), `baxter-rollouts/README.md` (the Baxter robot evaluation and its videos),
 `paper/` (NeurIPS-style manuscript) and `slides/` (deck). Everything in this report is read from
 finished evaluation cells on disk; no number was produced for this document by re-running a model.
 
@@ -170,7 +170,7 @@ To test transfer to our own hardware, we built a tactile capture stack on a Reth
 - **Policy.** An ACT policy (LeRobot 0.6.1, chunk 30, 15 action steps, ResNet-18, VAE) trained
   for 50,000 steps on five RTX 2080 Ti GPUs (global batch 65, fp16), episodes 45 to 49 held out;
   held-out action L1 fell from 0.0325 (step 5,000) to 0.0267 (step 50,000). The rollouts used the
-  step-30,000 checkpoint (held-out L1 0.0278). Scripts: `scripts/baxter_act/`; checkpoint
+  step-30,000 checkpoint (held-out L1 0.0278). Scripts: `baxter/act/`; checkpoint
   `OG7407/baxter-act-cube-left`.
 - **Rollouts.** Ten live rollouts of the policy at 30 Hz with a 1 s replan, 20 s limit and safety
   checks (joint-jump guard of 0.25 rad between the commanded chunk and the measured arm, a
@@ -239,7 +239,7 @@ and the tactile VLM does not yet fully exploit it: the VLM, not the sensor, is t
 ### 4.2 What the wins look like
 
 All 26 clips where tactile FLORA is right and the video-only model is wrong are rendered as
-side-by-side videos in `videos/` (scene camera twice with each model's prediction, force trace
+side-by-side videos in `hrdexdb/videos/` (scene camera twice with each model's prediction, force trace
 below). The pattern: the video-only model under-calls successes whose hold is visually
 unremarkable (long, steady contact above the median force) and over-calls failures where the hand
 closes convincingly on camera but the force shows a weak grip, a re-grasp, or contact that ends
@@ -251,7 +251,7 @@ early. The three largest margins:
 | serving bowl #3 (dev) | failure | 4.66 | **2.29** | 1.4x grasp but only 6.7 s of contact in a 39 s clip |
 | cactus #6 (dev) | failure | 4.19 | **1.98** | 1.8x grasp, contact ends at 14.7 s of 20.2 s |
 
-The 19 clips the video-only model wins are listed in `comparison.md`; most are successes the
+The 19 clips the video-only model wins are listed in `hrdexdb/README.md`; most are successes the
 tactile model scored 3.1 to 3.8 (just under the threshold) and failures with long, strong
 contact that the force cannot distinguish from a hold.
 
@@ -348,15 +348,15 @@ FLORA at judging grasp outcomes:
 
 | What | Where |
 |---|---|
-| HRDexDB comparison, 26 win videos, 19 losses, per-clip JSON | `writeup/comparison.md`, `writeup/videos/`, `writeup/clips.json` |
-| Baxter evaluation, per-episode tables, 7 videos | `writeup/baxter-rollouts.md`, `writeup/baxter-rollouts/` |
+| HRDexDB comparison, 26 win videos, 19 losses, per-clip JSON | `writeup/hrdexdb/README.md`, `writeup/hrdexdb/videos/`, `writeup/hrdexdb/clips.json` |
+| Baxter evaluation, per-episode tables, 7 videos | `writeup/baxter-rollouts/README.md`, `writeup/baxter-rollouts/` |
 | v3 experiment record, frozen plan, force config and classifier | `docs/experiments/hrdexdb-expanded-v3.md` and its folder |
 | v2 record, splits, alignment audit | `docs/experiments/hrdexdb-expanded-v2.md` and its folder |
 | Pilot and data-quality audit | `docs/experiments/hrdexdb-pilot/` |
 | Force pipeline (resample, normalize, render, classifier) | `tactile_flora/force/` |
 | Baxter sensor stack (firmware, ROS node, recorder, calibration) | `tactile_flora/baxter/` |
 | Baxter teleop, demo collection, dataset publishing, policy rollouts | `baxter/control/` |
-| ACT policy training and publishing | `scripts/baxter_act/` |
+| ACT policy training and publishing | `baxter/act/` |
 | Baxter rollout source adapter, prep and evaluation scripts | `tactile_flora/sources/baxter_rollouts.py`, `scripts/cluster/{prepare,evaluate}_baxter_rollouts.py` |
 | Datasets | `OG7407/baxter-cube-pick-left` (demos), `OG7407/baxter-cube-pick-left-rollouts` (rollouts), `HRDexDB/HRDexDB` rev `98b8f8e` |
 | Policy | `OG7407/baxter-act-cube-left` |

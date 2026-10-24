@@ -1,8 +1,8 @@
 """Render side-by-side clips of the Baxter rollouts: fine-tuned FLORA (video only) vs tactile.
 
-Same layout as ``writeup/make_videos.py`` for HRDexDB: the head camera shown twice (one panel per
-model, each with its expected score and its rank among the ten clips) above the normalized
-fingertip force the tactile model read. No model crosses the 4.0 threshold on these clips, so a
+Same layout as ``writeup/hrdexdb/make_videos.py`` for HRDexDB: the head camera shown twice
+(one panel per model, each with its expected score and its rank among the ten clips) above the
+normalized fingertip force the tactile model read. No model crosses the 4.0 threshold on these clips, so a
 panel is green when that model ranks the clip on the correct side of the other class (a success
 above every failure, a failure below both successes) and red otherwise.
 
