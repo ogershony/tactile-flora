@@ -122,6 +122,14 @@ and recent datasets pair tactile streams with manipulation video~\cite{hrdexdb20
 force-only probes agree with that literature: force statistics alone separate HRDexDB grasp
 outcomes at AUROC 0.76 to 0.80, a real but moderate signal, weaker than video alone (0.90).
 
+\paragraph{Touch-language models.} TVL~\cite{fu2024tvl} aligns a tactile encoder with
+vision and language on 44K GelSight-style image pairs; Octopi~\cite{yu2024octopi} trains a
+tactile-language model that reasons about object properties from GelSight videos; and
+UniTouch~\cite{yang2024unitouch} binds several vision-based touch sensors to a shared embedding
+space. All three learn a tactile encoder from high-resolution tactile images. Our signal is the
+opposite case, a handful of low-dimensional force channels, and we make no architectural change:
+the force is serialized as text and read through the model's existing tokenizer.
+
 \paragraph{Sensor data as text for language models.} Serializing time series and sensor readings
 as text for a language model is a known technique~\cite{gruver2023llmtime,jin2024timellm,xu2024penetrative}. Our contribution is not the idea but the demonstration that a video reward model can learn
 to combine such a block with video under LoRA, and the controls that show it does.
@@ -131,13 +139,24 @@ to combine such a block with video under LoRA, and the controls that show it doe
 
 \subsection{Model}
 
-FLORA-Rewarder~\cite{flora2026} is a Qwen3.5-27B~\cite{qwen35} vision-language model. For the
+FLORA-Rewarder~\cite{flora2026} is a Qwen3.5-27B~\cite{qwen35} vision-language model
+(Figure~\ref{fig:arch}). For the
 outcome task it receives up to 64 frames sampled uniformly from the clip, composed into a mosaic
 of up to four camera views, and a task instruction, and answers with a score from 1 (failure) to
 5 (success). We use the released weights and prompts, one scene camera, the released frame
 sampling, and 96-pixel mosaic cells. The continuous score we evaluate is the expected score
 \Es{} over the digits 1 to 5 at the answer token, with 4.0 as the success threshold, as in the
 released evaluation.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/flora_architecture.png}
+  \caption{How the force channel enters FLORA-Rewarder. The released inference path (blue) takes
+  the video mosaic and the task text; our addition (teal) normalizes the force stream, renders it
+  as timestamped text lines and feeds them through the same tokenizer; LoRA adapters on the
+  language model (purple) are the only trained weights. No architectural change is made.}
+  \label{fig:arch}
+\end{figure}
 
 \subsection{The force block}
 
@@ -176,8 +195,9 @@ Both adapters use LoRA~\cite{hu2021lora} with rank 32 and $\alpha = 64$ on all a
 projections of the language model, with the vision encoder frozen. The target is the released
 outcome answer template with the score digit. Settings, fixed before any held-out result was read:
 four epochs, seed 17, learning rate $2 \times 10^{-5}$ with 10\% warm-up, effective batch 16,
-gradient clipping 1.0, 88 optimizer updates, final checkpoint only. Training ran on two AMD MI210
-GPUs.
+gradient clipping 1.0, 88 optimizer updates, final checkpoint only. The force normalization
+was refitted on the training clips only (median grasp 1{,}016 raw units, contact threshold 49.4).
+Training ran on two AMD MI210 GPUs.
 
 \subsection{Controls and ablations}
 
@@ -198,12 +218,17 @@ block at all and what the force carries on its own.
 \subsection{HRDexDB}
 
 HRDexDB~\cite{hrdexdb2026} records a 12-DoF Inspire DFTP hand on a UR arm grasping household
-objects in a 23-camera rig, with per-finger force at 50~Hz and a success flag per trial (object
-lifted and held). We use one fixed scene camera and the released labels. All 618 Inspire DFTP
+objects in a 23-camera rig, with per-finger force at 50~Hz (six channels; the two most loaded
+are rendered) and a success flag per trial (object lifted and held for 10~s). We use one fixed
+scene camera (id 22641005) and the released labels. Clips run 12.5 to 74.6~s (median 27.5~s), so
+every clip receives the full 64 uniformly sampled frames of the released outcome sampling. All 618 Inspire DFTP
 trials were downloaded at a pinned revision with the recorded camera timestamps, and sensor time
 was mapped to video time through them (this corrects both the start offset of 2.2 to 2.3~s and
-the clock-rate difference between the two streams). Objects were hashed into object-disjoint
-splits before any model saw them; after 17 mechanical exclusions (invalid arrays, conflicting
+the clock-rate difference between the two streams). Objects were frozen into object-disjoint
+splits before any model saw them: the pilot's train and validation objects kept their
+assignment, and the remaining objects were hash-ordered with the seed string
+\texttt{hrdexdb-v2:20261021} to reserve 16 objects for test and eight more for development;
+after 17 mechanical exclusions (invalid arrays, conflicting
 labels, undecodable video, duplicate videos), the splits are \textbf{350 train / 136 development
 / 115 test clips over 52 / 16 / 16 objects}. Test clips were scored once, with settings fixed on
 the development set.
@@ -216,21 +241,29 @@ To test transfer to our own hardware we built a tactile capture stack on a Rethi
 \paragraph{Sensor.} Four thin-film force-sensing resistors (two per gripper) in a 3.3~V divider
 with a 4.7~k$\Omega$ reference, read by a Teensy 4.0 at 200~Hz (12-bit ADC, 16-sample
 oversampling), published into ROS on the robot clock with a linear clock fit refreshed every
-5~s. Only the left gripper's pads were mounted for these rollouts. Counts are uncalibrated, with a
-resting offset of 92 counts per pad; the same normalization pipeline handles them.
+5~s. Only the left gripper's pads were mounted for these rollouts. Counts are uncalibrated (no weight calibration file was present), with a resting offset of 92
+counts per pad; the same normalization pipeline handles them, fitted label-free on the ten
+rollouts (baseline 184 counts for the two pads, median grasp 892.5, contact threshold 219).
+Gripper closure is derived from Baxter's gripper position (0 to 100, scaled to 0 to 1, open
+about 0.96) as $(0.96 - \mathrm{position})/0.92$, so a close stopped by the 40~mm cube reads
+0.64 and an empty close 1.0.
 
 \paragraph{Demonstrations and policy.} Fifty hand-guided left-arm cube picks (``pick up the red
-cube'') were recorded at 15~fps from an overhead head webcam and the left wrist camera with joint
-state and gripper position (no tactile data), each cut at the first sign of the gripper re-opening
-after its grasp, and published as a LeRobot~\cite{lerobot} dataset. An ACT policy~\cite{zhao2023act}
-(chunk 30, 15 action steps, ResNet-18 backbone, VAE) was trained for 50{,}000 steps on five RTX
+cube'') were recorded at 15~fps from a USB webcam mounted on Baxter's head and the left wrist
+camera, both at $640 \times 360$, with joint state and gripper position (no tactile data): the
+operator squeezes the cuff to put the arm in zero-gravity mode, guides it to the cube, closes the
+gripper with the cuff button and lifts. Each demo is cut at the first sign of the gripper
+re-opening after its grasp and published as a LeRobot~\cite{lerobot} (v0.6.1) dataset. An ACT
+policy~\cite{zhao2023act} (chunk size 30, 15 action steps, ResNet-18 backbone, VAE, learning rate
+$10^{-5}$, inputs: the 8-dimensional state plus both cameras) was trained for 50{,}000 steps on five RTX
 2080~Ti GPUs (global batch 65, fp16) with episodes 45 to 49 held out; held-out action L1 fell from
 0.0325 at step 5{,}000 to 0.0267 at step 50{,}000. The rollouts used the step-30{,}000 checkpoint
 (held-out L1 0.0278).
 
-\paragraph{Rollouts.} Ten live rollouts of the policy at 30~Hz with a 1~s replan, a 20~s limit and
+\paragraph{Rollouts.} Ten live rollouts of the policy, commands at 30~Hz interpolated between the
+15~Hz action rows, a 1~s replan, a 20~s limit and
 safety checks (a joint-jump guard of 0.25~rad between the commanded chunk and the measured arm, a
-fingertip box, a speed cap), recorded with the same cameras plus the 200~Hz tactile stream. The
+fingertip box, a speed cap), recorded with the same cameras plus the 200~Hz tactile stream, which the policy never reads. The
 operator labelled episodes 0 and 1 successes and the other eight failures. Episode 0 is a clean
 grasp: the gripper stops at closure 0.64 on the cube, force rises to the grasp level and holds for
 2.9~s while the arm lifts the cube 20~cm. Episode 1 was stopped by the joint-jump guard at 2.7~s
@@ -255,8 +288,12 @@ gripper's two pads were presented as the ``pad R'' lines the adapters had seen i
 \subsection{Metrics}
 
 Accuracy is the share of clips called correctly at the 4.0 threshold on \Es. AUROC is the
-probability that a random success is scored above a random failure (ties count half). MAE is on
-the 0 to 100 scale of the released evaluation. For HRDexDB, paired differences are tested with
+probability that a random success is scored above a random failure (ties count half). MAE is
+the mean absolute error of the \emph{integer} hard score against the truth score (5 for a
+success, 1 for a failure) on the 1-to-5 scale, multiplied by 100 following the FLORA
+evaluation code; it therefore ranges from 0 to 400, not 0 to 100. A model that answers ``2''
+on every clip of a set with 20\% successes scores $100 \times (0.2 \cdot 3 + 0.8 \cdot 1) = 140$,
+which is the released model's Baxter value; answering ``1'' everywhere scores 80. For HRDexDB, paired differences are tested with
 an object-level bootstrap (AUROC) and the exact McNemar test (accuracy). On Baxter, with two
 successes and eight failures, AUROC is a count over 16 ordered pairs and no significance test is
 attempted.
@@ -296,8 +333,8 @@ run-to-run training noise.
 \subsection{HRDexDB}
 
 \begin{table}[t]
-  \caption{HRDexDB held-out results. Accuracy at the 4.0 threshold, AUROC, MAE on the 0 to 100
-  scale, and recall per class. The two fine-tuned models differ only in the force block.}
+  \caption{HRDexDB held-out results. Accuracy at the 4.0 threshold, AUROC, MAE of the hard
+  score ($100 \times$ mean $|$score $-$ truth$|$ on the 1--5 scale, range 0--400), and recall per class. The two fine-tuned models differ only in the force block.}
   \label{tab:hrdexdb}
   \centering
   \small
@@ -325,12 +362,20 @@ run-to-run training noise.
   \end{tabular}
 \end{table}
 
-Table~\ref{tab:hrdexdb} gives the held-out numbers. Against the released model, the tactile
+Table~\ref{tab:hrdexdb} and Figure~\ref{fig:hrdexdb-auroc} give the held-out numbers. Against the released model, the tactile
 fine-tune adds 12.8 accuracy points and 0.27 AUROC over the 251 pooled clips. Against the matched
 video-only fine-tune, it adds 2.8 points and 0.043 AUROC, with lower MAE on both splits (52.9
 against 70.6 on development, 97.4 against 121.7 on test). The tactile model's extra correct calls
 are mostly successes: its success recall is higher on both splits while failure recall stays
 level.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\linewidth]{figures/hrdexdb_auroc.png}
+  \caption{HRDexDB held-out AUROC of the released model, the matched video-only fine-tune and
+  the tactile fine-tune on the development, test and pooled clips. The dashed line is chance.}
+  \label{fig:hrdexdb-auroc}
+\end{figure}
 
 \paragraph{Statistics.} The AUROC gain over the video-only fine-tune is $+0.043$ pooled over 251
 clips, object-level bootstrap 95\% interval $+0.001$ to $+0.080$, $p \approx 0.02$; per split it
@@ -371,7 +416,8 @@ cannot make and leaves the confident ones alone.
 video-only model wrong, the pattern is consistent: the video-only model under-calls successes
 whose hold is visually unremarkable (long, steady contact above the median force) and over-calls
 failures where the hand closes convincingly on camera but the force shows a weak grip, a
-re-grasp, or contact that ends early. The three largest margins are in Table~\ref{tab:wins}. The
+re-grasp, or contact that ends early. The three largest margins are in Table~\ref{tab:wins}; Figure~\ref{fig:standing} shows the
+first. The
 19 clips the video-only model wins are mostly successes the tactile model scored 3.1 to 3.8, just
 under the threshold, and failures with long, strong contact that force cannot distinguish from a
 hold.
@@ -394,6 +440,17 @@ hold.
   \end{tabular}
 \end{table}
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/test_standing_frame_4_success.png}
+  \caption{Frame from the side-by-side video of HRDexDB test clip standing frame \#4 (success):
+  the scene camera with each model's prediction, above the tared fingertip force the tactile
+  model read (two most loaded pads, hand closure, the 64 sampled frames as ticks). The video-only
+  fine-tune scores 1.27; the tactile model, reading 16.4~s of contact at $2.5\times$ the median
+  grasp force, scores 4.19.}
+  \label{fig:standing}
+\end{figure}
+
 \paragraph{A stacking check.} A logistic stack of the video-only score, the tactile score and the
 force-only classifier probability, fitted object-grouped on development, reaches 88.2\% / 0.928
 on development and 76.5\% / 0.800 on test; the force classifier alone gets 72.8\% / 0.787 and
@@ -406,7 +463,8 @@ given: the language model, not the sensor, is the bottleneck.
 
 \begin{table}[t]
   \caption{Six conditions on the ten Baxter rollouts (two successes). Accuracy at 4.0, AUROC over
-  the $2 \times 8$ success--failure pairs, MAE on the 0 to 100 scale, and the hard scores each
+  the $2 \times 8$ success--failure pairs, MAE of the hard score ($100 \times$ mean
+  $|$score $-$ truth$|$, range 0--400), and the hard scores each
   condition emitted.}
   \label{tab:baxter}
   \centering
@@ -451,7 +509,8 @@ given: the language model, not the sensor, is the bottleneck.
   \end{tabular}
 \end{table}
 
-Tables~\ref{tab:baxter} and~\ref{tab:baxter-eps} give the six conditions. Every accuracy is the
+Tables~\ref{tab:baxter} and~\ref{tab:baxter-eps} and Figure~\ref{fig:baxter-auroc} give the six
+conditions. Every accuracy is the
 majority-class 0.80: no model scores either success at or above 4.0, so the hard answers carry
 nothing and the comparison lives in the ranking. There the two conditions that see the clip's own
 force block rank both successes above all eight failures (AUROC 1.0), and the four that do not
@@ -479,6 +538,15 @@ on top. The force-only classifier printed in the block scores 0.5 on these clips
 with its 0.13~s hold, last), so the robot result cannot come from that line alone. The ranking is
 carried by the model reading the force text, and the direction matches HRDexDB: force helps where
 the video is ambiguous, and here the video is ambiguous on every clip.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\linewidth]{figures/baxter_auroc.png}
+  \caption{AUROC of the six conditions on the ten Baxter rollouts (two successes, eight
+  failures). Only the two conditions that see the clip's own force block rank both successes
+  above every failure.}
+  \label{fig:baxter-auroc}
+\end{figure}
 
 \begin{figure}[t]
   \centering
@@ -529,7 +597,13 @@ inspectable, which makes it a practical way to add contact sensing to the reward
 starting to label robot data at scale. The next steps are more training clips and a second hand
 to attack the data limit, calibrated fingertips and more Baxter rollouts to turn the transfer
 result into a measured one, and higher-resolution video to find out how much of the force gain
-survives a stronger visual channel.
+survives a stronger visual channel. A further step is to evaluate, or supply reward to, a
+cloud-hosted vision-language-action policy. The \texttt{baxter\_control} repository already
+holds a control loop for Dream-1~\cite{dreamlabs2026}, a Dream Labs model served through its
+API: the client sends camera frames, a text prompt and joint state and receives chunks of joint
+targets, and the service fine-tunes the model on an uploaded demonstration set. Scoring such a
+policy's rollouts with the tactile reward model, or using the reward to select its fine-tuning
+data, is the natural next use of this work.
 
 \begin{ack}
 We thank Rahul Chandra and the UCSD Supercomputing Club for the cluster on which every model in
