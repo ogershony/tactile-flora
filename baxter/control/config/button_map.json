@@ -1,0 +1,10 @@
+{
+  "_comment": "Baxter left-arm control mapping, captured 2026-10-20 (bring-up STEP 7.1). baxter_interface names -> physical control + intended teaching-UI role. Right arm mirrors with 'right_' prefix (verify separately).",
+  "zero_g_squeeze": {"name": "left_lower_cuff", "kind": "DigitalIO", "true_when": "cuff squeezed", "role": "hold to move arm by hand (zero-G teaching)"},
+  "cuff_oval_button": {"name": "left_lower_button", "kind": "DigitalIO", "role": "teach: CAPTURE keyframe (confirmed oval=left_lower_button 2026-10-20)"},
+  "cuff_other_button": {"name": "left_upper_button", "kind": "DigitalIO", "role": "teach: toggle gripper open/close"},
+  "nav_button0": {"name": "button0", "kind": "Navigator", "role": "menu select"},
+  "nav_button1": {"name": "button1", "kind": "Navigator", "role": "menu"},
+  "nav_button2": {"name": "button2", "kind": "Navigator", "role": "menu"},
+  "nav_wheel": {"name": "wheel", "kind": "Navigator", "base_value": 250, "role": "scroll menus"}
+}

@@ -1,7 +1,7 @@
 # Handoff: evaluate baseline, fine-tuned and fine-tuned tactile FLORA on the Baxter rollouts
 
 **Status 2026-10-24:** this run completed on the SDSC node matthew (Slurm job 6490, 8 min);
-the results are in `writeup/baxter-rollouts.md`. The steps below remain the way to reproduce
+the results are in `writeup/baxter-rollouts/README.md`. The steps below remain the way to reproduce
 it elsewhere, or to re-run with a different adapter.
 
 Instructions for a Claude Code session on a machine with GPU compute. Everything below was
@@ -15,9 +15,7 @@ page before running anything.
 > tactile FLORA outperformed baseline and fine-tuned FLORA. Write it all up in a nice write-up.
 > Success is on episodes 0 and 1.
 
-The user first asked for "tactile-v4"; that adapter does not exist (lost with a Colab runtime,
-see `writeup/v4-results.md` on branch `plan-v4`), and the user then said to use the v3 adapters.
-So the three models are:
+The three models are the v3 tactile adapter, its video-only control and released FLORA:
 
 | Name | Checkpoint | Where it lives |
 |---|---|---|
@@ -47,7 +45,7 @@ Branch `hrdexdb-v3-force-representation` (pushed), commits 53903bf and later:
 - `scripts/cluster/evaluate_baxter_rollouts.py`: six cells, each checkpoint in a fresh
   interpreter: released omitted + real, control omitted, force real + shuffled + omitted.
   Writes `<base>/evaluation-result.json` with metrics and per-episode predictions.
-- `writeup/baxter-rollouts.md`: the write-up with data, method and figure sections done and a
+- `writeup/baxter-rollouts/README.md`: the write-up with data, method and figure sections done and a
   `RESULTS_PLACEHOLDER` line where the model results go. `writeup/baxter-rollouts/force_traces.png`
   is the per-rollout force figure.
 - Tests: `tests/unit/test_sources_baxter_rollouts.py`; the full suite passed.
@@ -123,7 +121,7 @@ account OG7407) so the private adapter repos and the dataset resolve.
    `no_logprobs` are 0 in every `metrics.json`. If a cell crashes, rerun with `--worker N`
    (0 released, 1 control, 2 force) after fixing the cause; completed cells are overwritten.
 
-6. **Fill in the write-up.** Replace `RESULTS_PLACEHOLDER` in `writeup/baxter-rollouts.md` with:
+6. **Fill in the write-up.** Replace `RESULTS_PLACEHOLDER` in `writeup/baxter-rollouts/README.md` with:
    - a headline table (one row per cell: accuracy at the 4.0 threshold, AUROC, MAE on the
      0-100 scale, how many of the 2 successes and 8 failures each model got right);
    - a per-episode table of expected score E[s] for every cell (10 rows x 6 columns), bold the
@@ -136,7 +134,7 @@ account OG7407) so the private adapter repos and the dataset resolve.
      from a dexterous hand to a parallel gripper; 96 px head-camera thumbnails; episode 1's
      contact begins 0.03 s before its last frame; normalization fitted on the test clips
      themselves (unavoidable without a Baxter training set, and label-free).
-   Keep the write-up style of `writeup/comparison.md`: plain sentences, tables, no hype.
+   Keep the write-up style of `writeup/hrdexdb/README.md`: plain sentences, tables, no hype.
    Also update the memory/notes line in `docs/status.md` if the repo convention asks for it.
 
 7. **Commit and push** to `hrdexdb-v3-force-representation`: the write-up, the

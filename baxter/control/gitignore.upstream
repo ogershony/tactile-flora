@@ -1,0 +1,24 @@
+ros_ws/build/
+ros_ws/devel/
+ros_ws/install/
+ros_ws/baxter.sh
+ros_ws/.catkin_workspace
+
+# host-side Python 3 venv for the bridge (recreate from bridge/requirements.txt)
+.venv/
+__pycache__/
+*.pyc
+
+# captured camera frames
+*.jpg
+.venv-dream/
+*.zip
+
+# dream_control.py per-run CSV logs
+logs/
+
+# recorded demonstrations (LeRobot v2.1 sessions for Dream fine-tuning)
+demos/
+.venv-lerobot/
+models/
+rollouts/

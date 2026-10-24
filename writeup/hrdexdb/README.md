@@ -3,7 +3,7 @@
 Date: 2026-10-22. Branch `hrdexdb-v3-force-representation`. Everything here is read from the
 finished evaluation cells under `data/acceptance/hrdexdb-expanded-{v2,v3}/eval`; no model was
 re-run to produce this write-up. Videos and poster frames are in `videos/`, per-clip numbers in
-`clips.json`, and `make_videos.py` regenerates all of it.
+`clips.json`, and `make_videos.py` (in this folder) regenerates all of it.
 
 ## What was compared
 

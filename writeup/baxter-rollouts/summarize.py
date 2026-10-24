@@ -1,4 +1,4 @@
-"""Print the result tables of writeup/baxter-rollouts.md from the finished evaluation cells.
+"""Print the result tables of writeup/baxter-rollouts/README.md from the finished evaluation cells.
 
 Reads ``<base>/eval/<tag>/baxter_rollouts/<mode>/{metrics.json,predictions.parquet}`` and the
 representation audit (labels, force-only classifier probability) and writes markdown to stdout.

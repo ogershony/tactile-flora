@@ -14,3 +14,10 @@ build/
 # local
 .env
 .DS_Store
+
+# LaTeX byproducts
+writeup/paper/*.aux
+writeup/paper/*.bbl
+writeup/paper/*.blg
+writeup/paper/*.log
+writeup/paper/*.out

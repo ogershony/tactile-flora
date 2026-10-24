@@ -1,0 +1,21 @@
+{
+  "_comment": "Baxter neutral/untucked working pose, captured 2026-10-20 (bring-up STEP 3.4). Use as 'rest' in skill files. Angles in radians.",
+  "left": {
+    "left_s0": -0.1519,
+    "left_s1": -0.9254,
+    "left_e0": -1.1091,
+    "left_e1": 1.9056,
+    "left_w0": 0.6857,
+    "left_w1": 0.958,
+    "left_w2": -0.4882
+  },
+  "right": {
+    "right_s0": 0.0986,
+    "right_s1": -0.9549,
+    "right_e0": 1.1386,
+    "right_e1": 1.9221,
+    "right_w0": -0.6527,
+    "right_w1": 0.9837,
+    "right_w2": 0.4694
+  }
+}

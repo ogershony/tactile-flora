@@ -69,9 +69,7 @@ def header(name: str, base: Path, *, gpus: bool, hours: int) -> str:
     return "\n".join(lines)
 
 
-def write_scripts(
-    base: Path, tag: str, force_run: str, control_run: str, force_modes: str
-) -> dict:
+def write_scripts(base: Path, tag: str, force_run: str, control_run: str, force_modes: str) -> dict:
     """Write the five batch scripts of one fold; return their paths."""
     jobs = base / "jobs"
     jobs.mkdir(exist_ok=True)

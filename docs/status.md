@@ -46,7 +46,7 @@ data/config hashes match its frozen plan. Recovery changed no core model files o
 inputs. Details and evaluator repair hashes: `data/acceptance/hrdexdb-expanded-v5/evaluation-repair.json`.
 
 Validation after the repair: **401 tests passed**; Pyright and Ruff checks for the changed
-Python files pass. See [the experiment plan](../writeup/v4-plan.md) for the preceding recipe
+Python files pass. See [the experiment plan](archive/v4-plan.md) for the preceding recipe
 decisions and cancelled fold experiments.
 
 ## Earlier expanded development results
