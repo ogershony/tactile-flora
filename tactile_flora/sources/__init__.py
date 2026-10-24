@@ -3,6 +3,7 @@
 from tactile_flora.sources import (  # noqa: F401
     airoa,
     baxter,
+    baxter_rollouts,
     hrdexdb,
     phantom,
     reassemble,

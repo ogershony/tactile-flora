@@ -27,6 +27,7 @@ SOURCES = [
     "hrdexdb",
     "softvtbench",
     "baxter",
+    "baxter_rollouts",
 ]
 
 

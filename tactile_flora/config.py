@@ -49,6 +49,11 @@ class SourceConfig(_Strict):
     # different units share one set of normalization constants (fitted on training trials
     # only, e.g. {"inspire_f1": 2.9} brings the F1 median grasp onto the DFTP scale).
     hrdexdb_hand_scale: dict[str, float] = Field(default_factory=dict)
+    # Baxter rollouts (LeRobot v3): the one instrumented gripper's pads are presented under this
+    # arm letter ("R" matches the HRDexDB-trained adapters, which only saw ``pad R`` lines),
+    # and only the listed cameras (by their short video key: head, wrist) become VideoRefs.
+    baxter_rollouts_arm: Literal["L", "R"] = "L"
+    baxter_rollouts_cameras: list[str] = Field(default_factory=lambda: ["head"])
     seed: int
 
 
