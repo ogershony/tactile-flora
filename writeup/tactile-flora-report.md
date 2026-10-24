@@ -1,7 +1,7 @@
 # Tactile FLORA: adding fingertip force to a vision-language reward model
 
 Experiment report. Date 2026-10-24. Branch `hrdexdb-v3-force-representation`. Authors: Oren
-Gershony and collaborators (Triton Droids / SDSC). Companion files: `hrdexdb/README.md` (HRDexDB
+Gershony, Aaryan Patel, Kenan Blair and Parth Trivedi (Triton Droids, UC San Diego). Companion files: `hrdexdb/README.md` (HRDexDB
 results and the 26 win videos), `baxter-rollouts/README.md` (the Baxter robot evaluation and its videos),
 `paper/` (NeurIPS-style manuscript) and `slides/` (deck). Everything in this report is read from
 finished evaluation cells on disk; no number was produced for this document by re-running a model.
@@ -194,7 +194,7 @@ cells (released omitted/real, control omitted, tactile real/shuffled/omitted) ra
 ### 4.1 HRDexDB held-out results
 
 Accuracy at the 4.0 threshold; AUROC is the probability a random success is scored above a random
-failure; MAE on the 0 to 100 scale.
+failure; MAE is the mean |score - truth| on the 1 to 5 scale, times 100 (so it can exceed 100).
 
 | Split | Model | Accuracy | AUROC | MAE | Success recall | Failure recall |
 |---|---|---:|---:|---:|---:|---:|
@@ -257,7 +257,7 @@ contact that the force cannot distinguish from a hold.
 
 ### 4.3 Baxter rollouts
 
-Six cells on ten clips. Accuracy at 4.0; AUROC over the 2 x 8 success-failure pairs; MAE 0 to 100.
+Six cells on ten clips. Accuracy at 4.0; AUROC over the 2 x 8 success-failure pairs; MAE as above (1 to 5 scale, times 100).
 
 | Condition | Accuracy | AUROC | MAE | Hard scores given |
 |---|---:|---:|---:|---|

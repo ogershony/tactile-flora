@@ -85,7 +85,7 @@ rationale.
 
 ### Headline
 
-Accuracy at the 4.0 threshold on E[s]; AUROC over the 2 successes x 8 failures pairs; MAE on the 0-100 scale.
+Accuracy at the 4.0 threshold on E[s]; AUROC over the 2 successes x 8 failures pairs; MAE: mean |score - truth| on the 1 to 5 scale, times 100.
 
 | Model | Accuracy | AUROC | MAE | Successes right (of 2) | Failures right (of 8) | Hard scores given |
 |---|---:|---:|---:|---:|---:|---|

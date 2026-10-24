@@ -5,7 +5,9 @@ the FLORA-Rewarder prompt, LoRA fine-tune), the controls, the four-stage process
 results and statistics, the shuffled-force and video-blank diagnostics, one win clip, the Baxter
 robot setup and its zero-shot result, caveats, and next steps. Every number is copied from
 `writeup/tactile-flora-report.md` (which cites `hrdexdb/README.md` and `baxter-rollouts/README.md`);
-nothing is recomputed in the build.
+nothing is recomputed in the build. The MAE figures on slides 7 to 9 are the harness's `mae`
+metric (`tactile_flora/eval/metrics.py`): the mean |score - truth| on the 1 to 5 scale times 100,
+so they can exceed 100 and are labelled that way on the slides.
 
 ## Files
 
@@ -36,7 +38,8 @@ force block. Palette: ink `1F2937`, blue accent `2A6FB0` (the tactile model), or
 (force), card tint `EEF2F6`, dark slate `17212B` for the first and last slide.
 
 Checks run on 2026-10-24: the pptx skill's `validate.py` passes; a geometric estimate found no
-text box overflowing its frame and no shape off the slide. The PDF was rendered with
+text box overflowing its frame and no shape off the slide; slides 1, 7 to 9, 12 and 13 of the
+PDF were rendered to PNG and inspected after the last rebuild. The PDF was rendered with
 
 ```sh
 apptainer exec docker://linuxserver/libreoffice:latest \
